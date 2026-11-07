@@ -15,7 +15,8 @@ Audit of every cue in the game against the rules in the architecture doc: nothin
 | Progress through a word | Strip cells: filled is done, thick outline is now, thin outline is next | Fill and line weight | None |
 | Result per letter (rhythm, music) | Strip cell in green, yellow, orange, or red | Dots under the letter (3 Perfect, 2 Good, 1 OK) and a strike for Miss | None |
 | Unplayable menu row | Dimmed, with "Needs ..." | Text | None |
-| Settings toggles | "On" or "Off" in the label | Text | Click |
+| Settings toggles (in the Settings panel) | "On" or "Off" in the label | Text | Click |
+| J and Z path | Dashed guide with an arrowhead and a moving dot; your stroke as a trail | Shape and motion | None |
 | Recording | Dot with "REC" | Text | None |
 
 ## Options

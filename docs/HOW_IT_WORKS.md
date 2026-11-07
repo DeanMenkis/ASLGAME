@@ -73,6 +73,7 @@ Anything with phases is an explicit `Enum` with its transitions in one place:
 - **App** (`game/app_flow.py`): Boot, Menu, Learn, Recall, Rhythm, Music, Paused, Results.
 - **Match detector**: No hand, Searching, Holding, Matched.
 - **Note** in rhythm modes: Waiting, Approaching, Hittable, Hit or Missed, Done.
+- **Motion** for J and Z (`game/motion.py`): No hand, Shaping, Drawing, Done.
 
 ## The modes
 
@@ -80,6 +81,10 @@ Anything with phases is an explicit `Enum` with its transitions in one place:
 - **Recall**: only the letter is shown; sign it from memory. Tab shows a hint.
 - **Rhythm**: letters arrive on a beat; speed goes up when you do well and down when you struggle.
 - **Music**: like Rhythm, locked to a song's tempo.
+
+## J and Z
+
+J and Z are drawn in the air, so a still shape is not enough. For these, the game checks which fingers are straight (pinky for J, index for Z), then follows that fingertip and compares its path to the letter's path, ignoring size and speed. The path is shown as a dashed guide with a moving dot, and your own stroke as a yellow trail.
 
 ## Where the letter shapes come from
 

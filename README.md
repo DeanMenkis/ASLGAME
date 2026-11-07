@@ -49,6 +49,7 @@ curl -L -o models/hand_landmarker.task https://storage.googleapis.com/mediapipe-
 ```
 
 - Double-click `ASLGAME.command`, or run `.venv/bin/python -m aslgame`: the game. Mouse or keyboard; press H or the ? button for keys.
+- All 26 letters. J and Z are drawn in the air: make the handshape, then trace the path shown.
 - Modes: **Learn** (match the outline, no timer), **Recall** (sign from memory, Tab for a hint), **Rhythm** (signs on a beat, speed adapts), **Music** (signs on a song).
 - `.venv/bin/python -m aslgame.tools.make_demo_track`: writes the two synthesized songs (Warm-up 90, Hardstyle 150) to `media/`.
 - The other songs are free tracks from OpenGameArt; see [Credits](docs/CREDITS.md) for links. Save each into `media/` under the name its chart in `data/charts/` expects (for example `bouncer.mp3`).
@@ -74,6 +75,6 @@ On first run macOS asks for camera access for the app that launched Python, such
 
 ## Scope and limits
 
-This is a learning tool, not a translator. It supports a defined set of handshapes and does not understand full ASL grammar, movement, or facial expression. See the roadmap for what is currently supported.
+This is a learning tool, not a translator. It supports the fingerspelled alphabet (J and Z by their drawn path) and does not understand word signs, full ASL grammar, or facial expression. See the roadmap for what is currently supported.
 
 This project is private and for demo use only. Media files are kept out of the repo.

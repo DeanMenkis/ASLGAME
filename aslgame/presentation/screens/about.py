@@ -16,8 +16,8 @@ CREDITS = (
 LIMITS = (
     "A learning aid, not a translator",
     "Fingerspelled letters only, not word signs",
-    "J and Z need motion and are left out",
-    "Handshape only: no movement, place, or face",
+    "J and Z: the shape and path, not every detail",
+    "No palm orientation, location, or face checks",
     "Letter shapes not yet checked by a fluent signer",
     "One hand at a time, in good light",
 )

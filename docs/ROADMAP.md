@@ -49,9 +49,11 @@ Build the core first, then the game on top. Each phase should run end to end bef
 - [x] More songs, charted automatically
 - [x] Per-letter judgement colors in the strip
 - [x] Low light warning
+- [x] J and Z as motion signs: handshape plus a drawn path
+- [x] Settings panel in place of header toggles
 
 ## Open questions
 
 - Review of the letter templates by a fluent signer
-- Whether to add motion signs (J, Z, and common word signs)
+- Whether to add common word signs, which need movement and location
 - Detecting backlight, not just low light

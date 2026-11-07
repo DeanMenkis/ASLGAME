@@ -97,3 +97,11 @@ Recall marks letters signed from memory like a Perfect and letters that needed a
 ## Songs are charted from the phrase list
 
 The chart tool fills each song with the phrase list, so every song practises real words rather than random letters.
+
+## J and Z by finger straightness and path
+
+Dataset samples of J and Z were caught mid-stroke, so their average shape is a blur. Instead the game checks which fingers are straight, which holds however the wrist turns, then matches the fingertip's path after resampling it by distance and scaling it to unit size. Speed and size do not matter; direction and shape do. Reversed, mirrored, and straight strokes are rejected in tests.
+
+## One Settings button
+
+Four header controls (About, two toggles, keys) competed with the title. Settings now holds the toggles and About, leaving the header with the title, Settings, and the keys button.
