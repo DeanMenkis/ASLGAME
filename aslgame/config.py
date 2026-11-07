@@ -80,6 +80,9 @@ PERFECT_WINDOW_S = 0.15
 GOOD_WINDOW_S = 0.3
 HIT_WINDOW_S = 0.5
 FEEDBACK_S = 0.5
+
+# Music mode stops at this length, whatever the song's chart holds.
+MUSIC_MAX_S = 30.0
 COMBO_CAP = 50
 COMBO_STEP = 25
 PERFECT_STREAK_BONUS = 0.1

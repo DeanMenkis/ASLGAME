@@ -3,6 +3,7 @@
 import json
 from dataclasses import dataclass
 
+from aslgame import config
 from aslgame.game.rhythm import RhythmSession
 from aslgame.game.sign_queue import make_queue
 
@@ -30,10 +31,18 @@ def load_charts(charts_dir):
 def make_session(chart):
     """A rhythm session locked to the song: fixed tempo, notes from the chart."""
     queue = make_queue(chart.text)
+    signs = [queue.text[index] for index in queue.positions]
     return RhythmSession(
-        [queue.text[index] for index in queue.positions],
+        signs[:note_count(chart)],
         bpm=chart.bpm,
         beats_per_note=chart.beats_per_note,
         adaptive=False,
         next_due_s=chart.first_note_s,
     )
+
+
+def note_count(chart):
+    """How many notes fit in the music time limit, counting the last note's hit window and feedback."""
+    interval_s = chart.beats_per_note * 60.0 / chart.bpm
+    last_due_s = config.MUSIC_MAX_S - config.HIT_WINDOW_S - config.FEEDBACK_S
+    return max(1, int((last_due_s - chart.first_note_s) // interval_s) + 1)

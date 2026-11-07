@@ -114,3 +114,16 @@ class AppFlowTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MusicLengthTest(unittest.TestCase):
+    def test_every_chart_fits_the_time_limit(self):
+        from pathlib import Path
+        from aslgame.game.chart import load_charts, make_session
+
+        for chart in load_charts(Path(__file__).resolve().parent.parent / "data" / "charts"):
+            session = make_session(chart)
+            interval_s = chart.beats_per_note * 60.0 / chart.bpm
+            last_due_s = chart.first_note_s + (len(session.signs) - 1) * interval_s
+            self.assertLessEqual(last_due_s + config.HIT_WINDOW_S + config.FEEDBACK_S, config.MUSIC_MAX_S, chart.name)
+            self.assertGreater(len(session.signs), 5, chart.name)
