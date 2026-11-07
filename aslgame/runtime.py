@@ -34,14 +34,31 @@ def make_fonts():
     )
 
 
+def fit_window(size_px):
+    """Grow the window to fill most of the screen at the same aspect. Skipped if SDL cannot resize it."""
+    desktop_w, desktop_h = pygame.display.get_desktop_sizes()[0]
+    scale = min(desktop_w * config.WINDOW_SCREEN_FRACTION / size_px[0], desktop_h * config.WINDOW_SCREEN_FRACTION / size_px[1])
+    if scale <= 1:
+        return
+    try:
+        from pygame._sdl2.video import Window
+        window = Window.from_display_module()
+        window.size = (int(size_px[0] * scale), int(size_px[1] * scale))
+        window.position = pygame.WINDOWPOS_CENTERED
+    except (ImportError, pygame.error):
+        return
+
+
 class Runtime:
     def __init__(self, title):
         pygame.mixer.pre_init(config.AUDIO_RATE_HZ, config.AUDIO_SAMPLE_BITS, config.AUDIO_CHANNELS, config.AUDIO_BUFFER_SAMPLES)
         pygame.init()
         self.camera = Camera()
         self.tracker = Tracker(self.camera.frames)
-        self.screen = pygame.display.set_mode(self.camera.size_px)
+        # SCALED keeps a fixed drawing size and lets the window grow, so layout and mouse positions never change.
+        self.screen = pygame.display.set_mode(self.camera.size_px, pygame.SCALED | pygame.RESIZABLE)
         pygame.display.set_caption(title)
+        fit_window(self.camera.size_px)
         self.fonts = make_fonts()
         self.debug = DebugOverlay(self.fonts.small)
         self.clock = pygame.time.Clock()
@@ -67,6 +84,8 @@ class Runtime:
             return True
         if event.type == pygame.KEYDOWN and event.key == pygame.K_F3:
             self.debug.toggle()
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+            pygame.display.toggle_fullscreen()
         return False
 
     def end_frame(self):

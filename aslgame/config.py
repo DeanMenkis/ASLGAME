@@ -24,10 +24,15 @@ AUDIO_RATE_HZ = 44100
 AUDIO_BUFFER_SAMPLES = 512
 AUDIO_SAMPLE_BITS = -16  # signed 16-bit
 AUDIO_CHANNELS = 2
+# Mixer voices, so effects can overlap the music and each other.
+AUDIO_CHANNEL_COUNT = 16
+SFX_VOLUME = 0.5
 
 # Main loop
 TARGET_FPS = 60
 WINDOW_TITLE = "ASLGAME"
+# The window opens at this share of the screen and can be resized or made fullscreen with F.
+WINDOW_SCREEN_FRACTION = 0.92
 
 # Tracking
 MAX_HANDS = 1
@@ -52,6 +57,7 @@ FINGER_HINT_LIMIT = 0.55
 
 # Learn mode. J and Z need motion, which handshape templates cannot capture.
 LEARN_WORDS = ("HI", "ASL", "CAB", "LOVE", "GOOD DAY", "THANK YOU")
+ALPHABET_LABEL = "A to Y"
 
 # Rhythm mode
 RHYTHM_BPM = 90

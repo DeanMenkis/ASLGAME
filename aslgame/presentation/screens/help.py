@@ -11,7 +11,7 @@ SECTIONS = (
     ("Playing", (("Esc  P", "Pause"),)),
     ("Paused", (("Esc  Space", "Resume"), ("M", "Menu"))),
     ("Results", (("R", "Retry"), ("M", "Menu"))),
-    ("Anywhere", (("F3", "Performance"),)),
+    ("Anywhere", (("C", "Finger colors"), ("S", "Sound"), ("F", "Fullscreen"), ("F3", "Performance"))),
 )
 CLOSE_KEYS = (pygame.K_ESCAPE, pygame.K_h, pygame.K_RETURN, pygame.K_SPACE)
 COLUMN_WIDTH_PX = theme.GRID_PX * 40
