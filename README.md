@@ -64,7 +64,7 @@ On first run macOS asks for camera access for the app that launched Python, such
 
 ## Docs
 
-- [How it works](docs/HOW_IT_WORKS.md): start here, a short tour of the code
+- [How it works](docs/HOW_IT_WORKS.md): start here, a one-minute overview
 - [Coding standards](docs/CODING_STANDARDS.md): how we write code
 - [Architecture](docs/ARCHITECTURE.md): how the program is shaped
 - [Roadmap](docs/ROADMAP.md): what's done, what's next
