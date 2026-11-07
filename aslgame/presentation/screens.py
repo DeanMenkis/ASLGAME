@@ -106,6 +106,7 @@ class LearnScreen:
         self.queue = make_queue(word)
         self._detector = MatchDetector()
         self._score = 0.0
+        self._scored_result = None
         self._strip = Strip(fonts.medium, self.queue, size_px)
         self._letters = {name: fonts.large.render(name, True, theme.INK) for name in set(self.queue.text) - {" "}}
         self._idle_wrist = (size_px[0] / 2 + theme.IDLE_GHOST_OFFSET_PX[0], size_px[1] / 2 + theme.IDLE_GHOST_OFFSET_PX[1], 0)
@@ -128,11 +129,15 @@ class LearnScreen:
         if self.queue.is_done():
             return None
         hand = result.hand if result else None
-        sign = self._signs[self.queue.current_sign()]
-        self._score = matcher.score(normalize(hand.points_px, hand.is_left), sign.samples) if hand else 0.0
+        if result is not self._scored_result:
+            # Scoring runs once per tracking result, not once per frame.
+            self._scored_result = result
+            sign = self._signs[self.queue.current_sign()]
+            self._score = matcher.target_score(normalize(hand.points_px, hand.is_left), sign, self._signs) if hand else 0.0
         if match_detector.update(self._detector, now_s, self._score if hand else None):
             self.queue.advance()
             self._detector = MatchDetector()
+            self._scored_result = None
         return None
 
     def draw(self, screen, now_s, hand):

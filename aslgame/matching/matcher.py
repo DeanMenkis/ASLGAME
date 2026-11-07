@@ -23,3 +23,12 @@ def best_match(hand, signs):
         if sign_score > best_score:
             best_name, best_score = sign.name, sign_score
     return best_name, best_score
+
+
+def target_score(hand, target, signs):
+    """Score against the target, or 0.0 when another sign fits clearly better. Stops look-alikes passing."""
+    target_value = score(hand, target.samples)
+    for sign in signs.values():
+        if sign.name != target.name and score(hand, sign.samples) > target_value + config.MATCH_RIVAL_MARGIN:
+            return 0.0
+    return target_value

@@ -61,6 +61,12 @@ class MatcherTest(unittest.TestCase):
         self.assertEqual(matcher.best_match(a, signs)[0], "A")
         self.assertEqual(matcher.best_match(b, signs)[0], "B")
 
+    def test_target_score_rejects_clearly_better_rival(self):
+        a, b = normalize(random_hand(), False), normalize(random_hand(), False)
+        signs = {"A": make_sign("A", [a]), "B": make_sign("B", [b])}
+        self.assertEqual(matcher.target_score(a, signs["B"], signs), 0.0)
+        self.assertAlmostEqual(matcher.target_score(a, signs["A"], signs), 1.0)
+
     def test_best_match_without_signs(self):
         self.assertEqual(matcher.best_match(np.zeros((21, 3)), {}), (None, 0.0))
 
