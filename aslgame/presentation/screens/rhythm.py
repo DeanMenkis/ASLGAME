@@ -35,9 +35,10 @@ class RhythmScreen:
         self._top_bar = TopBar(size_px)
         self._fix_hint = FixHint(fonts)
         self._idle_wrist = idle_wrist(size_px)
-        self._judgements = {j: fonts.medium.render(text, True, theme.ACCENT if j != Judgement.MISS else theme.FINGER_FIX)
+        self._judgements = {j: fonts.medium.render(text, True, theme.JUDGEMENT_COLORS[j.name])
                             for j, text in JUDGEMENT_TEXT.items()}
         self._sfx = sfx
+        self._strip_judgements = []
         self._hud_values = None
         self._hud = []
 
@@ -61,12 +62,15 @@ class RhythmScreen:
             if judgement != Judgement.MISS and self.session.combo and self.session.combo % COMBO_CHEER == 0:
                 self._sfx.play("combo")
         self.queue.current = len(self.session.results)
+        # Kept in step with results here, so drawing never builds a new list.
+        while len(self._strip_judgements) < len(self.session.results):
+            self._strip_judgements.append(self.session.results[len(self._strip_judgements)][1])
         return Action.FINISH if self.session.is_finished() else None
 
     def draw(self, screen, now_s, hand):
         game_s = self.clock.time(now_s)
         self._top_bar.draw(screen)
-        self._strip.draw(screen)
+        self._strip.draw(screen, self._strip_judgements)
         target = self.session.target()
         center_px, hit_radius_px = self._hit_ring(hand)
         if target is not None:

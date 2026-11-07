@@ -38,10 +38,10 @@ class ResultsScreen:
         for surface in (
             fonts.large.render(str(results.score), True, theme.INK),
             fonts.medium.render(f"{results.accuracy:.0%} accuracy    x{results.max_combo} best combo", True, theme.INK),
-            fonts.body.render("    ".join(f"{JUDGEMENT_TEXT[j]} {results.counts[j]}" for j in Judgement), True, theme.INK_DIM),
         ):
             draw_text_centered(card, surface, (center_x_px, y_px))
             y_px += surface.get_height() + theme.GRID_PX * 2
+        y_px += draw_counts(card, fonts, results, center_x_px, y_px) + theme.GRID_PX * 2
         if results.weakest:
             y_px += theme.GRID_PX * 2
             draw_text_centered(card, fonts.small.render("PRACTISE", True, theme.ACCENT), (center_x_px, y_px))
@@ -77,3 +77,14 @@ class ResultsScreen:
         screen.blit(self._card, self._card_rect)
         for index, button in enumerate(self._buttons):
             button.draw(screen, focused=index == self._focus)
+
+
+def draw_counts(card, fonts, results, center_x_px, y_px):
+    """Judgement counts in a row, each in its judgement's color. Returns the row height."""
+    pieces = [fonts.body.render(f"{JUDGEMENT_TEXT[j]} {results.counts[j]}", True, theme.JUDGEMENT_COLORS[j.name]) for j in Judgement]
+    gap_px = theme.GRID_PX * 4
+    x_px = center_x_px - (sum(piece.get_width() for piece in pieces) + gap_px * (len(pieces) - 1)) / 2
+    for piece in pieces:
+        card.blit(piece, piece.get_rect(midleft=(x_px, y_px)))
+        x_px += piece.get_width() + gap_px
+    return pieces[0].get_height()
