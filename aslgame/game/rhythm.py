@@ -127,7 +127,9 @@ def update(session, game_s, target_score):
 def spawn_notes(session, game_s):
     beat_s = session.beat_s()
     approach_s = config.APPROACH_BEATS * beat_s
-    while session.next_index < len(session.signs) and session.next_due_s - approach_s <= game_s:
+    # Spawned a beat before the approach starts, so the next sign is always shown.
+    spawn_ahead_s = approach_s + beat_s
+    while session.next_index < len(session.signs) and session.next_due_s - spawn_ahead_s <= game_s:
         session.notes.append(Note(session.signs[session.next_index], session.next_due_s, approach_s))
         session.due_times.append(session.next_due_s)
         session.next_index += 1
