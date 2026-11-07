@@ -51,6 +51,7 @@ Build the core first, then the game on top. Each phase should run end to end bef
 - [x] Low light warning
 - [x] J and Z as motion signs: handshape plus a drawn path
 - [x] Settings panel in place of header toggles
+- [x] Arcade scoring: multiplier from combo, Perfect streak, and speed; score pops, particles, combo banners, grades
 
 ## Open questions
 

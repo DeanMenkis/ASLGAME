@@ -82,6 +82,10 @@ Anything with phases is an explicit `Enum` with its transitions in one place:
 - **Rhythm**: letters arrive on a beat; speed goes up when you do well and down when you struggle.
 - **Music**: like Rhythm, locked to a song's tempo.
 
+## Scoring
+
+Each hit is worth 300, 100, or 50 points (Perfect, Good, OK) times a multiplier. The multiplier grows with your combo, with a run of Perfects in a row, and with speed in Rhythm mode, and resets on a miss (except the speed part). Every hit shows a "+points" pop and a particle burst; combos of 10, 25, 50, and 100 get a banner. Results give a grade from S to D by accuracy. The rules are in `game/rhythm.py`; the effects are in `presentation/arcade.py`.
+
 ## J and Z
 
 J and Z are drawn in the air, so a still shape is not enough. For these, the game checks which fingers are straight (pinky for J, index for Z), then follows that fingertip and compares its path to the letter's path, ignoring size and speed. The path is shown as a dashed guide with a moving dot, and your own stroke as a yellow trail.
