@@ -23,7 +23,7 @@ def draw_hand(screen, points_px, color, line_px, joint_radius_px, filled):
     xy = points_px[:, :2].tolist()
     for start, end in BONES:
         pygame.draw.line(screen, color, xy[start], xy[end], line_px)
-    joint_width_px = 0 if filled else line_px
+    joint_width_px = 0 if filled else theme.JOINT_OUTLINE_PX
     for point in xy:
         pygame.draw.circle(screen, color, point, joint_radius_px, joint_width_px)
 
