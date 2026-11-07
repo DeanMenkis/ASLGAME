@@ -15,6 +15,7 @@ class DetectorState(Enum):
 
 @dataclass
 class MatchDetector:
+    hold_s: float = config.MATCH_HOLD_S
     state: DetectorState = DetectorState.NO_HAND
     hold_started_s: float = 0.0
     hold_fraction: float = 0.0
@@ -39,7 +40,7 @@ def update(detector, now_s, score):
             detector.state = DetectorState.SEARCHING
             detector.hold_fraction = 0.0
             return False
-        detector.hold_fraction = min(1.0, (now_s - detector.hold_started_s) / config.MATCH_HOLD_S)
+        detector.hold_fraction = min(1.0, (now_s - detector.hold_started_s) / detector.hold_s)
         if detector.hold_fraction >= 1.0:
             detector.state = DetectorState.MATCHED
             return True

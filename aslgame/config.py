@@ -41,6 +41,30 @@ MATCH_RIVAL_MARGIN = 0.05
 # Learn mode. J and Z need motion, which handshape templates cannot capture.
 LEARN_WORDS = ("HI", "ASL", "CAB", "LOVE", "GOOD DAY", "THANK YOU")
 
+# Rhythm mode
+RHYTHM_BPM = 90
+BEATS_PER_NOTE = 4
+APPROACH_BEATS = 3
+RHYTHM_LEAD_IN_S = 3.0
+RHYTHM_REPEATS = 3
+# A short hold still filters single-frame flickers without slowing play down.
+RHYTHM_HOLD_S = 0.15
+PERFECT_WINDOW_S = 0.15
+GOOD_WINDOW_S = 0.3
+HIT_WINDOW_S = 0.5
+# Added to the player's timing to cancel camera and tracking delay. Tuned in music mode.
+LATENCY_OFFSET_S = 0.0
+FEEDBACK_S = 0.5
+COMBO_CAP = 50
+COMBO_STEP = 25
+SPEED_WINDOW_NOTES = 4
+SPEED_UP_ACCURACY = 0.8
+SPEED_DOWN_ACCURACY = 0.4
+SPEED_STEP = 1.1
+SPEED_MIN = 0.75
+SPEED_MAX = 2.0
+RESULTS_WEAKEST_COUNT = 3
+
 # Dataset import
 # The dataset normalizes x and y by frame width and height; its frames are treated as 16:9.
 DATASET_ASPECT = 16 / 9
