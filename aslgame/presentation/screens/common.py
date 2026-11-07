@@ -79,9 +79,17 @@ class ReferenceCard:
     """A large, still picture of the target sign, so the shape is clear even while the hand moves."""
 
     def __init__(self, fonts, signs, names, settings):
-        # Both color styles are built up front so switching never renders in the loop.
+        # Every style is built up front so switching never renders in the loop.
         self._cards = {(name, colors): self._build(fonts, signs[name], colors) for name in names for colors in (False, True)}
+        self._letters = {name: self._build_letter(fonts, name) for name in names}
         self._settings = settings
+
+    def _build_letter(self, fonts, name):
+        """Recall mode: only the letter, large, with no picture of the shape."""
+        card = make_panel(theme.REFERENCE_CARD_SIZE_PX)
+        letter = fonts.display.render(name, True, theme.INK)
+        draw_text_centered(card, letter, (card.get_width() // 2, card.get_height() // 2))
+        return card
 
     def _build(self, fonts, sign, finger_colors):
         card = make_panel(theme.REFERENCE_CARD_SIZE_PX)
@@ -95,9 +103,9 @@ class ReferenceCard:
         card.blit(silhouette, rect)
         return card
 
-    def draw(self, screen, name, progress=None):
+    def draw(self, screen, name, progress=None, letter_only=False):
         """progress, from 0 to 1, fills a bar along the card's bottom edge."""
-        card = self._cards[(name, self._settings.finger_colors)]
+        card = self._letters[name] if letter_only else self._cards[(name, self._settings.finger_colors)]
         rect = screen.blit(card, CARD_TOPLEFT_PX)
         if progress:
             fill = pygame.Rect(rect.left, rect.bottom - theme.GRID_PX, int(rect.width * min(1.0, progress)), theme.GRID_PX)

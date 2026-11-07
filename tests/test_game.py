@@ -94,6 +94,11 @@ class AppFlowTest(unittest.TestCase):
             state = next_state(state, action, AppState.RHYTHM)
             self.assertEqual(state, expected)
 
+    def test_recall_pauses_and_resumes(self):
+        state = next_state(AppState.MENU, Action.START_RECALL, AppState.RECALL)
+        state = next_state(next_state(state, Action.PAUSE, AppState.RECALL), Action.RESUME, AppState.RECALL)
+        self.assertEqual(state, AppState.RECALL)
+
     def test_music_resumes_music(self):
         state = next_state(AppState.MENU, Action.START_MUSIC, AppState.MUSIC)
         state = next_state(next_state(state, Action.PAUSE, AppState.MUSIC), Action.RESUME, AppState.MUSIC)

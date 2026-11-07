@@ -7,6 +7,7 @@ class AppState(Enum):
     BOOT = auto()
     MENU = auto()
     LEARN = auto()
+    RECALL = auto()
     RHYTHM = auto()
     MUSIC = auto()
     RESULTS = auto()
@@ -17,6 +18,7 @@ class AppState(Enum):
 class Action(Enum):
     READY = auto()
     START_LEARN = auto()
+    START_RECALL = auto()
     START_RHYTHM = auto()
     START_MUSIC = auto()
     RETRY = auto()
@@ -27,15 +29,18 @@ class Action(Enum):
     QUIT = auto()
 
 
-PLAY_STATES = (AppState.LEARN, AppState.RHYTHM, AppState.MUSIC)
+PLAY_STATES = (AppState.LEARN, AppState.RECALL, AppState.RHYTHM, AppState.MUSIC)
 
 TRANSITIONS = {
     (AppState.BOOT, Action.READY): AppState.MENU,
     (AppState.MENU, Action.START_LEARN): AppState.LEARN,
+    (AppState.MENU, Action.START_RECALL): AppState.RECALL,
     (AppState.MENU, Action.START_RHYTHM): AppState.RHYTHM,
     (AppState.MENU, Action.START_MUSIC): AppState.MUSIC,
     (AppState.LEARN, Action.PAUSE): AppState.PAUSED,
     (AppState.LEARN, Action.TO_MENU): AppState.MENU,
+    (AppState.RECALL, Action.PAUSE): AppState.PAUSED,
+    (AppState.RECALL, Action.TO_MENU): AppState.MENU,
     (AppState.RHYTHM, Action.PAUSE): AppState.PAUSED,
     (AppState.RHYTHM, Action.FINISH): AppState.RESULTS,
     (AppState.MUSIC, Action.PAUSE): AppState.PAUSED,

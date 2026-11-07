@@ -24,6 +24,7 @@ class Fonts:
     body: pygame.font.Font
     medium: pygame.font.Font
     large: pygame.font.Font
+    display: pygame.font.Font
 
 
 def make_fonts():
@@ -32,6 +33,7 @@ def make_fonts():
         body=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_BODY_PX),
         medium=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_MEDIUM_PX, bold=True),
         large=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_LARGE_PX, bold=True),
+        display=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_DISPLAY_PX, bold=True),
     )
 
 
