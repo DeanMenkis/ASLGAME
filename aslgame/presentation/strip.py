@@ -43,7 +43,8 @@ class Strip:
         wanted = self._cell_x[current] + theme.STRIP_CELL_PX // 2 - self._view_width_px // 2
         return max(0, min(self._width_px - self._view_width_px, wanted))
 
-    def draw(self, screen):
+    def draw(self, screen, judgements=None):
+        """judgements, when given, holds the Judgement of each finished sign, in order."""
         screen.blit(self._backing, (self._view_left_px - PAD_PX, self.top_px - PAD_PX))
         scroll_px = self._scroll_px()
         previous_clip = screen.get_clip()
@@ -54,6 +55,9 @@ class Strip:
                 continue
             rect = pygame.Rect(left_px, self.top_px, theme.STRIP_CELL_PX, theme.STRIP_CELL_PX)
             char = self._queue.text[self._queue.positions[sign_index]]
+            if judgements is not None and sign_index < len(judgements):
+                draw_judged_cell(screen, rect, judgements[sign_index].name, self._inverse[char], self._ink[char])
+                continue
             if sign_index < self._queue.current:
                 pygame.draw.rect(screen, theme.INK, rect)
                 label = self._inverse[char]
@@ -65,3 +69,20 @@ class Strip:
                 label = self._ink[char]
             screen.blit(label, label.get_rect(center=rect.center))
         screen.set_clip(previous_clip)
+
+
+def draw_judged_cell(screen, rect, judgement_name, dark_label, light_label):
+    """A finished sign in its judgement's color, with dots for hits and a strike for a miss."""
+    color = theme.JUDGEMENT_COLORS[judgement_name]
+    dots = theme.JUDGEMENT_DOTS[judgement_name]
+    if dots == 0:
+        pygame.draw.rect(screen, color, rect, theme.STRIP_CURRENT_LINE_PX)
+        screen.blit(light_label, light_label.get_rect(center=rect.center))
+        pygame.draw.line(screen, color, rect.bottomleft, rect.topright, theme.STRIP_CURRENT_LINE_PX)
+        return
+    pygame.draw.rect(screen, color, rect)
+    screen.blit(dark_label, dark_label.get_rect(center=(rect.centerx, rect.centery - theme.STRIP_LABEL_LIFT_PX)))
+    dot_y_px = rect.bottom - theme.STRIP_DOT_RADIUS_PX * 3
+    first_x_px = rect.centerx - (dots - 1) * theme.STRIP_DOT_STEP_PX / 2
+    for index in range(dots):
+        pygame.draw.circle(screen, theme.ACCENT_INK, (first_x_px + index * theme.STRIP_DOT_STEP_PX, dot_y_px), theme.STRIP_DOT_RADIUS_PX)

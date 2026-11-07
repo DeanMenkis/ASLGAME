@@ -105,3 +105,15 @@ FINGER_TINTS = {
 }
 
 RECORD = (230, 40, 40)
+
+# Judgements. Each also has a shape: dots under the letter (3, 2, 1), or a strike for a miss.
+JUDGEMENT_COLORS = {
+    "PERFECT": (70, 205, 115),
+    "GOOD": (245, 210, 60),
+    "OK": (245, 145, 50),
+    "MISS": (235, 75, 65),
+}
+JUDGEMENT_DOTS = {"PERFECT": 3, "GOOD": 2, "OK": 1, "MISS": 0}
+STRIP_DOT_RADIUS_PX = 4
+STRIP_DOT_STEP_PX = GRID_PX + 4
+STRIP_LABEL_LIFT_PX = GRID_PX // 2
