@@ -77,15 +77,27 @@ class AppFlowTest(unittest.TestCase):
             (Action.PAUSE, AppState.PAUSED),
             (Action.TO_MENU, AppState.MENU),
         ]:
-            state = next_state(state, action)
+            state = next_state(state, action, AppState.LEARN)
+            self.assertEqual(state, expected)
+
+    def test_rhythm_to_results(self):
+        state = AppState.MENU
+        for action, expected in [
+            (Action.START_RHYTHM, AppState.RHYTHM),
+            (Action.PAUSE, AppState.PAUSED),
+            (Action.RESUME, AppState.RHYTHM),
+            (Action.FINISH, AppState.RESULTS),
+            (Action.TO_MENU, AppState.MENU),
+        ]:
+            state = next_state(state, action, AppState.RHYTHM)
             self.assertEqual(state, expected)
 
     def test_unknown_action_keeps_state(self):
-        self.assertEqual(next_state(AppState.MENU, Action.RESUME), AppState.MENU)
+        self.assertEqual(next_state(AppState.MENU, Action.RESUME, AppState.LEARN), AppState.MENU)
 
     def test_quit_from_anywhere(self):
         for state in AppState:
-            self.assertEqual(next_state(state, Action.QUIT), AppState.QUIT)
+            self.assertEqual(next_state(state, Action.QUIT, AppState.LEARN), AppState.QUIT)
 
 
 if __name__ == "__main__":
