@@ -52,6 +52,12 @@ Simple and concise, in both code and comments. Fast by default.
 - `main` always runs. Work in short branches if more than one person is coding.
 - Never commit media, models, or personal recordings. See `.gitignore`.
 
+## GUI
+
+- Follow the Design section in the README.
+- No emojis in code, strings, or comments.
+- Layout values (grid, spacing, sizes, palette, fonts) come from one theme module.
+
 ## AI use
 
 - AI-written code is allowed and must be disclosed in the credits doc.
