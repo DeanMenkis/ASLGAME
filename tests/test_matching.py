@@ -72,6 +72,11 @@ class MatcherTest(unittest.TestCase):
 
 
 class SignsTest(unittest.TestCase):
+    def test_outline_always_matches(self):
+        far_apart = [normalize(random_hand(), False) for _ in range(3)]
+        sign = make_sign("A", far_apart)
+        self.assertAlmostEqual(matcher.score(sign.outline, sign.samples), 1.0)
+
     def test_save_appends_and_loads(self):
         with tempfile.TemporaryDirectory() as directory:
             signs_dir = Path(directory)
@@ -79,7 +84,7 @@ class SignsTest(unittest.TestCase):
             save_sign(signs_dir, "A", [hand])
             self.assertEqual(save_sign(signs_dir, "A", [hand, hand]), 3)
             sign = load_signs(signs_dir)["A"]
-            self.assertEqual(sign.samples.shape, (3, 21, 3))
+            self.assertEqual(sign.samples.shape, (4, 21, 3))  # three saved plus the outline
             np.testing.assert_allclose(sign.outline, hand, atol=1e-3)
 
 

@@ -17,7 +17,9 @@ class Sign:
 
 def make_sign(name, samples):
     samples = np.asarray(samples, dtype=np.float32)
-    return Sign(name, samples, samples.mean(axis=0))
+    outline = samples.mean(axis=0)
+    # The outline is what the player is shown, so copying it exactly must always match.
+    return Sign(name, np.concatenate([samples, outline[None]]), outline)
 
 
 def load_signs(signs_dir):
