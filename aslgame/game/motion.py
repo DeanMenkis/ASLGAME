@@ -59,11 +59,17 @@ def normalize_path(points):
     return shifted / size
 
 
+def prepare(path):
+    return normalize_path(resample(path, config.MOTION_RESAMPLE_POINTS))
+
+
 def path_distance(drawn, template):
     """Mean distance between two paths after resampling and normalizing. 0 is identical."""
-    a = normalize_path(resample(drawn, config.MOTION_RESAMPLE_POINTS))
-    b = normalize_path(resample(template, config.MOTION_RESAMPLE_POINTS))
-    return float(np.linalg.norm(a - b, axis=1).mean())
+    return prepared_distance(drawn, prepare(template))
+
+
+def prepared_distance(drawn, prepared_template):
+    return float(np.linalg.norm(prepare(drawn) - prepared_template, axis=1).mean())
 
 
 def extent(points):
@@ -128,9 +134,9 @@ def found_path(tracker, is_left):
     if len(tracker.points) < config.MOTION_MIN_POINTS:
         return False
     points = np.asarray(tracker.points)
-    template = oriented_path(tracker.motion, is_left)
+    template = prepare(oriented_path(tracker.motion, is_left))
     for start in range(0, len(points) - config.MOTION_MIN_POINTS + 1, config.MOTION_START_STEP):
         stroke = points[start:]
-        if extent(stroke) >= config.MOTION_MIN_EXTENT_PALMS and path_distance(stroke, template) <= config.MOTION_MATCH_DISTANCE:
+        if extent(stroke) >= config.MOTION_MIN_EXTENT_PALMS and prepared_distance(stroke, template) <= config.MOTION_MATCH_DISTANCE:
             return True
     return False
