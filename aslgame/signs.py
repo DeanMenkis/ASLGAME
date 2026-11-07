@@ -33,7 +33,12 @@ def save_sign(signs_dir, name, new_samples):
     """Append samples to a sign's file, creating it if needed."""
     path = signs_dir / f"{name}.json"
     samples = json.loads(path.read_text())["samples"] if path.exists() else []
-    samples += np.round(np.asarray(new_samples), DECIMALS).tolist()
+    return write_sign(signs_dir, name, samples + np.round(np.asarray(new_samples), DECIMALS).tolist())
+
+
+def write_sign(signs_dir, name, samples):
+    """Replace a sign's file with these samples."""
+    samples = np.round(np.asarray(samples), DECIMALS).tolist()
     signs_dir.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps({"name": name, "samples": samples}))
+    (signs_dir / f"{name}.json").write_text(json.dumps({"name": name, "samples": samples}))
     return len(samples)

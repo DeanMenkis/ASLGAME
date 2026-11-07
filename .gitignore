@@ -21,3 +21,6 @@ recordings/
 .DS_Store
 .vscode/
 .idea/
+
+# Third-party datasets (local only)
+datasets/
