@@ -20,13 +20,15 @@ class Frame:
 
 class Camera:
     def __init__(self):
-        # Opened on the main thread: macOS camera permission needs it.
-        self._capture = cv2.VideoCapture(config.CAMERA_INDEX, cv2.CAP_AVFOUNDATION)
-        if not self._capture.isOpened():
-            raise RuntimeError(f"Cannot open camera {config.CAMERA_INDEX}")
+        self._capture = open_capture()
         self._capture.set(cv2.CAP_PROP_FRAME_WIDTH, config.CAMERA_WIDTH_PX)
         self._capture.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CAMERA_HEIGHT_PX)
         self._capture.set(cv2.CAP_PROP_FPS, config.CAMERA_FPS)
+        # The camera may not support the requested size.
+        self.size_px = (
+            int(self._capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+            int(self._capture.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+        )
         self.frames = Latest()
         self.fps = 0.0
         self._stop = threading.Event()
@@ -54,3 +56,16 @@ class Camera:
             self.fps = smooth_fps(self.fps, captured_s - last_s)
             last_s = captured_s
 
+
+
+def open_capture():
+    """Open the camera on the main thread, retrying while macOS shows its permission prompt."""
+    give_up_s = time.perf_counter() + config.CAMERA_OPEN_TIMEOUT_S
+    while True:
+        capture = cv2.VideoCapture(config.CAMERA_INDEX, cv2.CAP_AVFOUNDATION)
+        if capture.isOpened():
+            return capture
+        capture.release()
+        if time.perf_counter() > give_up_s:
+            raise RuntimeError(f"Cannot open camera {config.CAMERA_INDEX}. Check camera permission.")
+        time.sleep(config.CAMERA_OPEN_RETRY_S)
