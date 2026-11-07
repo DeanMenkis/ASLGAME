@@ -104,14 +104,13 @@ class RhythmScreen:
         pygame.draw.circle(screen, theme.INK, (screen.get_width() // 2, theme.MARGIN_PX + theme.GRID_PX * 2), radius_px)
 
     def _draw_hud(self, screen):
-        values = (self.session.score, self.session.combo, round(self.session.speed, 2))
+        values = (self.session.score, self.session.combo)
         if values != self._hud_values:
             # Re-rendered only when a value changes.
             self._hud_values = values
             self._hud = [
                 self._fonts.large.render(str(values[0]), True, theme.INK),
                 self._fonts.medium.render(f"x{values[1]}", True, theme.ACCENT if values[1] else theme.INK_DIM),
-                self._fonts.small.render(f"{values[2]:.2f} speed", True, theme.INK_DIM),
             ]
         y_px = theme.MARGIN_PX
         for surface in self._hud:
