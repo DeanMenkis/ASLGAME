@@ -20,4 +20,4 @@ Everything external that the project uses. Required by the brief. Keep this up t
 
 ## AI use
 
-- Claude Code (Anthropic) wrote the Phase 1 code: camera and tracking threads, normalization, matcher, capture tool, ghost outline, and debug overlay.
+- Claude Code (Anthropic) wrote the Phase 1 code (camera and tracking threads, normalization, matcher, capture tool, ghost outline, debug overlay) and the Phase 2 code (app state machine, menu, sign queue, match detector, karaoke strip, Learn mode).

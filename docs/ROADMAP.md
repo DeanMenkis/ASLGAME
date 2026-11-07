@@ -13,11 +13,11 @@ Build the core first, then the game on top. Each phase should run end to end bef
 
 ## Phase 2: Learn mode
 
-- [ ] App state machine and menu
-- [ ] Sign queue for a word or sentence
-- [ ] Match detector with hold-to-confirm
-- [ ] Karaoke strip showing progress through the word
-- [ ] Clear on-screen instructions
+- [x] App state machine and menu
+- [x] Sign queue for a word or sentence
+- [x] Match detector with hold-to-confirm
+- [x] Karaoke strip showing progress through the word
+- [x] Clear on-screen instructions
 
 ## Phase 3: Rhythm mode
 

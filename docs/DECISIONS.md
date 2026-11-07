@@ -37,3 +37,11 @@ Landmarks are normalized from image coordinates: wrist at the origin, scaled by 
 ## pygame loads before OpenCV
 
 opencv-contrib-python and pygame each bundle SDL2. On macOS the first copy loaded wins, so every entry point imports the runtime, which imports pygame, before anything that imports OpenCV.
+
+## Hold-to-confirm with two thresholds
+
+A sign counts once the score stays high for a short hold. Starting a hold needs the match threshold; breaking it needs a drop below a lower release threshold, so tracking jitter near the line does not keep restarting the hold.
+
+## Fingerspelling without J and Z
+
+J and Z are traced with motion, and templates hold a single still handshape. Learn mode words avoid them until movement is supported.
