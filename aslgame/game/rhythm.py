@@ -81,6 +81,9 @@ class RhythmSession:
     score: int = 0
     combo: int = 0
     max_combo: int = 0
+    perfect_streak: int = 0
+    multiplier: float = 1.0
+    last_points: int = 0
     notes: list = field(default_factory=list)  # spawned and not yet done
     next_index: int = 0
     next_due_s: float = config.RHYTHM_LEAD_IN_S
@@ -144,14 +147,31 @@ def resolve(session, note):
     session.results.append((note.sign, note.judgement))
     session.detector = MatchDetector(hold_s=config.RHYTHM_HOLD_S)
     if note.judgement == Judgement.MISS:
-        session.combo = 0
+        session.combo = session.perfect_streak = 0
     else:
         session.combo += 1
         session.max_combo = max(session.max_combo, session.combo)
-    multiplier = 1.0 + min(session.combo, config.COMBO_CAP) / config.COMBO_STEP
-    session.score += int(POINTS[note.judgement] * multiplier)
+        session.perfect_streak = session.perfect_streak + 1 if note.judgement == Judgement.PERFECT else 0
+    session.multiplier = multiplier(session)
+    session.last_points = int(POINTS[note.judgement] * session.multiplier)
+    session.score += session.last_points
     if session.adaptive:
         adapt_speed(session, ACCURACY[note.judgement])
+
+
+def multiplier(session):
+    """Grows with combo, with a run of Perfects, and with speed: bigger, faster, steadier play pays more."""
+    combo_part = min(session.combo, config.COMBO_CAP) / config.COMBO_STEP
+    streak_part = min(session.perfect_streak * config.PERFECT_STREAK_BONUS, config.PERFECT_STREAK_CAP)
+    speed_part = max(0.0, session.speed - 1.0) * config.SPEED_BONUS
+    return round(1.0 + combo_part + streak_part + speed_part, 1)
+
+
+def grade(accuracy):
+    for letter, minimum in config.GRADES:
+        if accuracy >= minimum:
+            return letter
+    return config.GRADES[-1][0]
 
 
 def adapt_speed(session, accuracy):
@@ -177,6 +197,7 @@ class Results:
     accuracy: float
     counts: dict
     weakest: list  # (sign, accuracy), weakest first
+    grade: str
 
 
 def summarize(session):
@@ -188,4 +209,4 @@ def summarize(session):
     accuracy = sum(ACCURACY[j] for _, j in session.results) / len(session.results) if session.results else 0.0
     sign_accuracy = sorted(((sign, sum(v) / len(v)) for sign, v in per_sign.items()), key=lambda item: item[1])
     weakest = [item for item in sign_accuracy if item[1] < 1.0][: config.RESULTS_WEAKEST_COUNT]
-    return Results(session.score, session.max_combo, accuracy, counts, weakest)
+    return Results(session.score, session.max_combo, accuracy, counts, weakest, grade(accuracy))

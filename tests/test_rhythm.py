@@ -100,6 +100,25 @@ class SessionTest(unittest.TestCase):
         self.assertEqual(results.counts[Judgement.MISS], 1)
         self.assertAlmostEqual(results.accuracy, 1.7 / 3)
 
+    def test_multiplier_grows_and_resets(self):
+        session = RhythmSession(["A"] * 20)
+        note = Note("A", 0.0, 1.0)
+        for _ in range(5):
+            note.judgement = Judgement.PERFECT
+            rhythm.resolve(session, note)
+        self.assertGreater(session.multiplier, 1.4)
+        self.assertEqual(session.last_points, int(300 * session.multiplier))
+        before = session.multiplier
+        note.judgement = Judgement.MISS
+        rhythm.resolve(session, note)
+        self.assertEqual((session.combo, session.perfect_streak), (0, 0))
+        # Only the speed bonus survives a miss.
+        self.assertAlmostEqual(session.multiplier, round(1.0 + (session.speed - 1.0) * config.SPEED_BONUS, 1))
+        self.assertLess(session.multiplier, before)
+
+    def test_grades(self):
+        self.assertEqual([rhythm.grade(a) for a in (1.0, 0.9, 0.75, 0.6, 0.1)], ["S", "A", "B", "C", "D"])
+
     def test_beat_phase_is_zero_on_note(self):
         session = RhythmSession(list("ABC"))
         rhythm.spawn_notes(session, 100.0)
