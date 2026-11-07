@@ -21,5 +21,10 @@ def normalize(points, is_left):
 
 def place_on(normalized, points, is_left):
     """Inverse of normalize: put a normalized shape at the position, size, and side of a live hand."""
+    return place_at(normalized, points[WRIST], palm_size(points), is_left)
+
+
+def place_at(normalized, wrist, size, is_left):
+    """Put a normalized shape with its wrist at a point and a given palm size."""
     shape = normalized * MIRROR_X if is_left else normalized
-    return shape * palm_size(points) + points[WRIST]
+    return shape * size + wrist
