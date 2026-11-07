@@ -51,7 +51,7 @@ def judge(offset_s):
     return Judgement.OK
 
 
-def update_note(note, game_s, matched):
+def update_note(note, game_s, matched, latency_offset_s=0.0):
     """The note state machine. All transitions happen here."""
     if note.state == NoteState.WAITING and game_s >= note.due_s - note.approach_s:
         note.state = NoteState.APPROACHING
@@ -60,7 +60,7 @@ def update_note(note, game_s, matched):
     if note.state == NoteState.HITTABLE:
         if matched:
             note.state = NoteState.HIT
-            note.judgement = judge(game_s - config.LATENCY_OFFSET_S - note.due_s)
+            note.judgement = judge(game_s - latency_offset_s - note.due_s)
             note.resolved_s = game_s
         elif game_s > note.due_s + config.HIT_WINDOW_S:
             note.state = NoteState.MISSED
@@ -73,6 +73,11 @@ def update_note(note, game_s, matched):
 @dataclass
 class RhythmSession:
     signs: list
+    bpm: float = config.RHYTHM_BPM
+    beats_per_note: int = config.BEATS_PER_NOTE
+    # Music mode fixes the tempo to the song, so speed only adapts in rhythm mode.
+    adaptive: bool = True
+    latency_offset_s: float = 0.0
     speed: float = 1.0
     score: int = 0
     combo: int = 0
@@ -86,7 +91,7 @@ class RhythmSession:
     detector: MatchDetector = field(default_factory=lambda: MatchDetector(hold_s=config.RHYTHM_HOLD_S))
 
     def beat_s(self):
-        return 60.0 / (config.RHYTHM_BPM * self.speed)
+        return 60.0 / (self.bpm * self.speed)
 
     def target(self):
         """The earliest note still waiting to be signed."""
@@ -103,7 +108,7 @@ class RhythmSession:
         previous_s = 0.0
         for due_s in self.due_times + [self.next_due_s]:
             if game_s < due_s:
-                beat_s = (due_s - previous_s) / config.BEATS_PER_NOTE if previous_s else self.beat_s()
+                beat_s = (due_s - previous_s) / self.beats_per_note if previous_s else self.beat_s()
                 return ((game_s - due_s) / beat_s) % 1.0
             previous_s = due_s
         return ((game_s - previous_s) / self.beat_s()) % 1.0
@@ -118,7 +123,7 @@ def update(session, game_s, target_score):
     matched = session.detector.state == DetectorState.MATCHED
     for note in session.notes:
         was_open = note.state in (NoteState.WAITING, NoteState.APPROACHING, NoteState.HITTABLE)
-        update_note(note, game_s, matched and note is target)
+        update_note(note, game_s, matched and note is target, session.latency_offset_s)
         if was_open and note.judgement is not None:
             resolve(session, note)
     session.notes = [note for note in session.notes if note.state != NoteState.DONE]
@@ -133,7 +138,7 @@ def spawn_notes(session, game_s):
         session.notes.append(Note(session.signs[session.next_index], session.next_due_s, approach_s))
         session.due_times.append(session.next_due_s)
         session.next_index += 1
-        session.next_due_s += config.BEATS_PER_NOTE * beat_s
+        session.next_due_s += session.beats_per_note * beat_s
 
 
 def resolve(session, note):
@@ -146,7 +151,8 @@ def resolve(session, note):
         session.max_combo = max(session.max_combo, session.combo)
     multiplier = 1.0 + min(session.combo, config.COMBO_CAP) / config.COMBO_STEP
     session.score += int(POINTS[note.judgement] * multiplier)
-    adapt_speed(session, ACCURACY[note.judgement])
+    if session.adaptive:
+        adapt_speed(session, ACCURACY[note.judgement])
 
 
 def adapt_speed(session, accuracy):
