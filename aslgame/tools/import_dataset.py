@@ -58,12 +58,19 @@ def pointing_side(samples):
     return samples[:, WRIST, 0] - samples[:, INDEX_TIP, 0]
 
 
+def points_up(samples):
+    """Samples whose index finger points up the image, past its knuckle by POINTING_UP_PALMS."""
+    return samples[(samples[:, 5, 1] - samples[:, INDEX_TIP, 1]) > config.POINTING_UP_PALMS]
+
+
 def build_letter(letter_dir):
     raw = load_letter(letter_dir)
     normalized = np.stack([normalize(points, False) for points in raw])
     # Sideways hands show little of the palm, so their pointing direction is the reliable side cue.
     side = pointing_side(raw) if letter_dir.name in config.SIDEWAYS_LETTERS else palm_turn(raw)
     aligned = drop_outliers(align_chirality(normalized, side))
+    if letter_dir.name in config.DATASET_POINTING_UP:
+        aligned = points_up(aligned)
     return aligned[: config.DATASET_MAX_SAMPLES]
 
 
@@ -72,7 +79,7 @@ def main():
     parser.add_argument("dataset_dir", type=Path, help="local clone of sid220/asl-now-fingerspelling")
     dataset_dir = parser.parse_args().dataset_dir
     for letter_dir in sorted(path for path in dataset_dir.iterdir() if path.is_dir() and len(path.name) == 1):
-        if letter_dir.name in config.MOTION_LETTERS:
+        if letter_dir.name in config.DATASET_SKIP:
             continue
         samples = build_letter(letter_dir)
         write_sign(config.SIGNS_DIR, letter_dir.name, samples)
