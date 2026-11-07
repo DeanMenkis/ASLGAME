@@ -32,6 +32,12 @@ THREAD_JOIN_TIMEOUT_S = 1.0
 # Mean normalized joint distance at which the score falls to zero.
 MATCH_ZERO_SCORE_DISTANCE = 0.6
 MATCH_THRESHOLD = 0.75
+# Lower than MATCH_THRESHOLD so a hold survives small dips in score.
+MATCH_RELEASE_THRESHOLD = 0.65
+MATCH_HOLD_S = 0.6
+
+# Learn mode. J and Z need motion, which handshape templates cannot capture.
+LEARN_WORDS = ("HI", "ASL", "CAB", "LOVE", "GOOD DAY", "THANK YOU")
 
 # Capture tool
 CAPTURE_COUNTDOWN_S = 2.0
