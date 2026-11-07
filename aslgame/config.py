@@ -46,6 +46,9 @@ MATCH_RELEASE_THRESHOLD = 0.65
 MATCH_HOLD_S = 0.6
 # How far another sign may outscore the target before the target is rejected.
 MATCH_RIVAL_MARGIN = 0.05
+# A finger is flagged when its joints sit this far from the target, in palm sizes.
+# Correct signs stay under it about 90% of the time; other letters mostly go over.
+FINGER_HINT_LIMIT = 0.55
 
 # Learn mode. J and Z need motion, which handshape templates cannot capture.
 LEARN_WORDS = ("HI", "ASL", "CAB", "LOVE", "GOOD DAY", "THANK YOU")
@@ -90,5 +93,6 @@ CAPTURE_SAMPLES_PER_BURST = 15
 
 # Debug overlay
 DEBUG_OVERLAY_ON_START = False
+# The tracked skeleton over the player's hand is only drawn with the debug overlay.
 DEBUG_REFRESH_S = 0.25
 FPS_SMOOTHING = 0.1

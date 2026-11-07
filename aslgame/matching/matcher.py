@@ -3,6 +3,7 @@
 import numpy as np
 
 from aslgame import config
+from aslgame.hand import FINGERS
 
 
 def distance(hand, samples):
@@ -32,3 +33,9 @@ def target_score(hand, target, signs):
         if sign.name != target.name and score(hand, sign.samples) > target_value + config.MATCH_RIVAL_MARGIN:
             return 0.0
     return target_value
+
+
+def fingers_off(hand, target):
+    """Names of the fingers whose joints sit clearly away from the target's outline."""
+    return [name for name, joints in FINGERS.items()
+            if np.linalg.norm(hand[list(joints[1:])] - target.outline[list(joints[1:])], axis=1).mean() > config.FINGER_HINT_LIMIT]
