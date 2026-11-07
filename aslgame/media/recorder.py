@@ -15,6 +15,7 @@ class Recorder:
     def __init__(self):
         self._frames = queue.Queue(maxsize=config.RECORD_QUEUE_FRAMES)
         self._thread = None
+        self._finishing = []  # encoders still writing out their last frames
         self._next_frame_s = 0.0
         self.path = None
         self.dropped = 0
@@ -33,13 +34,22 @@ class Recorder:
         config.RECORDINGS_DIR.mkdir(parents=True, exist_ok=True)
         self.path = config.RECORDINGS_DIR / time.strftime("aslgame-%Y%m%d-%H%M%S.mp4")
         self.dropped = 0
-        self._thread = threading.Thread(target=self._run, args=(self.path, size_px), name="recorder", daemon=True)
+        self._frames = queue.Queue(maxsize=config.RECORD_QUEUE_FRAMES)
+        self._thread = threading.Thread(target=self._run, args=(self._frames, self.path, size_px), name="recorder")
         self._thread.start()
 
     def stop(self):
+        """Returns at once; the encoder finishes the file in the background."""
         self._frames.put(None)
-        self._thread.join(config.THREAD_JOIN_TIMEOUT_S * 5)
+        self._finishing.append(self._thread)
         self._thread = None
+
+    def close(self):
+        """Wait for every file to be finished. Called once when the app exits."""
+        if self.active:
+            self.stop()
+        for thread in self._finishing:
+            thread.join()
 
     def capture(self, screen, now_s):
         """Called each frame. Copies the screen at the recording rate and never waits on the encoder."""
@@ -51,9 +61,9 @@ class Recorder:
         except queue.Full:
             self.dropped += 1
 
-    def _run(self, path, size_px):
+    def _run(self, frames, path, size_px):
         writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"avc1"), config.RECORD_FPS, size_px)
-        while (data := self._frames.get()) is not None:
+        while (data := frames.get()) is not None:
             rgb = np.frombuffer(data, dtype=np.uint8).reshape(size_px[1], size_px[0], 3)
             writer.write(cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
         writer.release()

@@ -114,8 +114,7 @@ class Runtime:
         self.screen.blit(self._rec_label, self._rec_label.get_rect(midleft=(center_px[0] + theme.GRID_PX * 2, center_px[1])))
 
     def close(self):
-        if self.recorder.active:
-            self.recorder.stop()
+        self.recorder.close()
         self.tracker.stop()
         self.camera.stop()
         pygame.quit()
