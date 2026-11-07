@@ -48,11 +48,13 @@ curl -L -o models/hand_landmarker.task https://storage.googleapis.com/mediapipe-
 ```
 
 - `.venv/bin/python -m aslgame`: the game. Mouse or keyboard; press H or the ? button for keys.
-- `.venv/bin/python -m aslgame.tools.make_demo_track`: writes the synthesized demo song to `media/` for Music mode. Other songs go in `media/` with a chart in `data/charts/`.
+- `.venv/bin/python -m aslgame.tools.make_demo_track`: writes the two synthesized songs (Warm-up 90, Hardstyle 150) to `media/`.
+- Bouncer is a CC0 track; download it from https://opengameart.org/node/107501 into `media/bouncer.mp3`.
+- `.venv/bin/python -m aslgame.tools.chart_track song.mp3 "Title"`: charts any song in `media/` (finds tempo and first beat). Add `--bpm` if it picks double time.
 - `.venv/bin/python -m aslgame.tools.import_dataset datasets/asl-now-fingerspelling`: rebuilds the letter templates.
 - `.venv/bin/python -m aslgame.tools.capture A`: record templates for sign A. Space records a burst after a short countdown, Backspace drops the last burst. Saved to `data/signs/` on close.
 - `.venv/bin/python -m unittest`: tests that need no camera or window.
-- F3 toggles the performance overlay and the tracked skeleton.
+- F3 toggles the performance overlay and the tracked skeleton. F9 records a demo video to `recordings/`.
 - A word is playable once every letter in it has a recorded template. The menu lists the missing letters.
 
 On first run macOS asks for camera access for the app that launched Python, such as Terminal.
@@ -64,6 +66,8 @@ On first run macOS asks for camera access for the app that launched Python, such
 - [Roadmap](docs/ROADMAP.md): what's done, what's next
 - [Decisions](docs/DECISIONS.md): why we chose what we chose
 - [Credits](docs/CREDITS.md): sources, models, libraries, AI use
+- [Accessibility](docs/ACCESSIBILITY.md): cues, options, and known gaps
+- [Presentation](docs/PRESENTATION.md): talk outline and demo checklist
 
 ## Scope and limits
 

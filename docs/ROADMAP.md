@@ -32,18 +32,18 @@ Build the core first, then the game on top. Each phase should run end to end bef
 
 - [x] Local music playback (video not supported yet)
 - [x] Chart synced to the media clock
-- [x] Latency offset setting
+- [x] Latency offset setting (later removed as not needed)
 
 ## Phase 5: Polish and demo
 
-- [ ] Accessibility pass (no sound-only or color-only cues)
-- [ ] Credits and limitations screen
+- [x] Accessibility pass (no sound-only or color-only cues), see [Accessibility](ACCESSIBILITY.md)
+- [x] Credits and limitations screen
 - [x] Debug overlay for FPS and latency
-- [ ] Backup demo recording
-- [ ] Presentation
+- [ ] Backup demo recording (recorder built: F9; the recording itself is still to make)
+- [ ] Presentation (outline in [Presentation](PRESENTATION.md))
 
 ## Open questions
 
-- Which handshapes make the supported set
-- How to handle signs that look alike
-- Which songs or tracks to use for the demo
+- Review of the letter templates by a fluent signer
+- Whether to add motion signs (J, Z, and common word signs)
+- How to warn the player about poor lighting

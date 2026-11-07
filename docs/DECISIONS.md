@@ -73,3 +73,15 @@ A white skeleton blended into the camera image and did not read as a hand. The g
 ## Music clock starts with playback
 
 Tracks load into memory at startup. The game clock starts at the moment the sound starts and pauses with it, so chart times line up with the music. A player-set offset in the menu cancels camera, tracking, and audio delay.
+
+## No audio offset setting
+
+Play testing showed the default timing felt right, and the setting added a control nobody needed. It was removed with the code behind it.
+
+## Sounds are synthesized
+
+Sound effects and the two demo songs are generated with NumPy, so there are no files to license and they always match the beat. Bouncer, a CC0 track, gives the demo a real song.
+
+## Scaled window
+
+The game draws at the camera's 1280 by 720 and pygame scales it to a larger, resizable window, so layout and mouse positions never change with the window size.
