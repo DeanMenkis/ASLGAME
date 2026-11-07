@@ -1,23 +1,25 @@
 """Player settings saved between runs in a local file. Read at startup and written at exit only."""
 
 import json
-from dataclasses import asdict, dataclass
-
-from aslgame import config
+from dataclasses import asdict, dataclass, fields
 
 
 @dataclass
 class Settings:
-    latency_offset_ms: int = config.LATENCY_OFFSET_DEFAULT_MS
+    finger_colors: bool = False
+    sound: bool = True
 
 
 def load_settings(path):
     if not path.exists():
         return Settings()
     try:
-        return Settings(**json.loads(path.read_text()))
-    except (ValueError, TypeError):
+        saved = json.loads(path.read_text())
+    except ValueError:
         return Settings()
+    # Unknown keys from older versions are ignored.
+    known = {field.name for field in fields(Settings)}
+    return Settings(**{key: value for key, value in saved.items() if key in known})
 
 
 def save_settings(path, settings):

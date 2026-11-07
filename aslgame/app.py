@@ -53,11 +53,10 @@ class App:
             self.screens[state] = LearnScreen(fonts, self.signs, item_value, self.size_px)
         elif state == AppState.RHYTHM:
             queue = make_queue(" ".join([item_value] * config.RHYTHM_REPEATS))
-            session = RhythmSession([queue.text[i] for i in queue.positions],
-                                    latency_offset_s=self.settings.latency_offset_ms / 1000)
+            session = RhythmSession([queue.text[i] for i in queue.positions])
             self.screens[state] = RhythmScreen(fonts, self.signs, queue, session, GameClock(now_s), self.size_px)
         elif state == AppState.MUSIC:
-            session = make_session(item_value, self.settings.latency_offset_ms / 1000)
+            session = make_session(item_value)
             self.player = MediaPlayer(self.tracks[item_value.name], now_s)
             self.screens[state] = RhythmScreen(fonts, self.signs, make_queue(item_value.text), session, self.player, self.size_px)
         self.play_state = state

@@ -7,7 +7,7 @@ from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.ui import clicked, draw_key_chip, make_panel
 
 SECTIONS = (
-    ("Menu", (("Left  Right", "Mode"), ("Up  Down", "Choose"), ("Enter", "Start"), ("[  ]", "Audio offset"), ("H", "Keys"), ("Esc", "Quit"))),
+    ("Menu", (("Left  Right", "Mode"), ("Up  Down", "Choose"), ("Enter", "Start"), ("H", "Keys"), ("Esc", "Quit"))),
     ("Playing", (("Esc  P", "Pause"),)),
     ("Paused", (("Esc  Space", "Resume"), ("M", "Menu"))),
     ("Results", (("R", "Retry"), ("M", "Menu"))),

@@ -64,10 +64,6 @@ RHYTHM_HOLD_S = 0.15
 PERFECT_WINDOW_S = 0.15
 GOOD_WINDOW_S = 0.3
 HIT_WINDOW_S = 0.5
-# Subtracted from the player's timing to cancel camera, tracking, and audio delay. Set from the menu.
-LATENCY_OFFSET_DEFAULT_MS = 0
-LATENCY_OFFSET_STEP_MS = 10
-LATENCY_OFFSET_LIMIT_MS = 300
 FEEDBACK_S = 0.5
 COMBO_CAP = 50
 COMBO_STEP = 25

@@ -27,7 +27,7 @@ def load_charts(charts_dir):
     return charts
 
 
-def make_session(chart, latency_offset_s):
+def make_session(chart):
     """A rhythm session locked to the song: fixed tempo, notes from the chart."""
     queue = make_queue(chart.text)
     return RhythmSession(
@@ -35,6 +35,5 @@ def make_session(chart, latency_offset_s):
         bpm=chart.bpm,
         beats_per_note=chart.beats_per_note,
         adaptive=False,
-        latency_offset_s=latency_offset_s,
         next_due_s=chart.first_note_s,
     )

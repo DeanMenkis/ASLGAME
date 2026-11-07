@@ -77,12 +77,6 @@ class MenuScreen:
         start_rect = pygame.Rect(0, 0, theme.GRID_PX * 28, theme.BUTTON_HEIGHT_PX)
         start_rect.midtop = (size_px[0] // 2, self._card_rect.bottom + theme.GRID_PX * 3)
         self._start = Button(fonts.body, "Start", start_rect, primary=True)
-        self._minus = Button(fonts.medium, "-", (0, 0, theme.ICON_BUTTON_PX, theme.ICON_BUTTON_PX))
-        self._plus = Button(fonts.medium, "+", (0, 0, theme.ICON_BUTTON_PX, theme.ICON_BUTTON_PX))
-        # The offset sits in the card's last row; the song list is short.
-        self._minus.rect.midleft = (self._card_rect.left + theme.GRID_PX * 3, self._row_rect(MAX_ROWS - 1).centery)
-        self._offset_text = None
-        self._offset_surface = None
 
     def _make_tabs(self, fonts, size_px):
         widths = [button_width(fonts.body, mode.name) + theme.GRID_PX * 4 for mode in self.modes]
@@ -116,10 +110,6 @@ class MenuScreen:
             self._step(-1)
         elif is_key(event, (pygame.K_DOWN,)):
             self._step(1)
-        elif is_key(event, (pygame.K_LEFTBRACKET,)) or (self._shows_offset() and self._minus.is_clicked(event)):
-            self._change_offset(-config.LATENCY_OFFSET_STEP_MS)
-        elif is_key(event, (pygame.K_RIGHTBRACKET,)) or (self._shows_offset() and self._plus.is_clicked(event)):
-            self._change_offset(config.LATENCY_OFFSET_STEP_MS)
         elif is_key(event, (pygame.K_RETURN, pygame.K_SPACE)) or self._start.is_clicked(event):
             return self._start_action()
         else:
@@ -153,13 +143,6 @@ class MenuScreen:
             if items[index].playable:
                 self.selected[self.mode] = index
                 return
-
-    def _shows_offset(self):
-        return self.current().action == Action.START_MUSIC
-
-    def _change_offset(self, step_ms):
-        limit = config.LATENCY_OFFSET_LIMIT_MS
-        self._settings.latency_offset_ms = max(-limit, min(limit, self._settings.latency_offset_ms + step_ms))
 
     def _row_rect(self, index):
         top_px = self._card_rect.top + theme.GRID_PX + index * theme.ROW_HEIGHT_PX
@@ -204,17 +187,5 @@ class MenuScreen:
             screen.blit(self._row_surface(item, index == self.selected[self.mode]), rect)
         self._start.enabled = self.selected_item() is not None and self.selected_item().playable
         self._start.draw(screen)
-        if self._shows_offset():
-            self._draw_offset(screen)
         self._help.draw(screen)
 
-    def _draw_offset(self, screen):
-        text = f"Audio offset  {self._settings.latency_offset_ms:+d} ms"
-        if text != self._offset_text:
-            self._offset_text = text
-            self._offset_surface = self._fonts.body.render(text, True, theme.INK)
-        self._minus.draw(screen)
-        label_rect = self._offset_surface.get_rect(midleft=(self._minus.rect.right + theme.GRID_PX * 2, self._minus.rect.centery))
-        screen.blit(self._offset_surface, label_rect)
-        self._plus.rect.midleft = (label_rect.right + theme.GRID_PX * 2, self._minus.rect.centery)
-        self._plus.draw(screen)

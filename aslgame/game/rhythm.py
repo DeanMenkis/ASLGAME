@@ -51,7 +51,7 @@ def judge(offset_s):
     return Judgement.OK
 
 
-def update_note(note, game_s, matched, latency_offset_s=0.0):
+def update_note(note, game_s, matched):
     """The note state machine. All transitions happen here."""
     if note.state == NoteState.WAITING and game_s >= note.due_s - note.approach_s:
         note.state = NoteState.APPROACHING
@@ -60,7 +60,7 @@ def update_note(note, game_s, matched, latency_offset_s=0.0):
     if note.state == NoteState.HITTABLE:
         if matched:
             note.state = NoteState.HIT
-            note.judgement = judge(game_s - latency_offset_s - note.due_s)
+            note.judgement = judge(game_s - note.due_s)
             note.resolved_s = game_s
         elif game_s > note.due_s + config.HIT_WINDOW_S:
             note.state = NoteState.MISSED
@@ -77,7 +77,6 @@ class RhythmSession:
     beats_per_note: int = config.BEATS_PER_NOTE
     # Music mode fixes the tempo to the song, so speed only adapts in rhythm mode.
     adaptive: bool = True
-    latency_offset_s: float = 0.0
     speed: float = 1.0
     score: int = 0
     combo: int = 0
@@ -123,7 +122,7 @@ def update(session, game_s, target_score):
     matched = session.detector.state == DetectorState.MATCHED
     for note in session.notes:
         was_open = note.state in (NoteState.WAITING, NoteState.APPROACHING, NoteState.HITTABLE)
-        update_note(note, game_s, matched and note is target, session.latency_offset_s)
+        update_note(note, game_s, matched and note is target)
         if was_open and note.judgement is not None:
             resolve(session, note)
     session.notes = [note for note in session.notes if note.state != NoteState.DONE]
