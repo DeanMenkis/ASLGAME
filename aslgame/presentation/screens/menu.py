@@ -57,11 +57,13 @@ class MenuScreen:
         words = word_items(sign_names)
         self.modes = [
             Mode("Learn", Action.START_LEARN, words),
+            Mode("Recall", Action.START_RECALL, words),
             Mode("Rhythm", Action.START_RHYTHM, words),
             Mode("Music", Action.START_MUSIC, chart_items(charts, sign_names, track_names)),
         ]
         self.mode = 0
         self.selected = [next((i for i, item in enumerate(m.items) if item.playable), None) for m in self.modes]
+        self.first_row = [0 for _ in self.modes]  # index of the top visible row, per mode
         self._settings = settings
         self._sfx = sfx
         self._fonts = fonts
@@ -157,7 +159,10 @@ class MenuScreen:
             if tab.is_clicked(event):
                 self.mode = index
                 return None
-        for index in range(len(self.current().items)):
+        if event.type == pygame.MOUSEWHEEL:
+            self._scroll(-event.y)
+            return None
+        for index in self._visible_indexes():
             if clicked(event, self._row_rect(index)) and self.current().items[index].playable:
                 # A second click on the selected row starts it.
                 if self.selected[self.mode] == index:
@@ -178,17 +183,34 @@ class MenuScreen:
             index = (index + direction) % len(items)
             if items[index].playable:
                 self.selected[self.mode] = index
+                self._keep_in_view(index)
                 return
 
+    def _scroll(self, rows):
+        last = max(0, len(self.current().items) - MAX_ROWS)
+        self.first_row[self.mode] = max(0, min(last, self.first_row[self.mode] + rows))
+
+    def _keep_in_view(self, index):
+        first = self.first_row[self.mode]
+        if index < first:
+            self.first_row[self.mode] = index
+        elif index >= first + MAX_ROWS:
+            self.first_row[self.mode] = index - MAX_ROWS + 1
+
+    def _visible_indexes(self):
+        first = self.first_row[self.mode]
+        return range(first, min(len(self.current().items), first + MAX_ROWS))
+
     def _row_rect(self, index):
-        top_px = self._card_rect.top + theme.GRID_PX + index * theme.ROW_HEIGHT_PX
+        """Screen rect of an item, counted from the top visible row."""
+        top_px = self._card_rect.top + theme.GRID_PX + (index - self.first_row[self.mode]) * theme.ROW_HEIGHT_PX
         return pygame.Rect(self._card_rect.left + theme.GRID_PX, top_px, self._card_rect.width - theme.GRID_PX * 2, theme.ROW_HEIGHT_PX)
 
     def _row_surface(self, item, selected):
         key = (id(item), selected)
         if key not in self._rows:
             # Rendered once per row and state, then reused.
-            rect = self._row_rect(0)
+            rect = self._row_rect(self.first_row[self.mode])
             row = pygame.Surface(rect.size, pygame.SRCALPHA)
             if selected:
                 pygame.draw.rect(row, theme.SURFACE_RAISED, row.get_rect(), border_radius=theme.CORNER_PX)
@@ -219,13 +241,27 @@ class MenuScreen:
             (self._active_tabs[index] if index == self.mode else tab).draw(screen)
         screen.blit(self._card, self._card_rect)
         mouse = pygame.mouse.get_pos()
-        for index, item in enumerate(self.current().items[:MAX_ROWS]):
+        items = self.current().items
+        for index in self._visible_indexes():
+            item = items[index]
             rect = self._row_rect(index)
             if index != self.selected[self.mode] and item.playable and rect.collidepoint(mouse):
                 pygame.draw.rect(screen, theme.SURFACE_HOVER, rect, border_radius=theme.CORNER_PX)
             screen.blit(self._row_surface(item, index == self.selected[self.mode]), rect)
+        self._draw_scroll_marks(screen)
         self._start.enabled = self.selected_item() is not None and self.selected_item().playable
         self._start.draw(screen)
         self._help.draw(screen)
         self._about.draw(screen)
 
+    def _draw_scroll_marks(self, screen):
+        """Small arrows at the card's edges when more rows are above or below."""
+        first = self.first_row[self.mode]
+        size_px = theme.GRID_PX
+        x_px = self._card_rect.right - theme.GRID_PX * 3
+        if first > 0:
+            y_px = self._card_rect.top + theme.GRID_PX * 2
+            pygame.draw.polygon(screen, theme.INK_DIM, [(x_px - size_px, y_px + size_px), (x_px + size_px, y_px + size_px), (x_px, y_px)])
+        if first + MAX_ROWS < len(self.current().items):
+            y_px = self._card_rect.bottom - theme.GRID_PX * 2
+            pygame.draw.polygon(screen, theme.INK_DIM, [(x_px - size_px, y_px - size_px), (x_px + size_px, y_px - size_px), (x_px, y_px)])
