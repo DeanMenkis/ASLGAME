@@ -4,7 +4,8 @@ Everything external that the project uses. Required by the brief. Keep this up t
 
 ## Sign language references
 
-- (add each reference used to check sign templates, with a link)
+- Letter templates are built from the [ASL-Now fingerspelling dataset](https://huggingface.co/datasets/sid220/asl-now-fingerspelling) (sid220, MIT License, DOI 10.57967/hf/1494, commit 9b3c96a): MediaPipe hand landmarks from several signers. Rebuild with `python -m aslgame.tools.import_dataset datasets/asl-now-fingerspelling`.
+- The templates have not yet been reviewed by a fluent signer. Each letter should be checked against a trusted reference such as [Lifeprint](https://www.lifeprint.com/asl101/fingerspelling/abc.htm) before any demo.
 
 ## Libraries and models
 
