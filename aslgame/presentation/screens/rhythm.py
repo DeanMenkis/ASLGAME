@@ -16,12 +16,13 @@ from aslgame.presentation.strip import Strip
 
 OPEN_STATES = (NoteState.WAITING, NoteState.APPROACHING, NoteState.HITTABLE)
 PALM_POINTS = [WRIST] + FINGER_BASES
+COMBO_CHEER = 10
 
 
 class RhythmScreen:
     """clock is anything with time, pause, and resume: a GameClock, or a MediaPlayer in music mode."""
 
-    def __init__(self, fonts, signs, queue, session, clock, size_px):
+    def __init__(self, fonts, signs, queue, session, clock, size_px, settings, sfx):
         self._signs = signs
         self.queue = queue
         self.session = session
@@ -29,13 +30,14 @@ class RhythmScreen:
         self._scorer = TargetScorer(signs)
         self._fonts = fonts
         self._strip = Strip(fonts.medium, self.queue, size_px)
-        self._ghost = Ghost(size_px)
-        self._card = ReferenceCard(fonts, signs, set(session.signs))
+        self._ghost = Ghost(size_px, settings)
+        self._card = ReferenceCard(fonts, signs, set(session.signs), settings)
         self._top_bar = TopBar(size_px)
         self._fix_hint = FixHint(fonts)
         self._idle_wrist = idle_wrist(size_px)
         self._judgements = {j: fonts.medium.render(text, True, theme.ACCENT if j != Judgement.MISS else theme.FINGER_FIX)
                             for j, text in JUDGEMENT_TEXT.items()}
+        self._sfx = sfx
         self._hud_values = None
         self._hud = []
 
@@ -54,6 +56,10 @@ class RhythmScreen:
         hand = result.hand if result else None
         score = self._scorer.update(result, target.sign) if target is not None and hand is not None else None
         rhythm.update(self.session, game_s, score)
+        for _, judgement in self.session.results[self.queue.current:]:
+            self._sfx.play(judgement.name.lower())
+            if judgement != Judgement.MISS and self.session.combo and self.session.combo % COMBO_CHEER == 0:
+                self._sfx.play("combo")
         self.queue.current = len(self.session.results)
         return Action.FINISH if self.session.is_finished() else None
 

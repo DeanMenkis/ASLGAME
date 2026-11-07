@@ -14,14 +14,14 @@ from aslgame.presentation.ui import Button
 
 
 class LearnScreen:
-    def __init__(self, fonts, signs, word, size_px):
+    def __init__(self, fonts, signs, word, size_px, settings, sfx):
         self._signs = signs
         self.queue = make_queue(word)
         self._detector = MatchDetector()
         self._scorer = TargetScorer(signs)
         self._strip = Strip(fonts.medium, self.queue, size_px)
-        self._ghost = Ghost(size_px)
-        self._card = ReferenceCard(fonts, signs, set(self.queue.text) - {" "})
+        self._ghost = Ghost(size_px, settings)
+        self._card = ReferenceCard(fonts, signs, set(self.queue.text) - {" "}, settings)
         self._top_bar = TopBar(size_px)
         self._labels = {
             DetectorState.NO_HAND: fonts.medium.render("Show your hand", True, theme.INK),
@@ -34,6 +34,7 @@ class LearnScreen:
         self._menu_button = Button(fonts.body, "Back to menu", menu_rect, primary=True)
         self._menu_button.rect.center = (size_px[0] // 2, size_px[1] // 2)
         self._fix_hint = FixHint(fonts)
+        self._sfx = sfx
 
     def handle_event(self, event):
         if is_key(event, PAUSE_KEYS) or self._top_bar.pause_clicked(event):
@@ -50,6 +51,7 @@ class LearnScreen:
         if match_detector.update(self._detector, now_s, score if hand else None):
             self.queue.advance()
             self._detector = MatchDetector()
+            self._sfx.play("complete" if self.queue.is_done() else "confirm")
         return None
 
     def draw(self, screen, now_s, hand):

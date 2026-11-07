@@ -10,11 +10,11 @@ from aslgame.game.sign_queue import missing_signs
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.common import is_key, make_shade
 from aslgame.presentation.screens.help import HelpPanel
-from aslgame.presentation.ui import Button, button_width, clicked, make_panel
+from aslgame.presentation.ui import Button, Toggle, button_width, clicked, make_panel, toggle_width
 
 TAB_TOP_PX = theme.TOP_BAR_HEIGHT_PX + theme.GRID_PX * 2
 CARD_TOP_PX = TAB_TOP_PX + theme.BUTTON_HEIGHT_PX + theme.GRID_PX * 3
-MAX_ROWS = 6
+MAX_ROWS = 7
 
 
 @dataclass(frozen=True)
@@ -33,7 +33,9 @@ class Mode:
 
 
 def word_items(sign_names):
-    items = []
+    # Every recorded letter in order, as untimed practice.
+    alphabet = "".join(sorted(sign_names))
+    items = [Item(config.ALPHABET_LABEL, alphabet, "", bool(alphabet))]
     for word in config.LEARN_WORDS:
         missing = missing_signs(word, sign_names)
         items.append(Item(word, word, "Needs " + " ".join(missing) if missing else "", not missing))
@@ -50,7 +52,7 @@ def chart_items(charts, sign_names, track_names):
 
 
 class MenuScreen:
-    def __init__(self, fonts, sign_names, charts, track_names, settings, size_px):
+    def __init__(self, fonts, sign_names, charts, track_names, settings, size_px, sfx):
         words = word_items(sign_names)
         self.modes = [
             Mode("Learn", Action.START_LEARN, words),
@@ -60,6 +62,7 @@ class MenuScreen:
         self.mode = 0
         self.selected = [next((i for i, item in enumerate(m.items) if item.playable), None) for m in self.modes]
         self._settings = settings
+        self._sfx = sfx
         self._fonts = fonts
         self._size_px = size_px
         self._shade = make_shade(size_px)
@@ -69,6 +72,7 @@ class MenuScreen:
         help_rect = pygame.Rect(0, 0, theme.ICON_BUTTON_PX, theme.ICON_BUTTON_PX)
         help_rect.midright = (size_px[0] - theme.MARGIN_PX, theme.TOP_BAR_HEIGHT_PX // 2)
         self._help_button = Button(fonts.medium, "?", help_rect)
+        self._toggles = self._make_toggles(fonts, help_rect)
         self._tabs = self._make_tabs(fonts, size_px)
         self._rows = {}  # (mode, index, selected) -> rendered row, built on first draw
         self._card_rect = pygame.Rect(0, CARD_TOP_PX, theme.CARD_WIDTH_PX, theme.ROW_HEIGHT_PX * MAX_ROWS + theme.GRID_PX * 2)
@@ -77,6 +81,18 @@ class MenuScreen:
         start_rect = pygame.Rect(0, 0, theme.GRID_PX * 28, theme.BUTTON_HEIGHT_PX)
         start_rect.midtop = (size_px[0] // 2, self._card_rect.bottom + theme.GRID_PX * 3)
         self._start = Button(fonts.body, "Start", start_rect, primary=True)
+
+    def _make_toggles(self, fonts, help_rect):
+        """Settings toggles in the header, right-aligned before the ? button."""
+        toggles = []
+        right_px = help_rect.left - theme.GRID_PX * 2
+        for name, label in (("sound", "Sound"), ("finger_colors", "Finger colors")):
+            width_px = toggle_width(fonts.small, label)
+            rect = pygame.Rect(right_px - width_px, 0, width_px, theme.ICON_BUTTON_PX)
+            rect.centery = help_rect.centery
+            toggles.append((name, Toggle(fonts.small, label, rect)))
+            right_px = rect.left - theme.GRID_PX * 2
+        return toggles
 
     def _make_tabs(self, fonts, size_px):
         widths = [button_width(fonts.body, mode.name) + theme.GRID_PX * 4 for mode in self.modes]
@@ -96,10 +112,21 @@ class MenuScreen:
         return None if index is None else self.current().items[index]
 
     def handle_event(self, event):
+        before = (self.mode, list(self.selected), self._help.visible)
+        action = self._handle(event)
+        if (self.mode, self.selected, self._help.visible) != before:
+            self._sfx.play("click")
+        return action
+
+    def _handle(self, event):
         if self._help.handle_event(event):
             return None
         if is_key(event, (pygame.K_ESCAPE,)):
             return Action.QUIT
+        for name, toggle in self._toggles:
+            if toggle.is_clicked(event):
+                setattr(self._settings, name, not getattr(self._settings, name))
+                return None
         if is_key(event, (pygame.K_h,)) or self._help_button.is_clicked(event):
             self._help.visible = True
         elif is_key(event, (pygame.K_LEFT,)):
@@ -176,6 +203,8 @@ class MenuScreen:
         screen.blit(self._top_bar, (0, 0))
         screen.blit(self._wordmark, self._wordmark.get_rect(midleft=(theme.MARGIN_PX, theme.TOP_BAR_HEIGHT_PX // 2)))
         self._help_button.draw(screen)
+        for name, toggle in self._toggles:
+            toggle.draw(screen, getattr(self._settings, name))
         for index, tab in enumerate(self._tabs):
             (self._active_tabs[index] if index == self.mode else tab).draw(screen)
         screen.blit(self._card, self._card_rect)

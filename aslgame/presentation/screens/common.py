@@ -58,16 +58,18 @@ class TargetScorer:
 class Ghost:
     """The target sign drawn as a silhouette over the live hand, or in the middle when no hand is seen."""
 
-    def __init__(self, size_px):
+    def __init__(self, size_px, settings):
         self._renderer = GhostRenderer()
         self._idle_wrist = idle_wrist(size_px)
+        self._settings = settings
 
     def draw(self, screen, sign, hand, matched, fingers_off):
+        colors = self._settings.finger_colors
         if hand is None:
-            self._renderer.draw(screen, sign, self._idle_wrist, theme.IDLE_GHOST_PALM_PX, False, False)
+            self._renderer.draw(screen, sign, self._idle_wrist, theme.IDLE_GHOST_PALM_PX, False, False, colors)
             return
         wrist = hand.points_px[WRIST, :2].tolist()
-        self._renderer.draw(screen, sign, wrist, palm_size(hand.points_px), hand.is_left, matched)
+        self._renderer.draw(screen, sign, wrist, palm_size(hand.points_px), hand.is_left, matched, colors)
         if fingers_off:
             # Marked on the player's own fingers; the ghost already shows where they should go.
             draw_finger_fixes(screen, hand.points_px, fingers_off)
@@ -76,15 +78,16 @@ class Ghost:
 class ReferenceCard:
     """A large, still picture of the target sign, so the shape is clear even while the hand moves."""
 
-    def __init__(self, fonts, signs, names):
-        self._cards = {name: self._build(fonts, signs[name]) for name in names}
-        self._fill_rect = pygame.Rect(0, 0, 0, theme.GRID_PX)
+    def __init__(self, fonts, signs, names, settings):
+        # Both color styles are built up front so switching never renders in the loop.
+        self._cards = {(name, colors): self._build(fonts, signs[name], colors) for name in names for colors in (False, True)}
+        self._settings = settings
 
-    def _build(self, fonts, sign):
+    def _build(self, fonts, sign, finger_colors):
         card = make_panel(theme.REFERENCE_CARD_SIZE_PX)
         width_px, height_px = theme.REFERENCE_CARD_SIZE_PX
         draw_text_centered(card, fonts.large.render(sign.name, True, theme.INK), (width_px // 2, theme.GRID_PX * 6))
-        silhouette, wrist = render_silhouette(sign.outline, theme.REFERENCE_PALM_PX, False)
+        silhouette, wrist = render_silhouette(sign.outline, theme.REFERENCE_PALM_PX, False, finger_colors)
         bottom_px = height_px - theme.GRID_PX * 4
         # Placed by the wrist, then pulled back inside the card if the shape runs over an edge.
         rect = silhouette.get_rect(topleft=(width_px // 2 - wrist[0], bottom_px - wrist[1] - theme.REFERENCE_PALM_PX))
@@ -94,7 +97,7 @@ class ReferenceCard:
 
     def draw(self, screen, name, progress=None):
         """progress, from 0 to 1, fills a bar along the card's bottom edge."""
-        card = self._cards[name]
+        card = self._cards[(name, self._settings.finger_colors)]
         rect = screen.blit(card, CARD_TOPLEFT_PX)
         if progress:
             fill = pygame.Rect(rect.left, rect.bottom - theme.GRID_PX, int(rect.width * min(1.0, progress)), theme.GRID_PX)
