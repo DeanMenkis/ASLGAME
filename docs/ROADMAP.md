@@ -30,9 +30,9 @@ Build the core first, then the game on top. Each phase should run end to end bef
 
 ## Phase 4: Music mode
 
-- [ ] Local music or video playback
-- [ ] Chart synced to the media clock
-- [ ] Latency offset setting
+- [x] Local music playback (video not supported yet)
+- [x] Chart synced to the media clock
+- [x] Latency offset setting
 
 ## Phase 5: Polish and demo
 

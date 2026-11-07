@@ -61,3 +61,15 @@ Adaptive speed changes the gap between notes, so a fixed list of note times cann
 ## The approach ring closes on the hand
 
 The hit ring sits around the player's palm rather than in a fixed lane, so the timing cue is where the player is already looking.
+
+## Handedness label is swapped for mirrored frames
+
+The MediaPipe docs say handedness assumes a mirrored image, but in play testing the Tasks API reported the player's right hand as "Left" on our mirrored frames, which mirrored the ghost. The tracker now swaps the label when the camera is mirrored.
+
+## Silhouette ghost instead of a skeleton
+
+A white skeleton blended into the camera image and did not read as a hand. The ghost is now a filled hand silhouette with a dark and light traced edge, so it stands out on any background. Fingers that are clearly off are traced in a warning color on the player's own hand and named under a reference card.
+
+## Music clock starts with playback
+
+Tracks load into memory at startup. The game clock starts at the moment the sound starts and pauses with it, so chart times line up with the music. A player-set offset in the menu cancels camera, tracking, and audio delay.

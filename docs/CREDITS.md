@@ -17,8 +17,8 @@ Everything external that the project uses. Required by the brief. Keep this up t
 
 ## Media
 
-- (add each song or video used in the demo, with artist and title)
+- Demo 90: an original track synthesized by `aslgame/tools/make_demo_track.py`. No third-party music is used.
 
 ## AI use
 
-- Claude Code (Anthropic) wrote the Phase 1 code (camera and tracking threads, normalization, matcher, capture tool, ghost outline, debug overlay) the Phase 2 code (app state machine, menu, sign queue, match detector, karaoke strip, Learn mode), the dataset import tool, and the Phase 3 code (game clock, rhythm session, approach ring, beat pulse, scoring, combo, adaptive speed, results).
+- Claude Code (Anthropic) wrote the Phase 1 code (camera and tracking threads, normalization, matcher, capture tool, ghost outline, debug overlay) the Phase 2 code (app state machine, menu, sign queue, match detector, karaoke strip, Learn mode), the dataset import tool, and the Phase 3 code (game clock, rhythm session, approach ring, beat pulse, scoring, combo, adaptive speed, results), the Phase 4 code (charts, media player, latency setting, demo track), and the GUI redesign (menu, pause, results, keys panel, hand silhouette ghost, finger hints).

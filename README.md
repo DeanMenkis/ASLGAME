@@ -47,10 +47,12 @@ mkdir -p models
 curl -L -o models/hand_landmarker.task https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task
 ```
 
-- `.venv/bin/python -m aslgame`: the game. Left and Right pick a mode, Up and Down pick a word, Enter starts, Escape pauses or goes back.
+- `.venv/bin/python -m aslgame`: the game. Mouse or keyboard; press H or the ? button for keys.
+- `.venv/bin/python -m aslgame.tools.make_demo_track`: writes the synthesized demo song to `media/` for Music mode. Other songs go in `media/` with a chart in `data/charts/`.
+- `.venv/bin/python -m aslgame.tools.import_dataset datasets/asl-now-fingerspelling`: rebuilds the letter templates.
 - `.venv/bin/python -m aslgame.tools.capture A`: record templates for sign A. Space records a burst after a short countdown, Backspace drops the last burst. Saved to `data/signs/` on close.
 - `.venv/bin/python -m unittest`: tests that need no camera or window.
-- F3 toggles the debug overlay.
+- F3 toggles the performance overlay and the tracked skeleton.
 - A word is playable once every letter in it has a recorded template. The menu lists the missing letters.
 
 On first run macOS asks for camera access for the app that launched Python, such as Terminal.
