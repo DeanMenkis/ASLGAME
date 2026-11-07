@@ -35,9 +35,19 @@ MATCH_THRESHOLD = 0.75
 # Lower than MATCH_THRESHOLD so a hold survives small dips in score.
 MATCH_RELEASE_THRESHOLD = 0.65
 MATCH_HOLD_S = 0.6
+# How far another sign may outscore the target before the target is rejected.
+MATCH_RIVAL_MARGIN = 0.05
 
 # Learn mode. J and Z need motion, which handshape templates cannot capture.
 LEARN_WORDS = ("HI", "ASL", "CAB", "LOVE", "GOOD DAY", "THANK YOU")
+
+# Dataset import
+# The dataset normalizes x and y by frame width and height; its frames are treated as 16:9.
+DATASET_ASPECT = 16 / 9
+DATASET_OUTLIER_FACTOR = 2.0
+DATASET_MAX_SAMPLES = 80
+MOTION_LETTERS = ("J", "Z")
+SIDEWAYS_LETTERS = ("G", "H", "P", "Q")
 
 # Capture tool
 CAPTURE_COUNTDOWN_S = 2.0

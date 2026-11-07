@@ -1,6 +1,7 @@
 """Hand landmark indices and bone topology, as defined by the MediaPipe hand model."""
 
 WRIST = 0
+INDEX_TIP = 8
 FINGER_BASES = [5, 9, 13, 17]
 
 BONES = (
