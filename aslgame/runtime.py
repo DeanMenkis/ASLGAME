@@ -41,11 +41,11 @@ def fit_window(size_px):
     if scale <= 1:
         return
     try:
-        from pygame._sdl2.video import Window
+        from pygame._sdl2.video import WINDOWPOS_CENTERED, Window
         window = Window.from_display_module()
         window.size = (int(size_px[0] * scale), int(size_px[1] * scale))
-        window.position = pygame.WINDOWPOS_CENTERED
-    except (ImportError, pygame.error):
+        window.position = WINDOWPOS_CENTERED
+    except (ImportError, AttributeError, pygame.error):
         return
 
 
