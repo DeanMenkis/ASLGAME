@@ -47,7 +47,7 @@ mkdir -p models
 curl -L -o models/hand_landmarker.task https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task
 ```
 
-- `.venv/bin/python -m aslgame`: the game. Mouse or keyboard; press H or the ? button for keys.
+- Double-click `ASLGAME.command`, or run `.venv/bin/python -m aslgame`: the game. Mouse or keyboard; press H or the ? button for keys.
 - `.venv/bin/python -m aslgame.tools.make_demo_track`: writes the two synthesized songs (Warm-up 90, Hardstyle 150) to `media/`.
 - Bouncer is a CC0 track; download it from https://opengameart.org/node/107501 into `media/bouncer.mp3`.
 - `.venv/bin/python -m aslgame.tools.chart_track song.mp3 "Title"`: charts any song in `media/` (finds tempo and first beat). Add `--bpm` if it picks double time.
