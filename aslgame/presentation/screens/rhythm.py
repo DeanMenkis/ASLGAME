@@ -12,11 +12,11 @@ from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.common import (
     JUDGEMENT_TEXT, PAUSE_KEYS, FixHint, Ghost, ReferenceCard, TargetScorer, TopBar, draw_motion, idle_wrist, is_key,
 )
+from aslgame.presentation.arcade import ArcadeFx
 from aslgame.presentation.strip import Strip
 
 OPEN_STATES = (NoteState.WAITING, NoteState.APPROACHING, NoteState.HITTABLE)
 PALM_POINTS = [WRIST] + FINGER_BASES
-COMBO_CHEER = 10
 
 
 class RhythmScreen:
@@ -39,8 +39,8 @@ class RhythmScreen:
                             for j, text in JUDGEMENT_TEXT.items()}
         self._sfx = sfx
         self._strip_judgements = []
-        self._hud_values = None
-        self._hud = []
+        self._fx = ArcadeFx(fonts, size_px)
+        self._last_draw_s = None
 
     def pause(self, now_s):
         self.clock.pause(now_s)
@@ -59,8 +59,10 @@ class RhythmScreen:
         rhythm.update(self.session, game_s, score)
         for _, judgement in self.session.results[self.queue.current:]:
             self._sfx.play(judgement.name.lower())
-            if judgement != Judgement.MISS and self.session.combo and self.session.combo % COMBO_CHEER == 0:
+            if judgement != Judgement.MISS and self.session.combo in config.COMBO_MILESTONES:
                 self._sfx.play("combo")
+            center, _ = self._hit_ring(hand)
+            self._fx.hit(judgement.name, self.session.last_points, self.session.multiplier, self.session.combo, center, now_s)
         self.queue.current = len(self.session.results)
         # Kept in step with results here, so drawing never builds a new list.
         while len(self._strip_judgements) < len(self.session.results):
@@ -85,7 +87,12 @@ class RhythmScreen:
                 self._draw_approach(screen, target, game_s, center_px, hit_radius_px)
         self._draw_feedback(screen, game_s, center_px, hit_radius_px)
         self._draw_beat(screen, game_s)
-        self._draw_hud(screen)
+        frame_s = 0.0 if self._last_draw_s is None else now_s - self._last_draw_s
+        self._last_draw_s = now_s
+        self._fx.update(now_s, frame_s)
+        self._fx.draw(screen, now_s)
+        right_px = self._top_bar.pause_rect.left - theme.GRID_PX * 3
+        self._fx.draw_hud(screen, self.session.score, self.session.multiplier, self.session.combo, right_px, now_s)
 
     def _hit_ring(self, hand):
         """The inner ring sits around the palm, so the cue is where the player is looking."""
@@ -117,18 +124,3 @@ class RhythmScreen:
         pulse = (1.0 - self.session.beat_phase(game_s)) ** 2
         radius_px = theme.BEAT_DOT_RADIUS_PX + theme.BEAT_PULSE_PX * pulse
         pygame.draw.circle(screen, theme.ACCENT, (screen.get_width() // 2, theme.TOP_BAR_HEIGHT_PX // 2), radius_px)
-
-    def _draw_hud(self, screen):
-        values = (self.session.score, self.session.combo)
-        if values != self._hud_values:
-            # Re-rendered only when a value changes.
-            self._hud_values = values
-            self._hud = [
-                self._fonts.medium.render(str(values[0]), True, theme.INK),
-                self._fonts.body.render(f"x{values[1]}", True, theme.ACCENT if values[1] else theme.INK_DIM),
-            ]
-        right_px = self._top_bar.pause_rect.left - theme.GRID_PX * 3
-        center_y_px = theme.TOP_BAR_HEIGHT_PX // 2
-        for surface in reversed(self._hud):
-            rect = screen.blit(surface, surface.get_rect(midright=(right_px, center_y_px)))
-            right_px = rect.left - theme.GRID_PX * 2

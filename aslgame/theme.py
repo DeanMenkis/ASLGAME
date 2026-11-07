@@ -133,3 +133,8 @@ TRAIL_LINE_PX = 5
 GUIDE_PERIOD_S = 1.4
 # The path on the reference card is drawn smaller than on the hand so it fits.
 CARD_PATH_SCALE = 0.8
+
+# Arcade effects
+PARTICLE_RADIUS_PX = 6
+POP_RISE_PX = GRID_PX * 10
+PULSE_GROWTH = 0.35

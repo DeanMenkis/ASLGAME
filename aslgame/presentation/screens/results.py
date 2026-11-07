@@ -34,9 +34,11 @@ class ResultsScreen:
         """The whole card is drawn once."""
         card = make_panel(CARD_SIZE_PX)
         center_x_px = CARD_SIZE_PX[0] // 2
+        grade = fonts.display.render(results.grade, True, theme.ACCENT)
+        card.blit(grade, grade.get_rect(midleft=(theme.GRID_PX * 6, CARD_SIZE_PX[1] // 2)))
         y_px = theme.GRID_PX * 8
         for surface in (
-            fonts.large.render(str(results.score), True, theme.INK),
+            fonts.large.render(f"{results.score:,}", True, theme.INK),
             fonts.medium.render(f"{results.accuracy:.0%} accuracy    x{results.max_combo} best combo", True, theme.INK),
         ):
             draw_text_centered(card, surface, (center_x_px, y_px))
