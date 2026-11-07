@@ -77,12 +77,13 @@ def main():
     parser.add_argument("title")
     parser.add_argument("--text", default="HI ASL LOVE GOOD DAY CAB THANK YOU", help="words to sign, repeated to fill the song")
     parser.add_argument("--beats-per-note", type=int, default=4)
+    parser.add_argument("--bpm", type=float, help="set the tempo when detection picks double or half time")
     args = parser.parse_args()
 
     mono = load_mono(config.MEDIA_DIR / args.media)
     frames_per_s = config.AUDIO_RATE_HZ / HOP_SAMPLES
     onset, energy = onset_envelope(mono)
-    bpm, phase_s = refine_bpm(onset, frames_per_s, find_bpm(onset, frames_per_s))
+    bpm, phase_s = refine_bpm(onset, frames_per_s, args.bpm or find_bpm(onset, frames_per_s))
     beat_s = 60.0 / bpm
     duration_s = len(mono) / config.AUDIO_RATE_HZ
     loud_frame = int(np.argmax(energy > energy.max() * LOUD_FRACTION))
