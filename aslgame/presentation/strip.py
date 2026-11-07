@@ -1,38 +1,58 @@
-"""Karaoke strip: the word as a row of cells. Filled is done, outlined in accent is now."""
+"""Karaoke strip: the word as a row of cells. Filled is done, outlined in accent is now.
+
+Long text scrolls so the current cell stays in view.
+"""
 
 import pygame
 
 from aslgame import theme
 from aslgame.presentation.ui import make_panel
 
+PAD_PX = theme.GRID_PX * 2
+CELL_STEP_PX = theme.STRIP_CELL_PX + theme.STRIP_GAP_PX
+
 
 class Strip:
     def __init__(self, font, queue, screen_size_px):
         self._queue = queue
-        self._cells = []  # one rect per sign, in queue order
         self._ink = {}
         self._inverse = {}
-        width_px = sum(theme.STRIP_SPACE_PX if char == " " else theme.STRIP_CELL_PX + theme.STRIP_GAP_PX
-                       for char in queue.text) - theme.STRIP_GAP_PX
-        x_px = (screen_size_px[0] - width_px) // 2
-        y_px = screen_size_px[1] - theme.MARGIN_PX - theme.STRIP_CELL_PX
+        self._cell_x = []  # left edge of each sign's cell, in the full unscrolled layout
+        x_px = 0
         for char in queue.text:
             if char == " ":
                 x_px += theme.STRIP_SPACE_PX
                 continue
-            self._cells.append(pygame.Rect(x_px, y_px, theme.STRIP_CELL_PX, theme.STRIP_CELL_PX))
-            x_px += theme.STRIP_CELL_PX + theme.STRIP_GAP_PX
+            self._cell_x.append(x_px)
+            x_px += CELL_STEP_PX
             # Rendered once here so drawing never renders text.
             self._ink[char] = font.render(char, True, theme.INK)
             self._inverse[char] = font.render(char, True, theme.BACKGROUND)
-        self.top_px = y_px
-        pad_px = theme.GRID_PX * 2
-        self._backing = make_panel((width_px + pad_px * 2, theme.STRIP_CELL_PX + pad_px * 2))
-        self._backing_topleft = ((screen_size_px[0] - width_px) // 2 - pad_px, y_px - pad_px)
+        self._width_px = x_px - theme.STRIP_GAP_PX
+        self._view_width_px = min(self._width_px, screen_size_px[0] - theme.MARGIN_PX * 2 - PAD_PX * 2)
+        self._view_left_px = (screen_size_px[0] - self._view_width_px) // 2
+        self.top_px = screen_size_px[1] - theme.MARGIN_PX - theme.STRIP_CELL_PX
+        self._backing = make_panel((self._view_width_px + PAD_PX * 2, theme.STRIP_CELL_PX + PAD_PX * 2))
+        self._clip = pygame.Rect(self._view_left_px, self.top_px, self._view_width_px, theme.STRIP_CELL_PX)
+
+    def _scroll_px(self):
+        """Shift so the current cell sits in the middle, without scrolling past either end."""
+        if self._width_px <= self._view_width_px:
+            return 0
+        current = min(self._queue.current, len(self._cell_x) - 1)
+        wanted = self._cell_x[current] + theme.STRIP_CELL_PX // 2 - self._view_width_px // 2
+        return max(0, min(self._width_px - self._view_width_px, wanted))
 
     def draw(self, screen):
-        screen.blit(self._backing, self._backing_topleft)
-        for sign_index, rect in enumerate(self._cells):
+        screen.blit(self._backing, (self._view_left_px - PAD_PX, self.top_px - PAD_PX))
+        scroll_px = self._scroll_px()
+        previous_clip = screen.get_clip()
+        screen.set_clip(self._clip)
+        for sign_index, cell_x in enumerate(self._cell_x):
+            left_px = self._view_left_px + cell_x - scroll_px
+            if left_px + theme.STRIP_CELL_PX < self._clip.left or left_px > self._clip.right:
+                continue
+            rect = pygame.Rect(left_px, self.top_px, theme.STRIP_CELL_PX, theme.STRIP_CELL_PX)
             char = self._queue.text[self._queue.positions[sign_index]]
             if sign_index < self._queue.current:
                 pygame.draw.rect(screen, theme.INK, rect)
@@ -44,3 +64,4 @@ class Strip:
                 pygame.draw.rect(screen, theme.INK_DIM, rect, theme.STRIP_LINE_PX)
                 label = self._ink[char]
             screen.blit(label, label.get_rect(center=rect.center))
+        screen.set_clip(previous_clip)
