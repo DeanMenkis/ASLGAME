@@ -3,7 +3,7 @@
 import numpy as np
 
 from aslgame import config
-from aslgame.hand import FINGERS
+from aslgame.hand import FINGERS, WRIST
 
 
 def distance(hand, samples):
@@ -39,3 +39,16 @@ def fingers_off(hand, target):
     """Names of the fingers whose joints sit clearly away from the target's outline."""
     return [name for name, joints in FINGERS.items()
             if np.linalg.norm(hand[list(joints[1:])] - target.outline[list(joints[1:])], axis=1).mean() > config.FINGER_HINT_LIMIT]
+
+
+def extended_fingers(hand):
+    """Names of the straight fingers, thumb aside. Works whichever way the hand points."""
+    straight = set()
+    for name, joints in FINGERS.items():
+        if name == "Thumb":
+            continue
+        tip_distance = np.linalg.norm(hand[joints[3]] - hand[WRIST])
+        middle_distance = np.linalg.norm(hand[joints[1]] - hand[WRIST])
+        if tip_distance > middle_distance * config.EXTENDED_RATIO:
+            straight.add(name)
+    return straight

@@ -66,7 +66,6 @@ LEARN_WORDS = (
     "GOOD LUCK", "GOOD MORNING", "GOOD NIGHT", "HAVE FUN", "LETS GO", "WHATS UP", "HOW ARE YOU",
     "I LOVE YOU", "BEST FRIEND", "SEE YOU LATER", "NICE TO MEET YOU", "MY NAME IS", "HAPPY BIRTHDAY",
 )
-ALPHABET_LABEL = "A to Y"
 
 # Rhythm mode
 RHYTHM_BPM = 90
@@ -96,8 +95,25 @@ RESULTS_WEAKEST_COUNT = 3
 DATASET_ASPECT = 16 / 9
 DATASET_OUTLIER_FACTOR = 2.0
 DATASET_MAX_SAMPLES = 80
-MOTION_LETTERS = ("J", "Z")
+# J borrows the I handshape, so its dataset samples are not imported.
+DATASET_SKIP = ("J",)
+# Z was recorded mid-stroke; only samples pointing up make a clear picture of its handshape.
+DATASET_POINTING_UP = ("Z",)
+POINTING_UP_PALMS = 0.6
 SIDEWAYS_LETTERS = ("G", "H", "P", "Q")
+
+# Motion signs (J, Z)
+MOTION_WINDOW_S = 2.0
+MOTION_SHAPE_GRACE_S = 0.4
+MOTION_RESAMPLE_POINTS = 24
+MOTION_MIN_POINTS = 8
+MOTION_START_STEP = 3
+MOTION_MIN_EXTENT_PALMS = 0.7
+MOTION_MATCH_DISTANCE = 0.2
+# A finger counts as straight when its tip is this much farther from the wrist than its middle joint.
+# Straight fingers measure about 1.3 and folded ones 0.85 or less.
+EXTENDED_RATIO = 1.1
+TRAIL_POINTS = 60
 
 # Capture tool
 CAPTURE_COUNTDOWN_S = 2.0
