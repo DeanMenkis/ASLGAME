@@ -17,6 +17,7 @@ from aslgame.game.sign_queue import make_queue
 from aslgame.media.player import MediaPlayer, load_tracks
 from aslgame.media.sfx import Sfx
 from aslgame.presentation.draw import draw_hand
+from aslgame.presentation.light_warning import LightWarning
 from aslgame.presentation.screens.boot import BootScreen
 from aslgame.presentation.screens.common import is_key
 from aslgame.presentation.screens.learn import LearnScreen
@@ -43,6 +44,7 @@ class App:
         self.played_item = None
         self.player = None
         fonts = self.runtime.fonts
+        self.light_warning = LightWarning(fonts, self.size_px)
         self.screens = {
             AppState.BOOT: BootScreen(),
             AppState.MENU: MenuScreen(fonts, set(self.signs), self.charts, set(self.tracks), self.settings, self.size_px, self.sfx),
@@ -116,6 +118,9 @@ class App:
             hand = runtime.result.hand if runtime.result else None
             action = action or screen.update(now_s, runtime.result)
             screen.draw(runtime.screen, now_s, hand)
+            self.light_warning.update(now_s, runtime.frame)
+            if self.state in PLAY_STATES:
+                self.light_warning.draw(runtime.screen, now_s)
             if runtime.debug.visible and hand is not None:
                 draw_hand(runtime.screen, hand.points_px, theme.LIVE_HAND, theme.LIVE_LINE_PX, theme.LIVE_JOINT_RADIUS_PX, True)
             runtime.end_frame()

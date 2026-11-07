@@ -16,6 +16,7 @@ from aslgame.latest import Latest
 class Frame:
     rgb: np.ndarray
     captured_s: float
+    brightness: float  # mean level from 0 to 255
 
 
 class Camera:
@@ -52,7 +53,10 @@ class Camera:
             captured_s = time.perf_counter()
             if config.CAMERA_MIRROR:
                 bgr = cv2.flip(bgr, 1)
-            self.frames.publish(Frame(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB), captured_s))
+            rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+            # A sparse sample is enough to judge the light, and costs almost nothing.
+            brightness = float(rgb[::config.BRIGHTNESS_SAMPLE_STEP, ::config.BRIGHTNESS_SAMPLE_STEP].mean())
+            self.frames.publish(Frame(rgb, captured_s, brightness))
             self.fps = smooth_fps(self.fps, captured_s - last_s)
             last_s = captured_s
 

@@ -17,6 +17,10 @@ CAMERA_HEIGHT_PX = 720
 CAMERA_FPS = 30
 CAMERA_MIRROR = True
 CAMERA_RETRY_S = 0.05
+# Low light warning: shown when the picture stays darker than this, on a 0 to 255 scale.
+LOW_LIGHT_LEVEL = 45
+LOW_LIGHT_DELAY_S = 1.5
+BRIGHTNESS_SAMPLE_STEP = 16
 CAMERA_OPEN_TIMEOUT_S = 30.0
 CAMERA_OPEN_RETRY_S = 1.0
 
