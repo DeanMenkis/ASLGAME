@@ -20,8 +20,18 @@ from aslgame.tracking.tracker import Tracker  # noqa: E402
 @dataclass(frozen=True)
 class Fonts:
     small: pygame.font.Font
+    body: pygame.font.Font
     medium: pygame.font.Font
     large: pygame.font.Font
+
+
+def make_fonts():
+    return Fonts(
+        small=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_SMALL_PX),
+        body=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_BODY_PX),
+        medium=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_MEDIUM_PX, bold=True),
+        large=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_LARGE_PX, bold=True),
+    )
 
 
 class Runtime:
@@ -32,11 +42,7 @@ class Runtime:
         self.tracker = Tracker(self.camera.frames)
         self.screen = pygame.display.set_mode(self.camera.size_px)
         pygame.display.set_caption(title)
-        self.fonts = Fonts(
-            small=pygame.font.Font(theme.FONT_NAME, theme.FONT_SIZE_SMALL_PX),
-            medium=pygame.font.Font(theme.FONT_NAME, theme.FONT_SIZE_MEDIUM_PX),
-            large=pygame.font.Font(theme.FONT_NAME, theme.FONT_SIZE_LARGE_PX),
-        )
+        self.fonts = make_fonts()
         self.debug = DebugOverlay(self.fonts.small)
         self.clock = pygame.time.Clock()
         self.fps = 0.0
