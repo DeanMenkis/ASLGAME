@@ -8,6 +8,7 @@ class AppState(Enum):
     MENU = auto()
     LEARN = auto()
     RHYTHM = auto()
+    MUSIC = auto()
     RESULTS = auto()
     PAUSED = auto()
     QUIT = auto()
@@ -17,6 +18,8 @@ class Action(Enum):
     READY = auto()
     START_LEARN = auto()
     START_RHYTHM = auto()
+    START_MUSIC = auto()
+    RETRY = auto()
     FINISH = auto()
     PAUSE = auto()
     RESUME = auto()
@@ -24,23 +27,31 @@ class Action(Enum):
     QUIT = auto()
 
 
+PLAY_STATES = (AppState.LEARN, AppState.RHYTHM, AppState.MUSIC)
+
 TRANSITIONS = {
     (AppState.BOOT, Action.READY): AppState.MENU,
     (AppState.MENU, Action.START_LEARN): AppState.LEARN,
     (AppState.MENU, Action.START_RHYTHM): AppState.RHYTHM,
+    (AppState.MENU, Action.START_MUSIC): AppState.MUSIC,
     (AppState.LEARN, Action.PAUSE): AppState.PAUSED,
     (AppState.LEARN, Action.TO_MENU): AppState.MENU,
     (AppState.RHYTHM, Action.PAUSE): AppState.PAUSED,
     (AppState.RHYTHM, Action.FINISH): AppState.RESULTS,
+    (AppState.MUSIC, Action.PAUSE): AppState.PAUSED,
+    (AppState.MUSIC, Action.FINISH): AppState.RESULTS,
     (AppState.RESULTS, Action.TO_MENU): AppState.MENU,
     (AppState.PAUSED, Action.TO_MENU): AppState.MENU,
 }
 
 
-def next_state(state, action, paused_from):
-    """Return the state after action. Actions that do not apply leave the state unchanged."""
+def next_state(state, action, play_state):
+    """Return the state after action. play_state is the mode being played, used to resume and retry.
+
+    Actions that do not apply leave the state unchanged.
+    """
     if action == Action.QUIT:
         return AppState.QUIT
-    if state == AppState.PAUSED and action == Action.RESUME:
-        return paused_from
+    if (state, action) in ((AppState.PAUSED, Action.RESUME), (AppState.RESULTS, Action.RETRY)):
+        return play_state
     return TRANSITIONS.get((state, action), state)

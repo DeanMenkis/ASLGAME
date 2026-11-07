@@ -3,6 +3,7 @@
 import pygame
 
 from aslgame import theme
+from aslgame.presentation.ui import make_panel
 
 
 class Strip:
@@ -25,8 +26,12 @@ class Strip:
             self._ink[char] = font.render(char, True, theme.INK)
             self._inverse[char] = font.render(char, True, theme.BACKGROUND)
         self.top_px = y_px
+        pad_px = theme.GRID_PX * 2
+        self._backing = make_panel((width_px + pad_px * 2, theme.STRIP_CELL_PX + pad_px * 2))
+        self._backing_topleft = ((screen_size_px[0] - width_px) // 2 - pad_px, y_px - pad_px)
 
     def draw(self, screen):
+        screen.blit(self._backing, self._backing_topleft)
         for sign_index, rect in enumerate(self._cells):
             char = self._queue.text[self._queue.positions[sign_index]]
             if sign_index < self._queue.current:
