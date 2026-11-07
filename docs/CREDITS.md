@@ -17,10 +17,21 @@ Everything external that the project uses. Required by the brief. Keep this up t
 
 ## Media
 
-- "Bouncer" by Of Far Different Nature, [OpenGameArt](https://opengameart.org/node/107501), CC0. Kept in `media/`, not committed.
+Songs by **Of Far Different Nature** from OpenGameArt, kept in `media/` and never committed:
+
+- "Bouncer", [CC0](https://opengameart.org/node/107501)
+- "Vengeance", [CC0](https://opengameart.org/content/vengeance-electro)
+- "Liquid Flame", [CC0](https://opengameart.org/content/liquid-flame)
+- "Funky House", [CC0](https://opengameart.org/content/funky-house)
+- "Electric Dream", [CC-BY 4.0](https://opengameart.org/content/electric-dream)
+- "Victory Party", [CC-BY 4.0](https://opengameart.org/content/victory-party)
+- "Whrghah!step", [CC-BY 4.0](https://opengameart.org/content/whrghahstep)
+
+CC-BY 4.0 tracks are credited here and on the in-game About panel, as the license requires.
+
 - "Warm-up 90" and "Hardstyle 150": original tracks synthesized by `aslgame/tools/make_demo_track.py`.
 - Sound effects: synthesized in code by `aslgame/media/sfx.py`.
 
 ## AI use
 
-- Claude Code (Anthropic) wrote the Phase 1 code (camera and tracking threads, normalization, matcher, capture tool, ghost outline, debug overlay) the Phase 2 code (app state machine, menu, sign queue, match detector, karaoke strip, Learn mode), the dataset import tool, and the Phase 3 code (game clock, rhythm session, approach ring, beat pulse, scoring, combo, adaptive speed, results), the Phase 4 code (charts, media player, latency setting, demo track), the GUI redesign (menu, pause, results, keys panel, hand silhouette ghost, finger hints), and the Phase 5 code (finger colors, sound effects, chart tool, hardstyle track, About panel, demo recorder, accessibility and presentation notes).
+- Claude Code (Anthropic) wrote the Phase 1 code (camera and tracking threads, normalization, matcher, capture tool, ghost outline, debug overlay) the Phase 2 code (app state machine, menu, sign queue, match detector, karaoke strip, Learn mode), the dataset import tool, and the Phase 3 code (game clock, rhythm session, approach ring, beat pulse, scoring, combo, adaptive speed, results), the Phase 4 code (charts, media player, latency setting, demo track), the GUI redesign (menu, pause, results, keys panel, hand silhouette ghost, finger hints), the Phase 5 code (finger colors, sound effects, chart tool, hardstyle track, About panel, demo recorder, accessibility and presentation notes), Recall mode, the phrase list, judgement colors, and the low light warning.

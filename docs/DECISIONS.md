@@ -85,3 +85,15 @@ Sound effects and the two demo songs are generated with NumPy, so there are no f
 ## Scaled window
 
 The game draws at the camera's 1280 by 720 and pygame scales it to a larger, resizable window, so layout and mouse positions never change with the window size.
+
+## The shown outline always matches
+
+Some letters (G, O, P) vary a lot between signers, so their averaged outline sat between clusters and scored under the threshold. Copying the ghost exactly did not count. The outline is now one of each sign's samples, so the shape on screen is always a valid answer.
+
+## Recall reuses the judgement look
+
+Recall marks letters signed from memory like a Perfect and letters that needed a hint like an OK, so the strip speaks one visual language across modes.
+
+## Songs are charted from the phrase list
+
+The chart tool fills each song with the phrase list, so every song practises real words rather than random letters.

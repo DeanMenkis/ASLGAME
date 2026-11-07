@@ -9,7 +9,7 @@ CREDITS = (
     "Letter shapes: ASL-Now fingerspelling dataset, MIT",
     "Hand tracking: MediaPipe Hand Landmarker, Apache 2.0",
     "pygame (LGPL), NumPy (BSD), OpenCV (Apache 2.0)",
-    "Bouncer by Of Far Different Nature, CC0",
+    "Songs by Of Far Different Nature, CC0 and CC-BY 4.0",
     "Warm-up 90 and Hardstyle 150: made for this game",
     "Code written with Claude Code (Anthropic)",
 )

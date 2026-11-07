@@ -7,6 +7,7 @@ The player sees a target handshape drawn over their own hand, matches it on the 
 ## Modes
 
 - **Learn**: untimed. Match each handshape at your own pace.
+- **Recall**: untimed and harder. Only the letter is shown; sign it from memory.
 - **Rhythm**: handshapes arrive on a beat. Speed adapts to how well you sign.
 - **Music**: sign along to a song or music video. Rhythm mode with a soundtrack.
 
@@ -48,8 +49,9 @@ curl -L -o models/hand_landmarker.task https://storage.googleapis.com/mediapipe-
 ```
 
 - Double-click `ASLGAME.command`, or run `.venv/bin/python -m aslgame`: the game. Mouse or keyboard; press H or the ? button for keys.
+- Modes: **Learn** (match the outline, no timer), **Recall** (sign from memory, Tab for a hint), **Rhythm** (signs on a beat, speed adapts), **Music** (signs on a song).
 - `.venv/bin/python -m aslgame.tools.make_demo_track`: writes the two synthesized songs (Warm-up 90, Hardstyle 150) to `media/`.
-- Bouncer is a CC0 track; download it from https://opengameart.org/node/107501 into `media/bouncer.mp3`.
+- The other songs are free tracks from OpenGameArt; see [Credits](docs/CREDITS.md) for links. Save each into `media/` under the name its chart in `data/charts/` expects (for example `bouncer.mp3`).
 - `.venv/bin/python -m aslgame.tools.chart_track song.mp3 "Title"`: charts any song in `media/` (finds tempo and first beat). Add `--bpm` if it picks double time.
 - `.venv/bin/python -m aslgame.tools.import_dataset datasets/asl-now-fingerspelling`: rebuilds the letter templates.
 - `.venv/bin/python -m aslgame.tools.capture A`: record templates for sign A. Space records a burst after a short countdown, Backspace drops the last burst. Saved to `data/signs/` on close.

@@ -42,8 +42,16 @@ Build the core first, then the game on top. Each phase should run end to end bef
 - [ ] Backup demo recording (recorder built: F9; the recording itself is still to make)
 - [ ] Presentation (outline in [Presentation](PRESENTATION.md))
 
+## Phase 6: Depth
+
+- [x] Recall mode: sign from memory with an optional hint
+- [x] Longer phrase list and a scrolling menu
+- [x] More songs, charted automatically
+- [x] Per-letter judgement colors in the strip
+- [x] Low light warning
+
 ## Open questions
 
 - Review of the letter templates by a fluent signer
 - Whether to add motion signs (J, Z, and common word signs)
-- How to warn the player about poor lighting
+- Detecting backlight, not just low light

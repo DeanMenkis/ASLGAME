@@ -30,9 +30,9 @@ Audit of every cue in the game against the rules in the architecture doc: nothin
 - Smallest text is 18 px; play screens use 24 px and up.
 - The ghost has a dark outer edge and a light inner edge, so it stays visible on light and dark backgrounds.
 - No full-screen flashing. The beat pulse changes size, not brightness.
-- Learn mode has no time limit.
+- Learn and Recall modes have no time limit.
 
 ## Known gaps
 
 - Only one hand is tracked, and the player must be able to form handshapes with it.
-- Strong backlight or low light lowers tracking quality. There is no on-screen warning for this yet.
+- Strong backlight lowers tracking quality. Low light is warned about ("More light" with a sun icon), but backlight is not detected.
