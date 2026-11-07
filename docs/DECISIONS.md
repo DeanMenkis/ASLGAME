@@ -25,3 +25,15 @@ Every timing cue is visual so the game works without sound. Music is an extra la
 ## Media stays local
 
 Songs and videos are used for a private demo only and are never committed to the repo.
+
+## MediaPipe Tasks API in VIDEO mode
+
+HandLandmarker from the Tasks API replaces the legacy `mp.solutions` API. VIDEO mode runs synchronously on the tracker thread, so the thread always works on the newest frame and drops the rest, with no callback plumbing.
+
+## Normalize in image space, keep orientation
+
+Landmarks are normalized from image coordinates: wrist at the origin, scaled by mean palm size, left hands mirrored to match right hands. The same transform inverted places the ghost outline on the live hand. Rotation is not removed, because orientation is part of some handshapes, such as H versus U.
+
+## pygame loads before OpenCV
+
+opencv-contrib-python and pygame each bundle SDL2. On macOS the first copy loaded wins, so every entry point imports the runtime, which imports pygame, before anything that imports OpenCV.

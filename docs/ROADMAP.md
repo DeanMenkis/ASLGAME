@@ -4,12 +4,12 @@ Build the core first, then the game on top. Each phase should run end to end bef
 
 ## Phase 1: Core
 
-- [ ] Camera feed in a window
-- [ ] Hand tracking on a background thread
-- [ ] Landmark normalization
-- [ ] Capture tool to record sign templates
-- [ ] Matcher that scores a hand against a target
-- [ ] Ghost hand outline drawn over the live hand
+- [x] Camera feed in a window
+- [x] Hand tracking on a background thread
+- [x] Landmark normalization
+- [x] Capture tool to record sign templates
+- [x] Matcher that scores a hand against a target
+- [x] Ghost hand outline drawn over the live hand
 
 ## Phase 2: Learn mode
 
@@ -38,7 +38,7 @@ Build the core first, then the game on top. Each phase should run end to end bef
 
 - [ ] Accessibility pass (no sound-only or color-only cues)
 - [ ] Credits and limitations screen
-- [ ] Debug overlay for FPS and latency
+- [x] Debug overlay for FPS and latency
 - [ ] Backup demo recording
 - [ ] Presentation
 

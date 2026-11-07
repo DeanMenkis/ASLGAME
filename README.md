@@ -36,6 +36,24 @@ References:
 - Lidwell, Holden and Butler, *Universal Principles of Design*: general reference
 - Steve Krug, *Don't Make Me Think*: self-evident interfaces
 
+## Running
+
+Python 3.11 on macOS.
+
+```
+python3.11 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+mkdir -p models
+curl -L -o models/hand_landmarker.task https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task
+```
+
+- `.venv/bin/python -m aslgame`: the live hand with the target sign's ghost. Left and Right change the target.
+- `.venv/bin/python -m aslgame.tools.capture A`: record templates for sign A. Space records a burst after a short countdown, Backspace drops the last burst. Saved to `data/signs/` on close.
+- `.venv/bin/python -m unittest`: tests that need no camera or window.
+- F3 toggles the debug overlay. Escape quits.
+
+On first run macOS asks for camera access for the app that launched Python, such as Terminal.
+
 ## Docs
 
 - [Coding standards](docs/CODING_STANDARDS.md): how we write code
