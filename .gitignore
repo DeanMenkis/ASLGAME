@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Models and media (local only)
+models/
+media/
+*.task
+*.mp3
+*.mp4
+*.wav
+*.m4a
+*.mov
+
+# Personal recordings
+recordings/
+
+# OS and editors
+.DS_Store
+.vscode/
+.idea/
