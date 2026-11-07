@@ -26,6 +26,7 @@ class Fonts:
 
 class Runtime:
     def __init__(self, title):
+        pygame.mixer.pre_init(config.AUDIO_RATE_HZ, config.AUDIO_SAMPLE_BITS, config.AUDIO_CHANNELS, config.AUDIO_BUFFER_SAMPLES)
         pygame.init()
         self.camera = Camera()
         self.tracker = Tracker(self.camera.frames)

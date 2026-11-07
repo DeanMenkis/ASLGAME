@@ -5,8 +5,8 @@ __pycache__/
 venv/
 
 # Models and media (local only)
-models/
-media/
+/models/
+/media/
 *.task
 *.mp3
 *.mp4
@@ -15,7 +15,7 @@ media/
 *.mov
 
 # Personal recordings
-recordings/
+/recordings/
 
 # OS and editors
 .DS_Store
@@ -23,4 +23,7 @@ recordings/
 .idea/
 
 # Third-party datasets (local only)
-datasets/
+/datasets/
+
+# Local player settings
+settings.json

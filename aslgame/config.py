@@ -5,6 +5,9 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 MODEL_PATH = ROOT_DIR / "models" / "hand_landmarker.task"
 SIGNS_DIR = ROOT_DIR / "data" / "signs"
+CHARTS_DIR = ROOT_DIR / "data" / "charts"
+MEDIA_DIR = ROOT_DIR / "media"
+SETTINGS_PATH = ROOT_DIR / "settings.json"
 
 # Camera
 CAMERA_INDEX = 0
@@ -15,6 +18,12 @@ CAMERA_MIRROR = True
 CAMERA_RETRY_S = 0.05
 CAMERA_OPEN_TIMEOUT_S = 30.0
 CAMERA_OPEN_RETRY_S = 1.0
+
+# Audio. A small buffer keeps the delay between play and sound short.
+AUDIO_RATE_HZ = 44100
+AUDIO_BUFFER_SAMPLES = 512
+AUDIO_SAMPLE_BITS = -16  # signed 16-bit
+AUDIO_CHANNELS = 2
 
 # Main loop
 TARGET_FPS = 60
@@ -52,8 +61,10 @@ RHYTHM_HOLD_S = 0.15
 PERFECT_WINDOW_S = 0.15
 GOOD_WINDOW_S = 0.3
 HIT_WINDOW_S = 0.5
-# Added to the player's timing to cancel camera and tracking delay. Tuned in music mode.
-LATENCY_OFFSET_S = 0.0
+# Subtracted from the player's timing to cancel camera, tracking, and audio delay. Set from the menu.
+LATENCY_OFFSET_DEFAULT_MS = 0
+LATENCY_OFFSET_STEP_MS = 10
+LATENCY_OFFSET_LIMIT_MS = 300
 FEEDBACK_S = 0.5
 COMBO_CAP = 50
 COMBO_STEP = 25
