@@ -69,7 +69,7 @@ CORNER_PX = GRID_PX * 2
 BUTTON_HEIGHT_PX = GRID_PX * 7
 BUTTON_PADDING_PX = GRID_PX * 3
 BORDER_PX = 2
-ROW_HEIGHT_PX = GRID_PX * 8
+ROW_HEIGHT_PX = GRID_PX * 7
 CARD_WIDTH_PX = GRID_PX * 70
 TOP_BAR_HEIGHT_PX = GRID_PX * 12
 ICON_BUTTON_PX = GRID_PX * 7
@@ -94,3 +94,12 @@ GHOST_SIZE_STEP_PX = 4
 GHOST_CACHE_SIZE = 48
 REFERENCE_CARD_SIZE_PX = (GRID_PX * 26, GRID_PX * 32)
 REFERENCE_PALM_PX = GRID_PX * 8
+
+# Finger colors option: one tint per finger, from the Okabe-Ito palette, which stays distinct with color blindness.
+FINGER_TINTS = {
+    "Thumb": (230, 159, 0, 150),
+    "Index": (86, 180, 233, 150),
+    "Middle": (0, 158, 115, 150),
+    "Ring": (240, 228, 66, 150),
+    "Pinky": (204, 121, 167, 150),
+}

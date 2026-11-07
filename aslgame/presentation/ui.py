@@ -75,3 +75,22 @@ def draw_key_chip(screen, font, text, midleft_px):
     pygame.draw.rect(screen, theme.BORDER, rect, theme.BORDER_PX, border_radius=theme.GRID_PX)
     screen.blit(label, label.get_rect(center=rect.center))
     return rect
+
+
+class Toggle:
+    """An on/off control. The state is spelled out as well as filled, so it never rests on color alone."""
+
+    def __init__(self, font, label, rect):
+        self.rect = pygame.Rect(rect)
+        self._on = Button(font, f"{label}  On", self.rect, primary=True)
+        self._off = Button(font, f"{label}  Off", self.rect)
+
+    def is_clicked(self, event):
+        return clicked(event, self.rect)
+
+    def draw(self, screen, on):
+        (self._on if on else self._off).draw(screen)
+
+
+def toggle_width(font, label):
+    return button_width(font, f"{label}  Off")
