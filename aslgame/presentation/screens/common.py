@@ -79,9 +79,10 @@ class ReferenceCard:
     """A large, still picture of the target sign, so the shape is clear even while the hand moves."""
 
     def __init__(self, fonts, signs, names, settings):
-        # Every style is built up front so switching never renders in the loop.
-        self._cards = {(name, colors): self._build(fonts, signs[name], colors) for name in names for colors in (False, True)}
-        self._letters = {name: self._build_letter(fonts, name) for name in names}
+        # Cards are built the first time each is shown (about a millisecond), so long words start without a pause.
+        self._fonts = fonts
+        self._signs = signs
+        self._cards = {}
         self._settings = settings
 
     def _build_letter(self, fonts, name):
@@ -105,7 +106,11 @@ class ReferenceCard:
 
     def draw(self, screen, name, progress=None, letter_only=False):
         """progress, from 0 to 1, fills a bar along the card's bottom edge."""
-        card = self._letters[name] if letter_only else self._cards[(name, self._settings.finger_colors)]
+        key = (name, "letter" if letter_only else self._settings.finger_colors)
+        if key not in self._cards:
+            sign = self._signs[name]
+            self._cards[key] = self._build_letter(self._fonts, name) if letter_only else self._build(self._fonts, sign, key[1])
+        card = self._cards[key]
         rect = screen.blit(card, CARD_TOPLEFT_PX)
         if progress:
             fill = pygame.Rect(rect.left, rect.bottom - theme.GRID_PX, int(rect.width * min(1.0, progress)), theme.GRID_PX)
