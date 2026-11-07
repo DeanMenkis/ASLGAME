@@ -85,6 +85,8 @@ def first_hand(raw, frame_shape):
     height_px, width_px = frame_shape[:2]
     normalized = np.array([(p.x, p.y, p.z) for p in raw.hand_landmarks[0]], dtype=np.float32)
     points_px = normalized * np.array([width_px, height_px, width_px], dtype=np.float32)
-    # MediaPipe labels handedness assuming a mirrored image, which CAMERA_MIRROR provides.
-    is_left = raw.handedness[0][0].category_name == "Left"
+    # In play testing the Tasks API label came out swapped for our mirrored frames,
+    # so the player's right hand is reported as "Left".
+    label = raw.handedness[0][0].category_name
+    is_left = (label == "Right") if config.CAMERA_MIRROR else (label == "Left")
     return Hand(points_px, is_left)
