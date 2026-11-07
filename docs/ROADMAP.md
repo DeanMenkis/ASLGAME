@@ -21,12 +21,12 @@ Build the core first, then the game on top. Each phase should run end to end bef
 
 ## Phase 3: Rhythm mode
 
-- [ ] Game clock and charts
-- [ ] Approach circles and beat pulse
-- [ ] Timing judgements and scoring
-- [ ] Combo system
-- [ ] Adaptive speed based on recent accuracy
-- [ ] Results screen with weakest signs
+- [x] Game clock and charts
+- [x] Approach circles and beat pulse
+- [x] Timing judgements and scoring
+- [x] Combo system
+- [x] Adaptive speed based on recent accuracy
+- [x] Results screen with weakest signs
 
 ## Phase 4: Music mode
 

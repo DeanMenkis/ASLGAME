@@ -53,3 +53,11 @@ Recording every letter by hand needs a fluent signer and time. The ASL-Now datas
 ## Reject a target when a rival fits clearly better
 
 A target only passes when no other sign outscores it by more than a small margin. This cut wrong-letter accepts by about two thirds on held-out data for a one point drop in right-letter accepts.
+
+## Rhythm charts are generated as you play
+
+Adaptive speed changes the gap between notes, so a fixed list of note times cannot work. Rhythm mode schedules each note a few beats ahead from the current speed, and the word is repeated so speed has room to change. Notes land on beats, so the beat pulse and the approach ring agree.
+
+## The approach ring closes on the hand
+
+The hit ring sits around the player's palm rather than in a fixed lane, so the timing cue is where the player is already looking.
