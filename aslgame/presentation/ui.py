@@ -90,7 +90,3 @@ class Toggle:
 
     def draw(self, screen, on):
         (self._on if on else self._off).draw(screen)
-
-
-def toggle_width(font, label):
-    return button_width(font, f"{label}  Off")
