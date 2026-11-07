@@ -57,7 +57,11 @@ MATCH_RIVAL_MARGIN = 0.05
 FINGER_HINT_LIMIT = 0.55
 
 # Learn mode. J and Z need motion, which handshape templates cannot capture.
-LEARN_WORDS = ("HI", "ASL", "CAB", "LOVE", "GOOD DAY", "THANK YOU")
+LEARN_WORDS = (
+    "HI", "HELLO", "ASL", "CAB", "LOVE", "PLEASE", "SORRY", "THANK YOU", "WELCOME", "GOOD DAY",
+    "GOOD LUCK", "GOOD MORNING", "GOOD NIGHT", "HAVE FUN", "LETS GO", "WHATS UP", "HOW ARE YOU",
+    "I LOVE YOU", "BEST FRIEND", "SEE YOU LATER", "NICE TO MEET YOU", "MY NAME IS", "HAPPY BIRTHDAY",
+)
 ALPHABET_LABEL = "A to Y"
 
 # Rhythm mode
@@ -65,7 +69,8 @@ RHYTHM_BPM = 90
 BEATS_PER_NOTE = 4
 APPROACH_BEATS = 3
 RHYTHM_LEAD_IN_S = 3.0
-RHYTHM_REPEATS = 3
+# Short words repeat until a rhythm run has at least this many signs.
+RHYTHM_MIN_SIGNS = 12
 # A short hold still filters single-frame flickers without slowing play down.
 RHYTHM_HOLD_S = 0.15
 PERFECT_WINDOW_S = 0.15

@@ -75,7 +75,7 @@ def main():
     parser = argparse.ArgumentParser(description="Write a chart for a song in media/.")
     parser.add_argument("media", help="file name inside media/")
     parser.add_argument("title")
-    parser.add_argument("--text", default="HI ASL LOVE GOOD DAY CAB THANK YOU", help="words to sign, repeated to fill the song")
+    parser.add_argument("--text", default=" ".join(config.LEARN_WORDS), help="words to sign, repeated to fill the song")
     parser.add_argument("--beats-per-note", type=int, default=4)
     parser.add_argument("--bpm", type=float, help="set the tempo when detection picks double or half time")
     args = parser.parse_args()

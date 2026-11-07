@@ -2,6 +2,7 @@
 
 from aslgame.runtime import Runtime  # First, so pygame loads before OpenCV.
 
+import math
 import time
 
 import pygame
@@ -52,10 +53,12 @@ class App:
         """Build a fresh screen for a mode, used by both the menu and retry."""
         fonts = self.runtime.fonts
         self.stop_music()
-        if state == AppState.LEARN:
-            self.screens[state] = LearnScreen(fonts, self.signs, item_value, self.size_px, self.settings, self.sfx)
+        if state in (AppState.LEARN, AppState.RECALL):
+            self.screens[state] = LearnScreen(fonts, self.signs, item_value, self.size_px, self.settings, self.sfx,
+                                              recall=state == AppState.RECALL)
         elif state == AppState.RHYTHM:
-            queue = make_queue(" ".join([item_value] * config.RHYTHM_REPEATS))
+            repeats = max(1, math.ceil(config.RHYTHM_MIN_SIGNS / len(item_value.replace(" ", ""))))
+            queue = make_queue(" ".join([item_value] * repeats))
             session = RhythmSession([queue.text[i] for i in queue.positions])
             self.screens[state] = RhythmScreen(fonts, self.signs, queue, session, GameClock(now_s), self.size_px, self.settings,
                                                self.sfx)
