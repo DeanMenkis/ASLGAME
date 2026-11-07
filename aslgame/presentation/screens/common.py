@@ -3,12 +3,15 @@
 import pygame
 
 from aslgame import config, theme
+from aslgame.game.motion import MOTION_SIGNS, MotionState, MotionTracker
+from aslgame.game.motion import update as motion_update
 from aslgame.game.rhythm import Judgement
 from aslgame.hand import FINGERS, WRIST
 from aslgame.matching import matcher
 from aslgame.matching.normalize import normalize, palm_size
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.hand_shape import GhostRenderer, draw_finger_fixes, render_silhouette
+from aslgame.presentation.motion_path import draw_guide, draw_trail, guide_points
 from aslgame.presentation.ui import clicked, make_panel
 
 CONFIRM_KEYS = (pygame.K_RETURN, pygame.K_SPACE)
@@ -31,27 +34,59 @@ def idle_wrist(size_px):
 
 
 class TargetScorer:
-    """Scores the live hand against a target once per tracking result, and finds the fingers to fix."""
+    """Scores the live hand against a target once per tracking result, and finds the fingers to fix.
+
+    Motion signs (J, Z) pass only once their path has been drawn with the right fingers straight.
+    """
 
     def __init__(self, signs):
         self._signs = signs
+        # Motion letters are told apart by their path, so they never count as look-alikes of still letters.
+        self._still_signs = {name: sign for name, sign in signs.items() if name not in MOTION_SIGNS}
         self._result = None
         self._target = None
         self.score = 0.0
         self.fingers_off = []
+        self.shape_ok = False
+        self.tracker = None
+        self.trail_px = []
 
     def update(self, result, target_name):
         if result is self._result and target_name == self._target:
             return self.score
+        if target_name != self._target:
+            motion = MOTION_SIGNS.get(target_name)
+            self.tracker = MotionTracker(motion) if motion else None
+            self.trail_px = []
         self._result, self._target = result, target_name
         hand = result.hand if result else None
         if hand is None:
-            self.score, self.fingers_off = 0.0, []
+            self.score, self.fingers_off, self.shape_ok = 0.0, [], False
+            if self.tracker is not None:
+                motion_update(self.tracker, 0.0, False, None, False)
+                self.trail_px = []
             return self.score
-        target = self._signs[target_name]
         normalized = normalize(hand.points_px, hand.is_left)
-        self.score = matcher.target_score(normalized, target, self._signs)
-        self.fingers_off = [] if self.score >= config.MATCH_THRESHOLD else matcher.fingers_off(normalized, target)
+        if self.tracker is not None:
+            return self._update_motion(result, hand, normalized)
+        target = self._signs[target_name]
+        self.score = matcher.target_score(normalized, target, self._still_signs)
+        self.shape_ok = self.score >= config.MATCH_THRESHOLD
+        self.fingers_off = [] if self.shape_ok else matcher.fingers_off(normalized, target)
+        return self.score
+
+    def _update_motion(self, result, hand, normalized):
+        motion = self.tracker.motion
+        straight = matcher.extended_fingers(normalized)
+        self.shape_ok = straight == motion.extended
+        self.fingers_off = sorted(straight ^ motion.extended, key=list(FINGERS).index)
+        tip_px = hand.points_px[motion.tip, :2]
+        state = motion_update(self.tracker, result.captured_s, self.shape_ok, tip_px / palm_size(hand.points_px), hand.is_left)
+        if state == MotionState.DRAWING:
+            self.trail_px = (self.trail_px + [tuple(tip_px.tolist())])[-config.TRAIL_POINTS:]
+        elif state != MotionState.DONE:
+            self.trail_px = []
+        self.score = 1.0 if state == MotionState.DONE else 0.0
         return self.score
 
 
@@ -102,6 +137,11 @@ class ReferenceCard:
         rect = silhouette.get_rect(topleft=(width_px // 2 - wrist[0], bottom_px - wrist[1] - theme.REFERENCE_PALM_PX))
         rect.clamp_ip(pygame.Rect(0, theme.GRID_PX * 11, width_px, height_px - theme.GRID_PX * 12))
         card.blit(silhouette, rect)
+        motion = MOTION_SIGNS.get(sign.name)
+        if motion is not None:
+            tip = sign.outline[motion.tip, :2] * theme.REFERENCE_PALM_PX
+            start = (rect.left + wrist[0] + tip[0], rect.top + wrist[1] + tip[1])
+            draw_guide(card, guide_points(motion, start, theme.REFERENCE_PALM_PX * theme.CARD_PATH_SCALE, False))
         return card
 
     def draw(self, screen, name, progress=None, letter_only=False):
@@ -152,3 +192,23 @@ class FixHint:
             surface = self._names[name]
             screen.blit(surface, surface.get_rect(midtop=(self._center_x_px, y_px)))
             y_px += surface.get_height()
+
+
+def draw_motion(screen, scorer, sign, hand, idle_wrist_px, now_s, show_guide):
+    """For J and Z: the path to draw, starting at the fingertip, and the stroke drawn so far."""
+    motion = MOTION_SIGNS.get(sign.name)
+    if motion is None:
+        return
+    if show_guide:
+        if hand is not None:
+            palm_px = palm_size(hand.points_px)
+            start = scorer.trail_px[0] if scorer.trail_px else tuple(hand.points_px[motion.tip, :2].tolist())
+            is_left = hand.is_left
+        else:
+            palm_px = theme.IDLE_GHOST_PALM_PX
+            tip = sign.outline[motion.tip, :2] * palm_px
+            start = (idle_wrist_px[0] + tip[0], idle_wrist_px[1] + tip[1])
+            is_left = False
+        phase = (now_s % theme.GUIDE_PERIOD_S) / theme.GUIDE_PERIOD_S
+        draw_guide(screen, guide_points(motion, start, palm_px, is_left), phase)
+    draw_trail(screen, scorer.trail_px)

@@ -5,7 +5,7 @@ Recall hides the shape and shows only the letter; Tab or the Hint button shows i
 
 import pygame
 
-from aslgame import config, theme
+from aslgame import theme
 from aslgame.game import match_detector
 from aslgame.game.app_flow import Action
 from aslgame.game.match_detector import DetectorState, MatchDetector
@@ -13,8 +13,9 @@ from aslgame.game.rhythm import Judgement
 from aslgame.game.sign_queue import make_queue
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.common import (
-    CONFIRM_KEYS, PAUSE_KEYS, FixHint, Ghost, ReferenceCard, TargetScorer, TopBar, is_key,
+    CONFIRM_KEYS, PAUSE_KEYS, FixHint, Ghost, ReferenceCard, TargetScorer, TopBar, draw_motion, idle_wrist, is_key,
 )
+from aslgame.game.motion import MOTION_SIGNS, MotionState
 from aslgame.presentation.strip import Strip
 from aslgame.presentation.ui import Button
 
@@ -47,6 +48,8 @@ class LearnScreen:
             DetectorState.HOLDING: fonts.medium.render("Hold it", True, theme.ACCENT),
             DetectorState.MATCHED: fonts.medium.render("Hold it", True, theme.ACCENT),
         }
+        self._draw_labels = {name: fonts.medium.render(f"Draw the {name}", True, theme.ACCENT) for name in MOTION_SIGNS}
+        self._idle_wrist = idle_wrist(size_px)
         self._done_label = fonts.medium.render("Done", True, theme.ACCENT)
         self._done_detail = None
         menu_rect = (0, 0, theme.GRID_PX * 24, theme.BUTTON_HEIGHT_PX)
@@ -104,11 +107,18 @@ class LearnScreen:
         sign = self._signs[self.queue.current_sign()]
         shows_shape = self._shows_shape()
         if shows_shape:
-            matched = hand is not None and self._scorer.score >= config.MATCH_THRESHOLD
+            matched = hand is not None and self._scorer.shape_ok
             fingers_off = self._scorer.fingers_off if hand is not None else []
             self._ghost.draw(screen, sign, hand, matched, fingers_off)
             self._fix_hint.draw(screen, fingers_off)
+        draw_motion(screen, self._scorer, sign, hand, self._idle_wrist, now_s, shows_shape)
         self._card.draw(screen, sign.name, self._detector.hold_fraction, letter_only=not shows_shape)
         if self.recall:
             self._hint_button.draw(screen, focused=self._hint_on)
-        draw_text_centered(screen, self._labels[self._detector.state], title_center_px)
+        draw_text_centered(screen, self._title(sign.name), title_center_px)
+
+    def _title(self, name):
+        tracker = self._scorer.tracker
+        if tracker is not None and tracker.state == MotionState.DRAWING:
+            return self._draw_labels[name]
+        return self._labels[self._detector.state]

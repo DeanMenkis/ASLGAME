@@ -36,7 +36,7 @@ class Mode:
 def word_items(sign_names):
     # Every recorded letter in order, as untimed practice.
     alphabet = "".join(sorted(sign_names))
-    items = [Item(config.ALPHABET_LABEL, alphabet, "", bool(alphabet))]
+    items = [Item(f"{alphabet[0]} to {alphabet[-1]}" if alphabet else "Alphabet", alphabet, "", bool(alphabet))]
     for word in config.LEARN_WORDS:
         missing = missing_signs(word, sign_names)
         items.append(Item(word, word, "Needs " + " ".join(missing) if missing else "", not missing))

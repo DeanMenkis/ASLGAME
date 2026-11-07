@@ -121,3 +121,15 @@ STRIP_LABEL_LIFT_PX = GRID_PX // 2
 
 # Recall mode
 HINT_BUTTON_WIDTH_PX = GRID_PX * 14
+
+# Motion signs (J, Z)
+GUIDE = (120, 220, 255)
+TRAIL = (255, 196, 0)
+GUIDE_POINTS = 32
+GUIDE_LINE_PX = 4
+GUIDE_DOT_PX = 7
+GUIDE_ARROW_PX = 16
+TRAIL_LINE_PX = 5
+GUIDE_PERIOD_S = 1.4
+# The path on the reference card is drawn smaller than on the hand so it fits.
+CARD_PATH_SCALE = 0.8

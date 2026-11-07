@@ -11,6 +11,7 @@ from aslgame import config, theme
 from aslgame.game import rhythm
 from aslgame.game.app_flow import PLAY_STATES, Action, AppState, next_state
 from aslgame.game.chart import load_charts, make_session
+from aslgame.game.motion import with_motion_letters
 from aslgame.game.clock import GameClock
 from aslgame.game.rhythm import RhythmSession
 from aslgame.game.sign_queue import make_queue
@@ -32,7 +33,7 @@ from aslgame.signs import load_signs
 class App:
     def __init__(self):
         # Everything from disk is loaded here, before the loop starts.
-        self.signs = load_signs(config.SIGNS_DIR)
+        self.signs = with_motion_letters(load_signs(config.SIGNS_DIR))
         self.settings = load_settings(config.SETTINGS_PATH)
         self.runtime = Runtime(config.WINDOW_TITLE)
         self.sfx = Sfx(self.settings)

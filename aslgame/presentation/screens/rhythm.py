@@ -10,7 +10,7 @@ from aslgame.hand import FINGER_BASES, WRIST
 from aslgame.matching.normalize import palm_size
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.common import (
-    JUDGEMENT_TEXT, PAUSE_KEYS, FixHint, Ghost, ReferenceCard, TargetScorer, TopBar, idle_wrist, is_key,
+    JUDGEMENT_TEXT, PAUSE_KEYS, FixHint, Ghost, ReferenceCard, TargetScorer, TopBar, draw_motion, idle_wrist, is_key,
 )
 from aslgame.presentation.strip import Strip
 
@@ -75,9 +75,10 @@ class RhythmScreen:
         center_px, hit_radius_px = self._hit_ring(hand)
         if target is not None:
             sign = self._signs[target.sign]
-            matched = hand is not None and self._scorer.score >= config.MATCH_THRESHOLD
+            matched = hand is not None and self._scorer.shape_ok
             fingers_off = self._scorer.fingers_off if hand is not None else []
             self._ghost.draw(screen, sign, hand, matched, fingers_off)
+            draw_motion(screen, self._scorer, sign, hand, self._idle_wrist, now_s, True)
             self._card.draw(screen, sign.name, 1.0 - target.approach_fraction(game_s))
             self._fix_hint.draw(screen, fingers_off)
             if target.state != NoteState.WAITING:
