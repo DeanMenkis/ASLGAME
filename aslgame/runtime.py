@@ -2,6 +2,7 @@
 
 import os
 import time
+from dataclasses import dataclass
 
 os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
 
@@ -16,6 +17,13 @@ from aslgame.presentation.draw import draw_camera  # noqa: E402
 from aslgame.tracking.tracker import Tracker  # noqa: E402
 
 
+@dataclass(frozen=True)
+class Fonts:
+    small: pygame.font.Font
+    medium: pygame.font.Font
+    large: pygame.font.Font
+
+
 class Runtime:
     def __init__(self, title):
         pygame.init()
@@ -23,9 +31,12 @@ class Runtime:
         self.tracker = Tracker(self.camera.frames)
         self.screen = pygame.display.set_mode(self.camera.size_px)
         pygame.display.set_caption(title)
-        self.font_small = pygame.font.Font(theme.FONT_NAME, theme.FONT_SIZE_SMALL_PX)
-        self.font_large = pygame.font.Font(theme.FONT_NAME, theme.FONT_SIZE_LARGE_PX)
-        self.debug = DebugOverlay(self.font_small)
+        self.fonts = Fonts(
+            small=pygame.font.Font(theme.FONT_NAME, theme.FONT_SIZE_SMALL_PX),
+            medium=pygame.font.Font(theme.FONT_NAME, theme.FONT_SIZE_MEDIUM_PX),
+            large=pygame.font.Font(theme.FONT_NAME, theme.FONT_SIZE_LARGE_PX),
+        )
+        self.debug = DebugOverlay(self.fonts.small)
         self.clock = pygame.time.Clock()
         self.fps = 0.0
         self.frame = None
@@ -44,10 +55,8 @@ class Runtime:
             draw_camera(self.screen, self.frame)
 
     def handle_common(self, event):
-        """Handle events every screen shares. Return True to quit."""
+        """Handle events every screen shares. Return True when the window is closed."""
         if event.type == pygame.QUIT:
-            return True
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             return True
         if event.type == pygame.KEYDOWN and event.key == pygame.K_F3:
             self.debug.toggle()
