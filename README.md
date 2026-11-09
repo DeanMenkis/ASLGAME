@@ -71,4 +71,6 @@ The letter shapes come from a public dataset and have not yet been checked by a 
 
 This is a learning tool, not a translator. It supports the fingerspelled alphabet (J and Z by their drawn path) and does not understand word signs, full ASL grammar, or facial expression. See the roadmap for what is currently supported.
 
-All songs and the hand tracking model are included under their licenses; see [Credits](docs/CREDITS.md).
+## License
+
+The code is under the [MIT License](LICENSE). Songs, the hand tracking model, and the letter data keep their own licenses; see [Credits](docs/CREDITS.md).
