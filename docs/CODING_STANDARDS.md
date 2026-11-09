@@ -50,7 +50,7 @@ Simple and concise, in both code and comments. Fast by default.
 
 - Small commits with short, present-tense messages ("Add approach circle").
 - `main` always runs. Work in short branches if more than one person is coding.
-- Never commit media, models, or personal recordings. See `.gitignore`.
+- Only commit media and models whose license allows it, and credit them in `docs/CREDITS.md`. Never commit personal recordings. See `.gitignore`.
 
 ## GUI
 

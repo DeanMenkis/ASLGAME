@@ -24,7 +24,7 @@ Every timing cue is visual so the game works without sound. Music is an extra la
 
 ## Media stays local
 
-Songs and videos are used for a private demo only and are never committed to the repo.
+Songs are included in `media/` because every track is CC0, CC-BY 4.0 (credited in-game and in Credits), or synthesized by the project. Videos are not committed.
 
 ## MediaPipe Tasks API in VIDEO mode
 

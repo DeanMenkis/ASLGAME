@@ -4,14 +4,8 @@ __pycache__/
 .venv/
 venv/
 
-# Models and media (local only)
-/models/
-/media/
-*.task
-*.mp3
+# Video (songs in media/ and the model in models/ are committed; see docs/CREDITS.md)
 *.mp4
-*.wav
-*.m4a
 *.mov
 
 # Personal recordings

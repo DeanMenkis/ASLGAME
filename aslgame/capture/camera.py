@@ -1,5 +1,6 @@
 """Camera thread that publishes the newest RGB frame."""
 
+import sys
 import threading
 import time
 from dataclasses import dataclass
@@ -66,10 +67,19 @@ def open_capture():
     """Open the camera on the main thread, retrying while macOS shows its permission prompt."""
     give_up_s = time.perf_counter() + config.CAMERA_OPEN_TIMEOUT_S
     while True:
-        capture = cv2.VideoCapture(config.CAMERA_INDEX, cv2.CAP_AVFOUNDATION)
+        capture = cv2.VideoCapture(config.CAMERA_INDEX, camera_backend())
         if capture.isOpened():
             return capture
         capture.release()
         if time.perf_counter() > give_up_s:
             raise RuntimeError(f"Cannot open camera {config.CAMERA_INDEX}. Check camera permission.")
         time.sleep(config.CAMERA_OPEN_RETRY_S)
+
+
+def camera_backend():
+    """The platform's native camera API. Windows support is untested."""
+    if sys.platform == "darwin":
+        return cv2.CAP_AVFOUNDATION
+    if sys.platform == "win32":
+        return cv2.CAP_DSHOW
+    return cv2.CAP_ANY

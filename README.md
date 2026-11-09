@@ -1,8 +1,40 @@
 # ASLGAME
 
-A camera-based game for learning ASL handshapes. Karaoke meets osu meets ASL.
+Learn the ASL alphabet by signing along to music.
 
-The player sees a target handshape drawn over their own hand, matches it on the beat, and earns points for speed and accuracy. The better they sign, the faster it goes.
+![Three players dancing while one signs letters at the webcam, with the game projected behind them](docs/demo.jpg)
+
+Apps like Duolingo work well for spoken languages but leave out visual ones like American Sign Language. ASLGAME is a rhythm game in the spirit of osu!: your webcam watches your hand, a target handshape appears over it, and you match each letter on the beat. The goal is to bring movement, music, and play into learning ASL, in a classroom or at home.
+
+Once installed it runs entirely on your computer. No account, no internet, no video leaves the machine.
+
+## Install
+
+You need a webcam and about 650 MB of free space: Python, the game's libraries (MediaPipe, OpenCV, NumPy, pygame), and the game with its songs. Setup downloads everything it needs the first time it runs.
+
+### Mac
+
+Needs Apple Silicon (M1 or newer). Open Terminal, paste this line, and press Return:
+
+```
+git clone https://github.com/DeanMenkis/ASLGAME.git ~/ASLGAME && ~/ASLGAME/ASLGAME.command
+```
+
+The first run takes a few minutes to set up, then the game opens. Allow camera access when macOS asks. To play again later, double-click `ASLGAME.command` in the `ASLGAME` folder in your home folder.
+
+If macOS asks to install developer tools when you run the line, click Install, then run the line again.
+
+### Windows (untested)
+
+Windows support has not been tested yet. If you try it, please report what happens.
+
+Open PowerShell, paste this line, and press Return:
+
+```
+irm https://github.com/DeanMenkis/ASLGAME/archive/refs/heads/main.zip -OutFile $env:TEMP\aslgame.zip; Expand-Archive $env:TEMP\aslgame.zip $HOME -Force; & $HOME\ASLGAME-main\ASLGAME.bat
+```
+
+The first run takes a few minutes to set up, then the game opens. To play again later, double-click `ASLGAME.bat` in the `ASLGAME-main` folder in your user folder.
 
 ## Modes
 
@@ -37,30 +69,18 @@ References:
 - Lidwell, Holden and Butler, *Universal Principles of Design*: general reference
 - Steve Krug, *Don't Make Me Think*: self-evident interfaces
 
-## Running
+## Developer notes
 
-Python 3.11 on macOS.
-
-```
-python3.11 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-mkdir -p models
-curl -L -o models/hand_landmarker.task https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task
-```
-
-- Double-click `ASLGAME.command`, or run `.venv/bin/python -m aslgame`: the game. Mouse or keyboard; press H or the ? button for keys.
+- Keys: mouse or keyboard; press H or the ? button for the full list.
 - All 26 letters. J and Z are drawn in the air: make the handshape, then trace the path shown.
-- Modes: **Learn** (match the outline, no timer), **Recall** (sign from memory, Tab for a hint), **Rhythm** (signs on a beat, speed adapts), **Music** (signs on a song).
-- `.venv/bin/python -m aslgame.tools.make_demo_track`: writes the two synthesized songs (Warm-up 90, Hardstyle 150) to `media/`.
-- The other songs are free tracks from OpenGameArt; see [Credits](docs/CREDITS.md) for links. Save each into `media/` under the name its chart in `data/charts/` expects (for example `bouncer.mp3`).
+- `.venv/bin/python -m aslgame`: runs the game directly.
+- `.venv/bin/python -m aslgame.tools.make_demo_track`: rebuilds the two synthesized songs (Warm-up 90, Hardstyle 150) in `media/`.
 - `.venv/bin/python -m aslgame.tools.chart_track song.mp3 "Title"`: charts any song in `media/` (finds tempo and first beat). Add `--bpm` if it picks double time.
 - `.venv/bin/python -m aslgame.tools.import_dataset datasets/asl-now-fingerspelling`: rebuilds the letter templates.
 - `.venv/bin/python -m aslgame.tools.capture A`: record templates for sign A. Space records a burst after a short countdown, Backspace drops the last burst. Saved to `data/signs/` on close.
 - `.venv/bin/python -m unittest`: tests that need no camera or window.
 - F3 toggles the performance overlay and the tracked skeleton. F9 records a demo video to `recordings/`.
 - A word is playable once every letter in it has a recorded template. The menu lists the missing letters.
-
-On first run macOS asks for camera access for the app that launched Python, such as Terminal.
 
 ## Docs
 
@@ -75,6 +95,8 @@ On first run macOS asks for camera access for the app that launched Python, such
 
 ## Scope and limits
 
+The letter shapes come from a public dataset and have not yet been checked by a fluent signer. Corrections are very welcome.
+
 This is a learning tool, not a translator. It supports the fingerspelled alphabet (J and Z by their drawn path) and does not understand word signs, full ASL grammar, or facial expression. See the roadmap for what is currently supported.
 
-This project is private and for demo use only. Media files are kept out of the repo.
+All songs and the hand tracking model are included under their licenses; see [Credits](docs/CREDITS.md).
