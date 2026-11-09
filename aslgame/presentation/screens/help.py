@@ -10,7 +10,7 @@ SECTIONS = (
     ("Playing", (("Esc  P", "Pause"), ("Tab", "Hint in Recall"))),
     ("Paused", (("Esc  Space", "Resume"), ("M", "Menu"))),
     ("Results", (("R", "Retry"), ("M", "Menu"))),
-    ("Anywhere", (("C", "Finger colors"), ("S", "Sound"), ("F", "Fullscreen"), ("F9", "Record demo"), ("F3", "Performance"))),
+    ("Anywhere", (("C", "Finger colors"), ("S", "Sound"), ("F", "Fullscreen"), ("F3", "Performance"))),
 )
 LEFT_COLUMN_SECTIONS = 3
 COLUMN_WIDTH_PX = theme.GRID_PX * 40

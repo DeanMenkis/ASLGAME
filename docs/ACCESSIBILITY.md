@@ -18,7 +18,6 @@ Audit of every cue in the game against the rules in the architecture doc: nothin
 | Unplayable menu row | Dimmed, with "Needs ..." | Text | None |
 | Settings toggles (in the Settings panel) | "On" or "Off" in the label | Text | Click |
 | J and Z path | Dashed guide with an arrowhead and a moving dot; the player's stroke as a trail | Shape and motion | None |
-| Recording | Dot with "REC" | Text | None |
 
 ## Options
 

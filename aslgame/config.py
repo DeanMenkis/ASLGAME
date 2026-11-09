@@ -8,7 +8,6 @@ SIGNS_DIR = ROOT_DIR / "data" / "signs"
 CHARTS_DIR = ROOT_DIR / "data" / "charts"
 MEDIA_DIR = ROOT_DIR / "media"
 SETTINGS_PATH = ROOT_DIR / "settings.json"
-RECORDINGS_DIR = ROOT_DIR / "recordings"
 
 # Camera
 CAMERA_INDEX = 0
@@ -137,11 +136,6 @@ TRAIL_POINTS = 60
 # Capture tool
 CAPTURE_COUNTDOWN_S = 2.0
 CAPTURE_SAMPLES_PER_BURST = 15
-
-# Demo recorder
-RECORD_FPS = 30
-# About two seconds of frames; beyond that frames are dropped rather than slowing the game.
-RECORD_QUEUE_FRAMES = 60
 
 # Debug overlay
 DEBUG_OVERLAY_ON_START = False

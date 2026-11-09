@@ -8,9 +8,6 @@ venv/
 *.mp4
 *.mov
 
-# Personal recordings
-/recordings/
-
 # OS and editors
 .DS_Store
 .vscode/

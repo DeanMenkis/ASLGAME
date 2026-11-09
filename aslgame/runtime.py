@@ -12,7 +12,6 @@ import pygame  # noqa: E402
 from aslgame import config, theme  # noqa: E402
 from aslgame.capture.camera import Camera  # noqa: E402
 from aslgame.fps import smooth_fps  # noqa: E402
-from aslgame.media.recorder import Recorder  # noqa: E402
 from aslgame.presentation.debug_overlay import DebugOverlay  # noqa: E402
 from aslgame.presentation.draw import draw_camera  # noqa: E402
 from aslgame.tracking.tracker import Tracker  # noqa: E402
@@ -64,8 +63,6 @@ class Runtime:
         fit_window(self.camera.size_px)
         self.fonts = make_fonts()
         self.debug = DebugOverlay(self.fonts.small)
-        self.recorder = Recorder()
-        self._rec_label = self.fonts.small.render("REC", True, theme.INK)
         self.clock = pygame.time.Clock()
         self.fps = 0.0
         self.frame = None
@@ -91,30 +88,17 @@ class Runtime:
             self.debug.toggle()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
             pygame.display.toggle_fullscreen()
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_F9:
-            self.recorder.toggle(self.screen.get_size())
         return False
 
     def end_frame(self):
         now_s = time.perf_counter()
         self.debug.update(now_s, self._frame_interval_ms, self.fps, self.camera.fps, self.tracker.fps, self.result)
         self.debug.draw(self.screen)
-        # Captured before the REC marker is drawn, so the video stays clean.
-        self.recorder.capture(self.screen, now_s)
-        if self.recorder.active:
-            self._draw_rec()
         pygame.display.flip()
         self._frame_interval_ms = self.clock.tick(config.TARGET_FPS)
         self.fps = smooth_fps(self.fps, self._frame_interval_ms / 1000)
 
-    def _draw_rec(self):
-        """A red dot and the word REC, so recording is never shown by color alone."""
-        center_px = (theme.MARGIN_PX, self.screen.get_height() - theme.MARGIN_PX)
-        pygame.draw.circle(self.screen, theme.RECORD, center_px, theme.GRID_PX)
-        self.screen.blit(self._rec_label, self._rec_label.get_rect(midleft=(center_px[0] + theme.GRID_PX * 2, center_px[1])))
-
     def close(self):
-        self.recorder.close()
         self.tracker.stop()
         self.camera.stop()
         pygame.quit()

@@ -105,8 +105,6 @@ FINGER_TINTS = {
     "Pinky": (204, 121, 167, 150),
 }
 
-RECORD = (230, 40, 40)
-
 # Judgements. Each also has a shape: dots under the letter (3, 2, 1), or a strike for a miss.
 JUDGEMENT_COLORS = {
     "PERFECT": (70, 205, 115),
