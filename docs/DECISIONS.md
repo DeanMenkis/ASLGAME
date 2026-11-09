@@ -4,13 +4,13 @@ A short log of choices and why. Newest at the bottom. One entry per decision.
 
 ## Learning game, not a translator
 
-Full ASL translation is out of reach and not what the brief asks for. A focused trainer on a defined sign set is achievable, honest, and more fun.
+Full ASL translation is out of reach. A focused trainer on a defined sign set is achievable, honest, and more fun.
 
 ## Hand landmarks, not image classification
 
 Landmarks from a tracking model are small, fast to compare, and less sensitive to lighting and background than raw images.
 
-## Template matching on our own recordings
+## Template matching on recorded examples
 
 Recorded templates checked against a trusted reference give reliable results without training a model. One matcher powers both recognition and scoring.
 
@@ -22,7 +22,7 @@ A rhythm game needs a tight frame loop with custom drawing every frame. pygame f
 
 Every timing cue is visual so the game works without sound. Music is an extra layer for players who can hear it.
 
-## Media stays local
+## Songs are included
 
 Songs are included in `media/` because every track is CC0, CC-BY 4.0 (credited in-game and in Credits), or synthesized by the project. Videos are not committed.
 
@@ -44,7 +44,7 @@ A sign counts once the score stays high for a short hold. Starting a hold needs 
 
 ## Fingerspelling without J and Z
 
-J and Z are traced with motion, and templates hold a single still handshape. Learn mode words avoid them until movement is supported.
+J and Z are traced with motion, and templates hold a single still handshape. Learn mode words avoid them until movement is supported. Superseded by "J and Z by finger straightness and path" below.
 
 ## Templates from a public landmark dataset
 
@@ -54,7 +54,7 @@ Recording every letter by hand needs a fluent signer and time. The ASL-Now datas
 
 A target only passes when no other sign outscores it by more than a small margin. This cut wrong-letter accepts by about two thirds on held-out data for a one point drop in right-letter accepts.
 
-## Rhythm charts are generated as you play
+## Rhythm charts are generated during play
 
 Adaptive speed changes the gap between notes, so a fixed list of note times cannot work. Rhythm mode schedules each note a few beats ahead from the current speed, and the word is repeated so speed has room to change. Notes land on beats, so the beat pulse and the approach ring agree.
 
@@ -64,7 +64,7 @@ The hit ring sits around the player's palm rather than in a fixed lane, so the t
 
 ## Handedness label is swapped for mirrored frames
 
-The MediaPipe docs say handedness assumes a mirrored image, but in play testing the Tasks API reported the player's right hand as "Left" on our mirrored frames, which mirrored the ghost. The tracker now swaps the label when the camera is mirrored.
+The MediaPipe docs say handedness assumes a mirrored image, but in play testing the Tasks API reported the player's right hand as "Left" on the mirrored frames, which mirrored the ghost. The tracker now swaps the label when the camera is mirrored.
 
 ## Silhouette ghost instead of a skeleton
 
@@ -72,7 +72,7 @@ A white skeleton blended into the camera image and did not read as a hand. The g
 
 ## Music clock starts with playback
 
-Tracks load into memory at startup. The game clock starts at the moment the sound starts and pauses with it, so chart times line up with the music. A player-set offset in the menu cancels camera, tracking, and audio delay.
+Tracks load into memory at startup. The game clock starts at the moment the sound starts and pauses with it, so chart times line up with the music. An offset setting was planned for camera, tracking, and audio delay; see the next entry.
 
 ## No audio offset setting
 
@@ -80,7 +80,7 @@ Play testing showed the default timing felt right, and the setting added a contr
 
 ## Sounds are synthesized
 
-Sound effects and the two demo songs are generated with NumPy, so there are no files to license and they always match the beat. Bouncer, a CC0 track, gives the demo a real song.
+Sound effects and the two demo songs are generated with NumPy, so there are no files to license and they always match the beat. The other songs are licensed tracks; see Credits.
 
 ## Scaled window
 

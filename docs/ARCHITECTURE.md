@@ -21,7 +21,7 @@ The main loop owns the window and runs at a steady frame rate. Camera capture an
 - **Matching**: normalizes landmarks and scores them against a target handshape. Pure math, no GUI.
 - **Game**: charts, timing, judgement, scoring, speed changes. Pure logic, no GUI.
 - **Presentation**: draws the camera feed, ghost hand, approach circles, HUD, and menus.
-- **Media**: plays music or video and reports the playback clock.
+- **Media**: plays music and reports the playback clock.
 
 Dependencies point downward only. Game logic can be tested without a camera or window.
 
@@ -30,8 +30,8 @@ Dependencies point downward only. Game logic can be tested without a camera or w
 **App**: the top-level screen.
 
 ```
-Boot -> Menu -> (Learn | Rhythm | Music) -> Results -> Menu
-                         \-> Paused -/
+Boot -> Menu -> (Learn | Recall | Rhythm | Music) -> Results -> Menu
+                              \-> Paused -/
 ```
 
 **Note**: one handshape in a chart.
@@ -52,11 +52,11 @@ Each machine has its states in an `Enum` and its transitions in one function.
 
 - **Signs**: one template set per handshape, recorded and checked against a cited reference.
 - **Charts**: a list of notes with target sign and beat time. Learn mode ignores time.
-- **Tracks**: a chart plus optional media file. Media is local only, never committed.
+- **Tracks**: a chart plus a song in `media/`.
 
 ## Timing
 
-The game clock is the single source of truth for when notes are due. In music mode, the media playback clock drives it. A user-set offset corrects for camera and tracking delay.
+The game clock is the single source of truth for when notes are due. In music mode, the media playback clock drives it. Notes are judged against this clock, so the music and the approach rings stay in step.
 
 ## Accessibility rules
 

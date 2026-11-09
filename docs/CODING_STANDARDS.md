@@ -34,7 +34,7 @@ Simple and concise, in both code and comments. Fast by default.
 
 - The frame loop is sacred. Nothing slow runs inside it.
 - No disk, network, or model loading in the loop. Load once at startup.
-- Slow work (camera, hand tracking, speech) runs off the main thread and hands results over through a queue or latest-value slot.
+- Slow work (camera, hand tracking) runs off the main thread and hands results over through a queue or latest-value slot.
 - Never block the game loop waiting on tracking. Use the most recent result.
 - Use NumPy for landmark math. No Python loops over points when a vector op works.
 - Reuse buffers and surfaces. Avoid creating objects every frame.
@@ -54,7 +54,7 @@ Simple and concise, in both code and comments. Fast by default.
 
 ## GUI
 
-- Follow the Design section in the README.
+- Follow [Design](DESIGN.md).
 - No emojis in code, strings, or comments.
 - Layout values (grid, spacing, sizes, palette, fonts) come from one theme module.
 

@@ -17,7 +17,7 @@ Audit of every cue in the game against the rules in the architecture doc: nothin
 | Result per letter (rhythm, music) | Strip cell in green, yellow, orange, or red | Dots under the letter (3 Perfect, 2 Good, 1 OK) and a strike for Miss | None |
 | Unplayable menu row | Dimmed, with "Needs ..." | Text | None |
 | Settings toggles (in the Settings panel) | "On" or "Off" in the label | Text | Click |
-| J and Z path | Dashed guide with an arrowhead and a moving dot; your stroke as a trail | Shape and motion | None |
+| J and Z path | Dashed guide with an arrowhead and a moving dot; the player's stroke as a trail | Shape and motion | None |
 | Recording | Dot with "REC" | Text | None |
 
 ## Options

@@ -40,7 +40,7 @@ Build the core first, then the game on top. Each phase should run end to end bef
 - [x] Credits and limitations screen
 - [x] Debug overlay for FPS and latency
 - [ ] Backup demo recording (recorder built: F9; the recording itself is still to make)
-- [ ] Presentation (outline in [Presentation](PRESENTATION.md))
+- [x] Presentation
 
 ## Phase 6: Depth
 
