@@ -124,10 +124,13 @@ class App:
 
     def run(self):
         runtime = self.runtime
+        last_click = None
         while self.state != AppState.QUIT:
             screen = self.screens[self.state]
             action = None
             for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    last_click = event.pos
                 if runtime.handle_common(event):
                     action = Action.QUIT
                 elif is_key(event, (pygame.K_c,)):
@@ -144,6 +147,11 @@ class App:
             self.light_warning.update(now_s, runtime.frame)
             if self.state in PLAY_STATES:
                 self.light_warning.draw(runtime.screen, now_s)
+            if runtime.debug.visible:
+                # Where the game thinks the mouse is, and where it saw the last click.
+                pygame.draw.circle(runtime.screen, theme.ACCENT, pygame.mouse.get_pos(), 12, 2)
+                if last_click is not None:
+                    pygame.draw.circle(runtime.screen, theme.FINGER_FIX, last_click, 6)
             if runtime.debug.visible and hand is not None:
                 draw_hand(runtime.screen, hand.points_px, theme.LIVE_HAND, theme.LIVE_LINE_PX, theme.LIVE_JOINT_RADIUS_PX, True)
             runtime.end_frame()
