@@ -61,4 +61,5 @@ Simple and concise, in both code and comments. Fast by default.
 ## AI use
 
 - AI-written code is allowed and must be disclosed in the credits doc.
+- Commits made with Claude Code end with a `Co-Authored-By: Claude <noreply@anthropic.com>` line.
 - Read and understand any AI-written code before committing it.

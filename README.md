@@ -47,6 +47,10 @@ The first run takes a few minutes to set up, then the game opens. To play again 
 
 Timing cues are always visual. Sound is never required to play.
 
+## Contributors
+
+ASLGAME is built by its human team together with Claude Code by Anthropic, which wrote much of the code and docs throughout development. Commits Claude worked on carry a `Co-Authored-By: Claude` line, so Claude appears in the GitHub contributor list. See [Credits](docs/CREDITS.md).
+
 ## Docs
 
 These docs are for contributors, both people and AI coding assistants such as Claude Code, which read them for project context. Players only need the sections above.
