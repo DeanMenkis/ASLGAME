@@ -39,7 +39,8 @@ class ArcadeFx:
         if event.kind == EventKind.HIT:
             color = theme.JUDGEMENT_COLORS[event.judgement.name]
             text = self._fonts.medium.render(f"+{event.points}", True, color)
-            label = self._fonts.small.render(f"x{event.multiplier:.1f}", True, tier_color(event.tier))
+            tag = f"ON BEAT  x{event.multiplier:.1f}" if event.on_beat else f"x{event.multiplier:.1f}"
+            label = self._fonts.small.render(tag, True, theme.ACCENT if event.on_beat else tier_color(event.tier))
             pop = pygame.Surface((max(text.get_width(), label.get_width()), text.get_height() + label.get_height()), pygame.SRCALPHA)
             pop.blit(text, text.get_rect(midtop=(pop.get_width() // 2, 0)))
             pop.blit(label, label.get_rect(midbottom=(pop.get_width() // 2, pop.get_height())))

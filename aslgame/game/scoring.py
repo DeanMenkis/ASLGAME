@@ -35,6 +35,7 @@ class Event:
     combo: int = 0
     tier: int = 1
     word: str = ""
+    on_beat: bool = False
 
 
 @dataclass
@@ -67,7 +68,7 @@ def multiplier(tally, speed=1.0):
     return min(config.MULTIPLIER_MAX, round(1.0 + combo_part + streak_part + speed_part, 1))
 
 
-def record(tally, sign, judgement, ends_word=False, speed=1.0):
+def record(tally, sign, judgement, ends_word=False, speed=1.0, bonus=1.0):
     """Score one resolved sign. The only place a tally changes."""
     tally.results.append((sign, judgement))
     before = tally.multiplier
@@ -80,10 +81,11 @@ def record(tally, sign, judgement, ends_word=False, speed=1.0):
         tally.perfect_streak = tally.perfect_streak + 1 if judgement == Judgement.PERFECT else 0
     tally.multiplier = multiplier(tally, speed)
     tally.max_multiplier = max(tally.max_multiplier, tally.multiplier)
-    tally.last_points = int(POINTS[judgement] * tally.multiplier)
+    tally.last_points = int(POINTS[judgement] * tally.multiplier * bonus)
     tally.score += tally.last_points
     kind = EventKind.MISS if judgement == Judgement.MISS else EventKind.HIT
-    tally.events.append(Event(kind, judgement, tally.last_points, tally.multiplier, tally.combo, tier(tally.multiplier)))
+    tally.events.append(Event(kind, judgement, tally.last_points, tally.multiplier, tally.combo, tier(tally.multiplier),
+                              on_beat=bonus > 1.0))
     if tier(tally.multiplier) > tier(before):
         tally.events.append(Event(EventKind.TIER_UP, multiplier=tally.multiplier, tier=tier(tally.multiplier)))
     elif judgement == Judgement.MISS and tier(before) >= 2:

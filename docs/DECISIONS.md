@@ -141,3 +141,7 @@ A mode with no beat: each sign has a fuse, faster signs score better, and clean 
 ## Paper and ink menu
 
 The menu moved to a warm paper look with serif type, a brushed ensō, and a vermilion seal, so it reads as calm and hand-made against the loud play screens. Signing at the camera in the menu shows the closest letter inside the ensō, as a quick way to warm up.
+
+## Music plays like Rush
+
+In play testing, beat-locked Music felt like it hung: a quick signer had to wait for each sign's beat. Music now uses the Rush engine on the song's clock. The next sign appears the moment one lands, each sign's fuse is a few beats long (6, 4, 3 by level), speed sets the judgement, and a sign that lands on a beat pays an ON BEAT bonus. The fuse ring breathes with the beat. Rhythm mode keeps the beat-locked rings for players who want strict timing.

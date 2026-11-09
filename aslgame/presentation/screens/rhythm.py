@@ -143,7 +143,11 @@ class RhythmScreen:
             if self.rush:
                 fuse = self.session.fuse_fraction(max(0.0, game_s))
                 self._card.draw(canvas, sign.name, 1.0 - fuse)
-                draw_ring(canvas, (int(center_px[0]), int(center_px[1])), hit_radius_px, fuse, fuse_color(fuse))
+                ring_px = hit_radius_px
+                if self.session.bpm and game_s >= 0:
+                    # The fuse ring breathes with the beat, so the music shows on the hand.
+                    ring_px *= 1.0 + 0.08 * (1.0 - self.session.beat_phase(game_s)) ** 3
+                draw_ring(canvas, (int(center_px[0]), int(center_px[1])), ring_px, fuse, fuse_color(fuse))
             else:
                 note = self.session.target()
                 self._card.draw(canvas, sign.name, 1.0 - note.approach_fraction(game_s))
@@ -154,7 +158,7 @@ class RhythmScreen:
         self._fx.draw(canvas, now_s)
         screen.blit(canvas, self._fx.shake_offset(now_s))
         self._top_bar.draw(screen)
-        if not self.rush:
+        if not self.rush or self.session.bpm:
             self._draw_beat(screen, game_s)
         self._draw_clock(screen, game_s)
         right_px = self._top_bar.pause_rect.left - theme.GRID_PX * 3

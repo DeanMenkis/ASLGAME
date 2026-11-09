@@ -104,7 +104,15 @@ RUSH_MOTION_FACTOR = 2.0
 RUSH_WORD_BONUS_S = 0.75
 RUSH_LEAD_IN_S = 0.3
 # The quickest anyone signs through the camera, used to draw enough words for a run.
-RUSH_FASTEST_SIGN_S = 0.25
+RUSH_FASTEST_SIGN_S = 0.1
+
+# Music: Rush on a song. Each sign's fuse is this many beats per level; Perfect and Good are shares of it.
+FLOW_FUSE_BEATS = (6, 4, 3)
+FLOW_PERFECT_FRACTION = 0.35
+FLOW_GOOD_FRACTION = 0.65
+# A sign landing this close to a beat scores this much more.
+ON_BEAT_WINDOW_S = 0.09
+ON_BEAT_BONUS = 1.5
 
 # Countdown before a timed run
 COUNTDOWN_STEPS = 3

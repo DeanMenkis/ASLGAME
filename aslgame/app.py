@@ -10,7 +10,7 @@ import pygame
 from aslgame import config, theme
 from aslgame.game import rush, scoring
 from aslgame.game.app_flow import PLAY_STATES, TIMED_STATES, Action, AppState, next_state
-from aslgame.game.chart import load_charts, make_session, signs_needed
+from aslgame.game.chart import load_charts
 from aslgame.game.clock import GameClock
 from aslgame.game.motion import with_motion_letters
 from aslgame.game.rhythm import RhythmSession, signs_for
@@ -79,8 +79,8 @@ class App:
                                                self.size_px, self.settings, self.sfx, length_s)
         elif state == AppState.MUSIC:
             deck = DECKS_BY_NAME[item.deck]
-            words = draw_words(deck, level, signs_needed(item, level, length_s), self.rng, self.signs)
-            session = make_session(item, words, level, length_s)
+            words = draw_words(deck, level, rush.signs_for(length_s), self.rng, self.signs)
+            session = rush.flow_session([c for w in words for c in w], word_ends(words), item, level, length_s)
             self.player = MediaPlayer(self.tracks[item.name], start_s, length_s)
             self.screens[state] = RhythmScreen(fonts, self.signs, make_queue(" ".join(words)), session, self.player, self.size_px,
                                                self.settings, self.sfx, length_s)
