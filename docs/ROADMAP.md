@@ -39,7 +39,7 @@ Build the core first, then the game on top. Each phase should run end to end bef
 - [x] Accessibility pass (no sound-only or color-only cues), see [Accessibility](ACCESSIBILITY.md)
 - [x] Credits and limitations screen
 - [x] Debug overlay for FPS and latency
-- [ ] Demo video for the README (recorded with the system screen recorder)
+- [x] Demo clip in the README
 - [x] Presentation
 
 ## Phase 6: Depth

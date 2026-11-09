@@ -2,6 +2,8 @@
 
 Learn the ASL alphabet by signing along to music.
 
+![Gameplay: signing letters to the beat while the score and multiplier climb](docs/demo.gif)
+
 ![Three players dancing while one signs letters at the webcam, with the game projected behind them](docs/demo.jpg)
 
 Apps like Duolingo work well for spoken languages but leave out visual ones like American Sign Language. ASLGAME is a rhythm game in the spirit of osu!: your webcam watches your hand, a target handshape appears over it, and you match each letter on the beat. The goal is to bring movement, music, and play into learning ASL, in a classroom or at home.
