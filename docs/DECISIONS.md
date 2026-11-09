@@ -105,3 +105,39 @@ Dataset samples of J and Z were caught mid-stroke, so their average shape is a b
 ## One Settings button
 
 Four header controls (About, two toggles, keys) competed with the title. Settings now holds the toggles and About, leaving the header with the title, Settings, and the keys button.
+
+## Early signs land on the beat
+
+Grades were nearly always D. A sign made before its beat was not accepted until the hit window opened, and every judgement was measured from the beat in both directions, so a ready hand scored OK at best and a fast signer was punished. Now a sign recognized at any point after its note appears is locked in and lands on the beat as Perfect; only lateness costs. Grades run D to S on accuracy rounded to the shown percentage.
+
+## Shorter hold in timed modes
+
+The rhythm hold dropped from 0.15 s to 0.06 s, about two tracker results: enough to ignore a one-frame flicker. Locked signs free the next note at once, so a fluent signer can spell ahead of the rings.
+
+## Multiplier tiers to x10
+
+The multiplier grows by 0.05 per hit and 0.1 per Perfect in a row, plus speed, capped at x10. Each whole number is a tier with its own color, sound, banner, shake, and from x3 embers. A miss that throws away x2 or more says so. A word signed with no miss pays a bonus per letter.
+
+## Word decks instead of one phrase list
+
+Songs repeated the same dozen words. Ten themed decks of about sixty words each (plus A to Z and Everything) are split by length into Easy (up to 4 letters), Medium (5 to 6, or a short word with J or Z), and Hard (7 and up). Each run draws words fresh and shuffled. Charts now hold only tempo, first beat, and a deck name; the level sets beats per sign (4, 2, 1).
+
+## Run length is chosen, not fixed
+
+The 30 s music limit is replaced by 0:30, 1:00, 2:00, or 4:00 picked in the menu. Songs shorter than the choice play to their end, and no new word starts after the time is up, so a run never ends mid word.
+
+## J and Z by shape or by checkpoints
+
+Paths are now compared after scaling each axis on its own (within a limit), so wide or tall strokes pass, and the fingertip is smoothed first. As a second way to pass, the guide is pinned where the stroke starts and the fingertip only has to touch its corners in order. The guide follows a fingertip that rests elsewhere, and resets if progress stalls. Drawn letters get at least two note slots in timed modes.
+
+## Countdown before timed play
+
+Timed runs open with 3, 2, 1, GO. The clock starts after it, so music and notes begin together.
+
+## Rush mode
+
+A mode with no beat: each sign has a fuse, faster signs score better, and clean words add time. It rewards fluent signers directly.
+
+## Paper and ink menu
+
+The menu moved to a warm paper look with serif type, a brushed ensō, and a vermilion seal, so it reads as calm and hand-made against the loud play screens. Signing at the camera in the menu shows the closest letter inside the ensō, as a quick way to warm up.

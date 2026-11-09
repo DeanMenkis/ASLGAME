@@ -8,6 +8,7 @@ SIGNS_DIR = ROOT_DIR / "data" / "signs"
 CHARTS_DIR = ROOT_DIR / "data" / "charts"
 MEDIA_DIR = ROOT_DIR / "media"
 SETTINGS_PATH = ROOT_DIR / "settings.json"
+RECORDS_PATH = ROOT_DIR / "records.json"
 
 # Camera
 CAMERA_INDEX = 0
@@ -52,54 +53,95 @@ MATCH_ZERO_SCORE_DISTANCE = 0.6
 MATCH_THRESHOLD = 0.75
 # Lower than MATCH_THRESHOLD so a hold survives small dips in score.
 MATCH_RELEASE_THRESHOLD = 0.65
-MATCH_HOLD_S = 0.6
+MATCH_HOLD_S = 0.4
 # How far another sign may outscore the target before the target is rejected.
 MATCH_RIVAL_MARGIN = 0.05
 # A finger is flagged when its joints sit this far from the target, in palm sizes.
 # Correct signs stay under it about 90% of the time; other letters mostly go over.
 FINGER_HINT_LIMIT = 0.55
 
-# Learn mode. J and Z need motion, which handshape templates cannot capture.
-LEARN_WORDS = (
-    "HI", "HELLO", "ASL", "CAB", "LOVE", "PLEASE", "SORRY", "THANK YOU", "WELCOME", "GOOD DAY",
-    "GOOD LUCK", "GOOD MORNING", "GOOD NIGHT", "HAVE FUN", "LETS GO", "WHATS UP", "HOW ARE YOU",
-    "I LOVE YOU", "BEST FRIEND", "SEE YOU LATER", "NICE TO MEET YOU", "MY NAME IS", "HAPPY BIRTHDAY",
-)
+# Learn and Recall draw words from a deck until a run has about this many signs.
+LEARN_RUN_SIGNS = 18
+
+# Levels: Easy, Medium, Hard. Each sets how many beats a sign gets and which words are drawn.
+LEVEL_NAMES = ("Easy", "Medium", "Hard")
+LEVEL_BEATS_PER_NOTE = (4, 2, 1)
+# Words up to this many letters belong to each level; longer ones are Hard.
+LEVEL_MAX_WORD_LETTERS = (4, 6)
+# Run lengths offered in the menu. A song shorter than the choice plays to its end.
+LENGTHS_S = (30, 60, 120, 240)
+DEFAULT_LENGTH_S = 60
 
 # Rhythm mode
 RHYTHM_BPM = 90
-BEATS_PER_NOTE = 4
 APPROACH_BEATS = 3
-RHYTHM_LEAD_IN_S = 3.0
-# Short words repeat until a rhythm run has at least this many signs.
-RHYTHM_MIN_SIGNS = 12
-# A short hold still filters single-frame flickers without slowing play down.
-RHYTHM_HOLD_S = 0.15
-PERFECT_WINDOW_S = 0.15
-GOOD_WINDOW_S = 0.3
+RHYTHM_LEAD_IN_S = 2.5
+# Two tracker results in a row: enough to drop a one-frame flicker, short enough for fast fingerspelling.
+RHYTHM_HOLD_S = 0.06
+# A sign made before its beat is held and lands on the beat. After the beat, lateness is judged
+# as a share of the hit window: up to this share is Perfect, then Good, then OK.
 HIT_WINDOW_S = 0.5
+PERFECT_FRACTION = 0.3
+GOOD_FRACTION = 0.6
+# Fast charts shrink the window so one sign's window never runs deep into the next sign's time.
+HIT_WINDOW_INTERVAL_FRACTION = 0.6
 FEEDBACK_S = 0.5
+# J and Z are drawn, so they get at least two note slots and at least this long.
+MOTION_MIN_SLOT_S = 1.4
+MOTION_MIN_SLOTS = 2
 
-# Music mode stops at this length, whatever the song's chart holds.
-MUSIC_MAX_S = 30.0
-COMBO_CAP = 50
-COMBO_STEP = 25
+# Music mode stops this long before the song's end, so the last sign is never cut off.
+MUSIC_END_MARGIN_S = 3.0
+MUSIC_FADE_MS = 1200
+
+# Rush mode: no beat. Each sign must land before its fuse burns down, and faster is better.
+RUSH_FUSE_S = (6.0, 4.5, 3.0)
+RUSH_PERFECT_S = 0.8
+RUSH_GOOD_S = 1.6
+# Drawn letters take longer, so their speed limits are stretched by this.
+RUSH_MOTION_FACTOR = 2.0
+# A word signed without a miss adds time to the clock.
+RUSH_WORD_BONUS_S = 0.75
+RUSH_LEAD_IN_S = 0.3
+# The quickest anyone signs through the camera, used to draw enough words for a run.
+RUSH_FASTEST_SIGN_S = 0.25
+
+# Countdown before a timed run
+COUNTDOWN_STEPS = 3
+COUNTDOWN_STEP_S = 0.6
+
+# Multiplier: x1.0 plus a little per hit in the combo, more per Perfect in a row, plus speed. Capped at x10.
+COMBO_CAP = 100
+COMBO_BONUS = 0.05
 PERFECT_STREAK_BONUS = 0.1
-PERFECT_STREAK_CAP = 1.0
+PERFECT_STREAK_CAP = 4.0
 SPEED_BONUS = 1.0
-COMBO_MILESTONES = (10, 25, 50, 100)
+MULTIPLIER_MAX = 10.0
+WORD_BONUS_PER_SIGN = 50
+WORD_BONUS_MIN_SIGNS = 2
+COMBO_MILESTONES = (10, 25, 50, 100, 200)
 # Arcade effects
 PARTICLES_PER_HIT = 14
-PARTICLES_MAX_BURST = 40
+PARTICLES_PER_TIER = 4
+PARTICLES_MAX_BURST = 60
 PARTICLE_SPEED_MIN = 150.0
 PARTICLE_SPEED_MAX = 420.0
 PARTICLE_GRAVITY = 600.0
 PARTICLE_LIFE_S = 0.7
 POP_LIFE_S = 0.9
-BANNER_LIFE_S = 1.2
+BANNER_LIFE_S = 1.1
+WORD_BANNER_LIFE_S = 1.3
+SHOCKWAVE_LIFE_S = 0.4
 SCORE_ROLL_RATE = 0.15
 PULSE_S = 0.3
-GRADES = (("S", 0.95), ("A", 0.85), ("B", 0.7), ("C", 0.5), ("D", 0.0))
+SHAKE_S = 0.22
+# Embers rise from the multiplier from this tier up, this many a second per tier.
+EMBER_MIN_TIER = 3
+EMBERS_PER_TIER_PER_S = 5.0
+EMBER_LIFE_S = 0.9
+# The hit sound climbs one step of its scale every this many hits in a combo.
+PITCH_STEP_COMBO = 4
+GRADES = (("S", 0.95), ("A", 0.88), ("B", 0.75), ("C", 0.55), ("D", 0.0))
 SPEED_WINDOW_NOTES = 4
 SPEED_UP_ACCURACY = 0.8
 SPEED_DOWN_ACCURACY = 0.4
@@ -120,14 +162,25 @@ DATASET_POINTING_UP = ("Z",)
 POINTING_UP_PALMS = 0.6
 SIDEWAYS_LETTERS = ("G", "H", "P", "Q")
 
-# Motion signs (J, Z)
-MOTION_WINDOW_S = 2.0
-MOTION_SHAPE_GRACE_S = 0.4
+# Motion signs (J, Z). A stroke passes by its shape, or by touching the guide's checkpoints in order.
+MOTION_WINDOW_S = 3.5
+MOTION_SHAPE_GRACE_S = 0.7
 MOTION_RESAMPLE_POINTS = 24
 MOTION_MIN_POINTS = 8
-MOTION_START_STEP = 3
+MOTION_START_STEP = 2
 MOTION_MIN_EXTENT_PALMS = 0.7
 MOTION_MATCH_DISTANCE = 0.2
+# Each axis is scaled on its own, so a wide or tall drawing still fits. The short axis is never
+# stretched by more than this, or a straight line would be blown up into noise.
+MOTION_MAX_STRETCH = 2.5
+# Fingertip positions are averaged over this many results to calm tracking jitter.
+MOTION_SMOOTH_POINTS = 3
+# Checkpoints: how close the fingertip must pass, in palm sizes, and how long it may stall before the guide resets.
+CHECKPOINT_RADIUS_PALMS = 0.45
+CHECKPOINT_STALL_S = 1.5
+# The guide follows a fingertip that rests within this distance of where it was placed.
+GUIDE_REST_PALMS = 0.25
+GUIDE_REST_POINTS = 5
 # A finger counts as straight when its tip is this much farther from the wrist than its middle joint.
 # Straight fingers measure about 1.3 and folded ones 0.85 or less.
 EXTENDED_RATIO = 1.1

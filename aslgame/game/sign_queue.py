@@ -28,3 +28,12 @@ def make_queue(text):
 def missing_signs(text, sign_names):
     """Signs the text needs that have no recorded template."""
     return sorted({char for char in text.upper() if char != " " and char not in sign_names})
+
+
+def word_ends(words):
+    """Index, counting signs only, of the last sign of each word."""
+    ends, count = [], 0
+    for word in words:
+        count += len(word)
+        ends.append(count - 1)
+    return frozenset(ends)

@@ -7,6 +7,7 @@ from aslgame import config
 
 # Note frequencies in Hz.
 E5, A5, B5, E6, GS6, B6 = 659.25, 880.0, 987.77, 1318.5, 1661.2, 1975.5
+MAJOR_SCALE = (1.0, 1.122, 1.26, 1.335, 1.498, 1.682, 1.888, 2.0)
 
 
 def _envelope(count, attack_s, decay_per_s):
@@ -47,8 +48,7 @@ def _click():
 
 
 def _waves():
-    return {
-        "perfect": _sequence([E6, B6], 0.05, 0.25, 14),
+    waves = {
         "good": _tone(B5, 0.2, 14),
         "ok": _tone(E5, 0.16, 18),
         "miss": _buzz(0.28),
@@ -56,7 +56,17 @@ def _waves():
         "complete": _sequence([E5, A5, E6, GS6, B6], 0.08, 0.45, 7),
         "combo": _sequence([E6, GS6, B6, E6 * 2], 0.04, 0.2, 16),
         "click": _click(),
+        "tick": _tone(A5, 0.12, 25),
+        "go": _sequence([E6, B6], 0.03, 0.4, 8),
+        "lock": _tone(B6, 0.06, 60, (1.0,)),
+        "tier": _sequence([E5, B5, E6, GS6, B6, E6 * 2], 0.035, 0.3, 10),
+        "word": _sequence([B5, E6, GS6], 0.05, 0.3, 12),
+        "break": _buzz(0.45),
     }
+    # Perfect climbs a major scale as the combo grows, so a long streak sounds like it is rising.
+    for step, ratio in enumerate(MAJOR_SCALE):
+        waves[f"perfect{step}"] = _sequence([E6 * ratio, B6 * ratio], 0.05, 0.25, 14)
+    return waves
 
 
 class Sfx:

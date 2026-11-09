@@ -116,14 +116,26 @@ if __name__ == "__main__":
     unittest.main()
 
 
-class MusicLengthTest(unittest.TestCase):
-    def test_every_chart_fits_the_time_limit(self):
-        from pathlib import Path
-        from aslgame.game.chart import load_charts, make_session
+class WordsTest(unittest.TestCase):
+    def test_every_deck_has_words_at_every_level(self):
+        from aslgame.game.words import ALPHABET, DECKS, pool
+        for deck in DECKS:
+            for level in range(3):
+                self.assertTrue(pool(deck, level, set(ALPHABET)), (deck.name, level))
 
+    def test_draws_are_fresh_and_long_enough(self):
+        import random
+        from aslgame.game.words import ALPHABET, DECKS_BY_NAME, draw_words
+        deck = DECKS_BY_NAME["wild"]
+        first = draw_words(deck, 1, 40, random.Random(1), set(ALPHABET))
+        second = draw_words(deck, 1, 40, random.Random(2), set(ALPHABET))
+        self.assertGreaterEqual(sum(map(len, first)), 40)
+        self.assertNotEqual(first, second)
+        self.assertTrue(all(a != b for a, b in zip(first, first[1:])))
+
+    def test_every_chart_names_a_deck(self):
+        from pathlib import Path
+        from aslgame.game.chart import load_charts
+        from aslgame.game.words import DECKS_BY_NAME
         for chart in load_charts(Path(__file__).resolve().parent.parent / "data" / "charts"):
-            session = make_session(chart)
-            interval_s = chart.beats_per_note * 60.0 / chart.bpm
-            last_due_s = chart.first_note_s + (len(session.signs) - 1) * interval_s
-            self.assertLessEqual(last_due_s + config.HIT_WINDOW_S + config.FEEDBACK_S, config.MUSIC_MAX_S, chart.name)
-            self.assertGreater(len(session.signs), 5, chart.name)
+            self.assertIn(chart.deck, DECKS_BY_NAME)

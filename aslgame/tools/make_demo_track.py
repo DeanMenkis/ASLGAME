@@ -11,6 +11,8 @@ from aslgame import config
 RATE = config.AUDIO_RATE_HZ
 INTRO_BEATS = 8
 OUTRO_BEATS = 8
+# A chord marks every fourth beat, where the Easy level puts its signs.
+BEATS_PER_NOTE = 4
 VOLUME = 0.32
 # Chord roots in Hz, one per bar.
 WARMUP_ROOTS_HZ = (130.81, 110.0, 87.31, 98.0)  # C A F G
@@ -24,13 +26,14 @@ class Track:
     name: str
     title: str
     bpm: int
-    text: str
+    note_count: int  # chord stabs in the song, which sets its length
+    deck: str
     style: str
 
 
 TRACKS = (
-    Track("demo_90", "Warm-up 90", 90, "HI ASL CAB GOOD DAY", "warmup"),
-    Track("hardstyle_150", "Hardstyle 150", 150, "HI ASL LOVE GOOD DAY CAB THANK YOU HI LOVE", "hardstyle"),
+    Track("demo_90", "Warm-up 90", 90, 16, "hello", "warmup"),
+    Track("hardstyle_150", "Hardstyle 150", 150, 33, "power", "hardstyle"),
 )
 
 
@@ -85,12 +88,12 @@ def add(track, start_s, sound, gain):
 
 def is_note_beat(beat, note_count):
     note_beat = beat - INTRO_BEATS
-    return 0 <= note_beat < note_count * config.BEATS_PER_NOTE and note_beat % config.BEATS_PER_NOTE == 0
+    return 0 <= note_beat < note_count * BEATS_PER_NOTE and note_beat % BEATS_PER_NOTE == 0
 
 
 def warmup(bpm, note_count):
     beat_s = 60.0 / bpm
-    total_beats = INTRO_BEATS + note_count * config.BEATS_PER_NOTE + OUTRO_BEATS
+    total_beats = INTRO_BEATS + note_count * BEATS_PER_NOTE + OUTRO_BEATS
     track = np.zeros(int((total_beats + 1) * beat_s * RATE))
     rng = np.random.default_rng(0)
     for beat in range(total_beats):
@@ -107,7 +110,7 @@ def warmup(bpm, note_count):
 
 def hardstyle(bpm, note_count):
     beat_s = 60.0 / bpm
-    total_beats = INTRO_BEATS + note_count * config.BEATS_PER_NOTE + OUTRO_BEATS
+    total_beats = INTRO_BEATS + note_count * BEATS_PER_NOTE + OUTRO_BEATS
     track = np.zeros(int((total_beats + 1) * beat_s * RATE))
     rng = np.random.default_rng(1)
     for beat in range(total_beats):
@@ -148,18 +151,16 @@ def main():
     styles = {"warmup": warmup, "hardstyle": hardstyle}
     config.CHARTS_DIR.mkdir(parents=True, exist_ok=True)
     for track in TRACKS:
-        note_count = len(track.text.replace(" ", ""))
-        write_wav(config.MEDIA_DIR / f"{track.name}.wav", styles[track.style](track.bpm, note_count))
+        write_wav(config.MEDIA_DIR / f"{track.name}.wav", styles[track.style](track.bpm, track.note_count))
         chart = {
             "title": track.title,
             "media": f"{track.name}.wav",
             "bpm": track.bpm,
             "first_note_s": INTRO_BEATS * 60.0 / track.bpm,
-            "beats_per_note": config.BEATS_PER_NOTE,
-            "text": track.text,
+            "deck": track.deck,
         }
         (config.CHARTS_DIR / f"{track.name}.json").write_text(json.dumps(chart, indent=2) + "\n")
-        print(f"Wrote {track.title}: {note_count} signs")
+        print(f"Wrote {track.title}")
 
 
 if __name__ == "__main__":

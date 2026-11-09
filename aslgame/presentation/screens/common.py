@@ -5,7 +5,7 @@ import pygame
 from aslgame import config, theme
 from aslgame.game.motion import MOTION_SIGNS, MotionState, MotionTracker
 from aslgame.game.motion import update as motion_update
-from aslgame.game.rhythm import Judgement
+from aslgame.game.scoring import Judgement
 from aslgame.hand import FINGERS, WRIST
 from aslgame.matching import matcher
 from aslgame.matching.normalize import normalize, palm_size
@@ -63,7 +63,7 @@ class TargetScorer:
         if hand is None:
             self.score, self.fingers_off, self.shape_ok = 0.0, [], False
             if self.tracker is not None:
-                motion_update(self.tracker, 0.0, False, None, False)
+                motion_update(self.tracker, 0.0, False, None, 1.0, False)
                 self.trail_px = []
             return self.score
         normalized = normalize(hand.points_px, hand.is_left)
@@ -81,7 +81,7 @@ class TargetScorer:
         self.shape_ok = straight == motion.extended
         self.fingers_off = sorted(straight ^ motion.extended, key=list(FINGERS).index)
         tip_px = hand.points_px[motion.tip, :2]
-        state = motion_update(self.tracker, result.captured_s, self.shape_ok, tip_px / palm_size(hand.points_px), hand.is_left)
+        state = motion_update(self.tracker, result.captured_s, self.shape_ok, tip_px, palm_size(hand.points_px), hand.is_left)
         if state == MotionState.DRAWING:
             self.trail_px = (self.trail_px + [tuple(tip_px.tolist())])[-config.TRAIL_POINTS:]
         elif state != MotionState.DONE:
@@ -201,8 +201,11 @@ def draw_motion(screen, scorer, sign, hand, idle_wrist_px, now_s, show_guide):
         return
     if show_guide:
         if hand is not None:
-            palm_px = palm_size(hand.points_px)
-            start = scorer.trail_px[0] if scorer.trail_px else tuple(hand.points_px[motion.tip, :2].tolist())
+            tracker = scorer.tracker
+            if tracker is not None and tracker.anchor_px is not None:
+                palm_px, start = tracker.anchor_palm_px, tuple(tracker.anchor_px.tolist())
+            else:
+                palm_px, start = palm_size(hand.points_px), tuple(hand.points_px[motion.tip, :2].tolist())
             is_left = hand.is_left
         else:
             palm_px = theme.IDLE_GHOST_PALM_PX

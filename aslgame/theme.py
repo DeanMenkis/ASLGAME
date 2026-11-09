@@ -136,3 +136,23 @@ CARD_PATH_SCALE = 0.8
 PARTICLE_RADIUS_PX = 6
 POP_RISE_PX = GRID_PX * 10
 PULSE_GROWTH = 0.35
+
+# Multiplier tiers, x1 to x10: cool to hot, then white-hot. Each tier is also named by its number.
+TIER_COLORS = (
+    (200, 200, 205), (120, 220, 255), (70, 205, 115), (245, 210, 60), (255, 160, 40),
+    (255, 90, 60), (255, 60, 140), (200, 90, 255), (120, 120, 255), (255, 255, 255),
+)
+
+# Menu: paper and ink, with a vermilion seal. Wabi-sabi: warm, quiet, a little uneven.
+PAPER = (236, 228, 212)
+PAPER_WASH = (236, 228, 212, 232)
+PAPER_SHADE = (214, 203, 182)
+INK_BLACK = (34, 30, 28)
+INK_SOFT = (110, 100, 92)
+INK_FAINT = (165, 154, 140)
+SEAL = (190, 52, 38)
+SERIF_FAMILIES = "hoeflertext,baskerville,bigcaslon,georgia,timesnewroman"
+FONT_SIZE_SERIF_TITLE_PX = 92
+FONT_SIZE_SERIF_MODE_PX = 44
+ENSO_RADIUS_PX = GRID_PX * 17
+ENSO_WIDTH_PX = GRID_PX * 3

@@ -46,6 +46,7 @@ The first run takes a few minutes to set up, then the game opens. To play again 
 - **Recall**: untimed and harder. Only the letter is shown; sign it from memory.
 - **Rhythm**: handshapes arrive on a beat. Speed adapts to how well you sign.
 - **Music**: sign along to a song. Rhythm mode with a soundtrack.
+- **Rush**: no beat. Sign each letter before its fuse burns out; clean words add time.
 
 Timing cues are always visual. Sound is never required to play.
 

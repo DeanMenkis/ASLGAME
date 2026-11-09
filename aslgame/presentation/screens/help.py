@@ -6,7 +6,7 @@ from aslgame.presentation.screens.overlay import Overlay
 from aslgame.presentation.ui import draw_key_chip, make_panel
 
 SECTIONS = (
-    ("Menu", (("Left  Right", "Mode"), ("Up  Down", "Choose"), ("Enter", "Start"), ("H", "Keys"), ("Esc", "Quit"))),
+    ("Menu", (("Left  Right", "Mode"), ("Up  Down", "Choose"), ("1 2 3  Tab", "Level"), ("L", "Length"), ("Enter", "Begin"), ("Esc", "Quit"))),
     ("Playing", (("Esc  P", "Pause"), ("Tab", "Hint in Recall"))),
     ("Paused", (("Esc  Space", "Resume"), ("M", "Menu"))),
     ("Results", (("R", "Retry"), ("M", "Menu"))),
@@ -14,7 +14,7 @@ SECTIONS = (
 )
 LEFT_COLUMN_SECTIONS = 3
 COLUMN_WIDTH_PX = theme.GRID_PX * 40
-PANEL_SIZE_PX = (COLUMN_WIDTH_PX * 2 + theme.GRID_PX * 8, theme.GRID_PX * 74)
+PANEL_SIZE_PX = (COLUMN_WIDTH_PX * 2 + theme.GRID_PX * 8, theme.GRID_PX * 80)
 
 
 def build_panel(fonts):

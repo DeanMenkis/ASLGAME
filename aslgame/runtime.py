@@ -24,6 +24,9 @@ class Fonts:
     medium: pygame.font.Font
     large: pygame.font.Font
     display: pygame.font.Font
+    serif_body: pygame.font.Font
+    serif_mode: pygame.font.Font
+    serif_title: pygame.font.Font
 
 
 def make_fonts():
@@ -33,6 +36,9 @@ def make_fonts():
         medium=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_MEDIUM_PX, bold=True),
         large=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_LARGE_PX, bold=True),
         display=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_DISPLAY_PX, bold=True),
+        serif_body=pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_BODY_PX),
+        serif_mode=pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_SERIF_MODE_PX),
+        serif_title=pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_SERIF_TITLE_PX, italic=True),
     )
 
 

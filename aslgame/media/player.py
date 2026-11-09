@@ -2,6 +2,7 @@
 
 import pygame
 
+from aslgame import config
 from aslgame.game.clock import GameClock
 
 
@@ -23,20 +24,33 @@ def load_tracks(media_dir, charts):
 class MediaPlayer:
     """The clock starts the moment playback starts, and pauses with it, so notes stay on the music."""
 
-    def __init__(self, sound, real_s):
-        self._channel = sound.play()
-        self.clock = GameClock(real_s)
+    def __init__(self, sound, start_s, length_s):
+        """Playback starts at start_s (after the countdown) and fades out once length_s has played."""
+        self._sound = sound
+        self._channel = None
+        self._fading = False
+        self._length_s = length_s
+        self.clock = GameClock(start_s)
 
     def time(self, real_s):
-        return self.clock.time(real_s)
+        game_s = self.clock.time(real_s)
+        if self._channel is None and game_s >= 0 and self.clock.paused_at_s is None:
+            self._channel = self._sound.play()
+        if self._channel is not None and not self._fading and game_s >= self._length_s:
+            self._fading = True
+            self._channel.fadeout(config.MUSIC_FADE_MS)
+        return game_s
 
     def pause(self, real_s):
-        self._channel.pause()
+        if self._channel is not None:
+            self._channel.pause()
         self.clock.pause(real_s)
 
     def resume(self, real_s):
-        self._channel.unpause()
+        if self._channel is not None:
+            self._channel.unpause()
         self.clock.resume(real_s)
 
     def stop(self):
-        self._channel.stop()
+        if self._channel is not None:
+            self._channel.stop()

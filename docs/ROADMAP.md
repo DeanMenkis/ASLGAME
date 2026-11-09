@@ -53,6 +53,22 @@ Build the core first, then the game on top. Each phase should run end to end bef
 - [x] Settings panel in place of header toggles
 - [x] Arcade scoring: multiplier from combo, Perfect streak, and speed; score pops, particles, combo banners, grades
 
+## Phase 7: Arcade overhaul
+
+Built on the `arcade-overhaul` branch. Each item is ticked when its feature is finished and its decision is logged.
+
+- [x] Judging that rewards a ready hand, and grades from D to S that can be earned
+- [x] Faster recognition in timed modes
+- [x] Word decks: themed word lists, drawn fresh each run, split into Easy, Medium, and Hard
+- [x] Level and run length chosen in the menu; each song has its own deck
+- [x] Multiplier tiers up to x10, word clear bonuses, and louder feedback
+- [x] J and Z by checkpoints as well as by shape
+- [x] 3, 2, 1 countdown before timed modes
+- [x] Rush mode: no beat, sign as fast as you can before the clock runs out
+- [x] Menu redesign: paper, ink, and a live hand reader
+- [x] Results with a grade seal, and best scores kept between runs
+- [ ] Play test all of the above with a camera and tune the numbers
+
 ## Open questions
 
 - Review of the letter templates by a fluent signer

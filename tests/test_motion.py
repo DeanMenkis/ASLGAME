@@ -9,13 +9,14 @@ from aslgame.game import motion
 from aslgame.game.motion import MOTION_SIGNS, MotionState, MotionTracker
 
 STEP_S = 1 / 30
+PALM_PX = 80.0
 
 
 def draw(tracker, path, is_left=False, shape_ok=True, start_s=0.0, points=30):
     """Feed a stroke along path at 30 results a second. Returns the final state."""
     state = tracker.state
     for index, point in enumerate(motion.resample(np.asarray(path, dtype=float), points)):
-        state = motion.update(tracker, start_s + index * STEP_S, shape_ok, point + (2.0, 3.0), is_left)
+        state = motion.update(tracker, start_s + index * STEP_S, shape_ok, (point + (2.0, 3.0)) * PALM_PX, PALM_PX, is_left)
     return state
 
 
@@ -47,13 +48,26 @@ class MotionTest(unittest.TestCase):
     def test_lost_hand_clears_the_stroke(self):
         tracker = MotionTracker(MOTION_SIGNS["Z"])
         draw(tracker, MOTION_SIGNS["Z"].path[:2])
-        self.assertEqual(motion.update(tracker, 5.0, True, None, False), MotionState.NO_HAND)
+        self.assertEqual(motion.update(tracker, 5.0, True, None, PALM_PX, False), MotionState.NO_HAND)
         self.assertEqual(tracker.points, [])
 
     def test_stroke_after_wandering_still_counts(self):
         tracker = MotionTracker(MOTION_SIGNS["Z"])
         draw(tracker, [(0, 0), (-0.5, 0.4), (0.3, -0.2)], points=12)
         self.assertEqual(draw(tracker, MOTION_SIGNS["Z"].path, start_s=0.5), MotionState.DONE)
+
+
+    def test_stretched_strokes_pass(self):
+        for name in ("J", "Z"):
+            for aspect in ((1.6, 1.0), (1.0, 1.6), (0.7, 1.0)):
+                path = MOTION_SIGNS[name].path * aspect
+                self.assertEqual(draw(MotionTracker(MOTION_SIGNS[name]), path), MotionState.DONE, (name, aspect))
+
+    def test_checkpoints_pass_a_rough_z(self):
+        # Wobbly and uneven, but through every corner of the guide.
+        rough = [(0, 0), (0.6, 0.15), (1.25, -0.1), (0.7, 0.5), (0.05, 1.25), (0.6, 1.1), (1.2, 1.3)]
+        tracker = MotionTracker(MOTION_SIGNS["Z"])
+        self.assertEqual(draw(tracker, rough), MotionState.DONE)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,5 @@
   "media": "bouncer.mp3",
   "bpm": 128.0,
   "first_note_s": 3.785,
-  "beats_per_note": 4,
-  "text": "HI HELLO ASL CAB LOVE PLEASE SORRY THANK YOU WELCOME GOO"
+  "deck": "move"
 }

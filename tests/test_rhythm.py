@@ -1,11 +1,12 @@
-"""Tests for the game clock and rhythm session. Needs no camera or window."""
+"""Tests for the game clock, rhythm session, scoring, and rush. Needs no camera or window."""
 
 import unittest
 
 from aslgame import config
-from aslgame.game import rhythm
+from aslgame.game import rhythm, rush, scoring
 from aslgame.game.clock import GameClock
-from aslgame.game.rhythm import Judgement, Note, NoteState, RhythmSession
+from aslgame.game.rhythm import Note, NoteState, RhythmSession
+from aslgame.game.scoring import EventKind, Judgement, Tally
 
 HIGH = config.MATCH_THRESHOLD + 0.1
 STEP_S = 1 / 60
@@ -20,9 +21,8 @@ def run(session, until_s, score_at):
     return session
 
 
-def sign_on_beat(game_s, note):
-    """A perfect player: the right sign from slightly before each note is due."""
-    return HIGH if note is not None and game_s >= note.due_s - config.RHYTHM_HOLD_S else 0.0
+def always_right(game_s, note):
+    return HIGH if note is not None else None
 
 
 class ClockTest(unittest.TestCase):
@@ -36,52 +36,63 @@ class ClockTest(unittest.TestCase):
 
 
 class NoteTest(unittest.TestCase):
-    def test_states_in_order(self):
+    def test_early_sign_lands_on_the_beat_as_perfect(self):
         note = Note("A", due_s=5.0, approach_s=2.0)
-        rhythm.update_note(note, 2.0, False)
-        self.assertEqual(note.state, NoteState.WAITING)
-        rhythm.update_note(note, 3.5, False)
+        rhythm.update_note(note, 3.5)
+        note.locked_s = 3.6
+        rhythm.update_note(note, 4.9)
         self.assertEqual(note.state, NoteState.APPROACHING)
-        rhythm.update_note(note, 4.9, False)
-        self.assertEqual(note.state, NoteState.HITTABLE)
-        rhythm.update_note(note, 5.05, True)
+        rhythm.update_note(note, 5.0)
         self.assertEqual((note.state, note.judgement), (NoteState.HIT, Judgement.PERFECT))
-        rhythm.update_note(note, 5.05 + config.FEEDBACK_S, False)
-        self.assertEqual(note.state, NoteState.DONE)
 
     def test_miss_after_window(self):
         note = Note("A", due_s=5.0, approach_s=2.0)
-        for game_s in (4.0, 4.9, 5.0 + config.HIT_WINDOW_S + 0.01):
-            rhythm.update_note(note, game_s, False)
+        for game_s in (4.0, 5.0, 5.0 + config.HIT_WINDOW_S + 0.01):
+            rhythm.update_note(note, game_s)
         self.assertEqual((note.state, note.judgement), (NoteState.MISSED, Judgement.MISS))
 
-    def test_match_before_window_waits(self):
-        note = Note("A", due_s=5.0, approach_s=2.0)
-        rhythm.update_note(note, 3.5, True)
-        self.assertEqual(note.state, NoteState.APPROACHING)
-
-    def test_judge_windows(self):
-        self.assertEqual(rhythm.judge(-0.1), Judgement.PERFECT)
-        self.assertEqual(rhythm.judge(0.25), Judgement.GOOD)
-        self.assertEqual(rhythm.judge(-0.45), Judgement.OK)
+    def test_late_judgements(self):
+        window = config.HIT_WINDOW_S
+        self.assertEqual(rhythm.judge(-1.0), Judgement.PERFECT)
+        self.assertEqual(rhythm.judge(window * 0.2), Judgement.PERFECT)
+        self.assertEqual(rhythm.judge(window * 0.5), Judgement.GOOD)
+        self.assertEqual(rhythm.judge(window * 0.9), Judgement.OK)
 
 
 class SessionTest(unittest.TestCase):
-    def test_perfect_player_hits_everything_and_speeds_up(self):
-        session = run(RhythmSession(list("ABCDEFGH")), 60.0, sign_on_beat)
+    def test_ready_player_gets_all_perfects_and_an_s(self):
+        session = run(RhythmSession(list("ABCDEFGH")), 60.0, always_right)
         self.assertTrue(session.is_finished())
-        judgements = [judgement for _, judgement in session.results]
-        self.assertEqual(len(judgements), 8)
-        self.assertNotIn(Judgement.MISS, judgements)
-        self.assertEqual(session.max_combo, 8)
+        self.assertEqual([j for _, j in session.tally.results], [Judgement.PERFECT] * 8)
+        self.assertEqual(scoring.summarize(session.tally).grade, "S")
         self.assertGreater(session.speed, 1.0)
 
-    def test_idle_player_misses_and_slows_down(self):
+    def test_idle_player_misses_and_gets_a_d(self):
         session = run(RhythmSession(list("ABCDEFGH")), 120.0, lambda game_s, note: None)
-        self.assertTrue(session.is_finished())
-        self.assertTrue(all(judgement == Judgement.MISS for _, judgement in session.results))
-        self.assertEqual((session.combo, session.score), (0, 0))
+        self.assertTrue(all(j == Judgement.MISS for _, j in session.tally.results))
+        self.assertEqual(scoring.summarize(session.tally).grade, "D")
         self.assertLess(session.speed, 1.0)
+
+    def test_fast_signer_spells_ahead(self):
+        session = RhythmSession(list("ABCD"), beats_per_note=1)
+        rhythm.update(session, 0.0, None)
+        rhythm.update(session, 0.1, HIGH)
+        rhythm.update(session, 0.2, HIGH)
+        locked = [note for note in session.notes if note.locked_s is not None]
+        self.assertGreaterEqual(len(locked), 1)
+
+    def test_run_stops_after_last_due(self):
+        session = RhythmSession(list("AB") * 50, frozenset(range(1, 100, 2)), last_due_s=10.0)
+        run(session, 200.0, always_right)
+        self.assertTrue(session.is_finished())
+        self.assertLess(len(session.tally.results), 100)
+        self.assertEqual(len(session.tally.results) % 2, 0)  # never stops mid word
+
+    def test_drawn_letters_get_extra_time(self):
+        session = RhythmSession(["A", "Z", "B"], beats_per_note=1)
+        rhythm.spawn_notes(session, 100.0)
+        gaps = [b.due_s - a.due_s for a, b in zip(session.notes, session.notes[1:])]
+        self.assertGreater(gaps[0], gaps[1])
 
     def test_speed_stays_in_bounds(self):
         session = RhythmSession(["A"])
@@ -92,39 +103,64 @@ class SessionTest(unittest.TestCase):
             rhythm.adapt_speed(session, 0.0)
         self.assertEqual(session.speed, config.SPEED_MIN)
 
+
+class ScoringTest(unittest.TestCase):
+    def test_multiplier_climbs_tiers_and_caps(self):
+        tally = Tally()
+        for _ in range(300):
+            scoring.record(tally, "A", Judgement.PERFECT)
+        self.assertEqual(tally.multiplier, config.MULTIPLIER_MAX)
+        tiers = [e.tier for e in tally.events if e.kind == EventKind.TIER_UP]
+        self.assertEqual(tiers, list(range(2, 11)))
+
+    def test_miss_breaks_a_high_multiplier(self):
+        tally = Tally()
+        for _ in range(20):
+            scoring.record(tally, "A", Judgement.PERFECT)
+        tally.events.clear()
+        scoring.record(tally, "A", Judgement.MISS)
+        self.assertEqual((tally.combo, tally.multiplier), (0, 1.0))
+        self.assertIn(EventKind.BREAK, [e.kind for e in tally.events])
+
+    def test_clean_word_pays_a_bonus(self):
+        clean, dirty = Tally(), Tally()
+        for letter in "CAT":
+            scoring.record(clean, letter, Judgement.GOOD, ends_word=letter == "T")
+        for letter, judgement in zip("CAT", (Judgement.GOOD, Judgement.MISS, Judgement.GOOD)):
+            scoring.record(dirty, letter, judgement, ends_word=letter == "T")
+        self.assertEqual(clean.words_cleared, 1)
+        self.assertEqual(dirty.words_cleared, 0)
+
+    def test_grades_span_d_to_s(self):
+        self.assertEqual([scoring.grade(a) for a in (1.0, 0.9, 0.8, 0.6, 0.1)], ["S", "A", "B", "C", "D"])
+
     def test_summary_lists_weakest_signs(self):
-        session = RhythmSession(["A", "B"])
-        session.results = [("A", Judgement.PERFECT), ("B", Judgement.MISS), ("B", Judgement.GOOD)]
-        results = rhythm.summarize(session)
-        self.assertEqual(results.weakest, [("B", 0.35)])
+        tally = Tally()
+        for sign, judgement in (("A", Judgement.PERFECT), ("B", Judgement.MISS), ("B", Judgement.GOOD)):
+            scoring.record(tally, sign, judgement)
+        results = scoring.summarize(tally)
+        self.assertEqual(results.weakest, [("B", 0.4)])
         self.assertEqual(results.counts[Judgement.MISS], 1)
-        self.assertAlmostEqual(results.accuracy, 1.7 / 3)
 
-    def test_multiplier_grows_and_resets(self):
-        session = RhythmSession(["A"] * 20)
-        note = Note("A", 0.0, 1.0)
-        for _ in range(5):
-            note.judgement = Judgement.PERFECT
-            rhythm.resolve(session, note)
-        self.assertGreater(session.multiplier, 1.4)
-        self.assertEqual(session.last_points, int(300 * session.multiplier))
-        before = session.multiplier
-        note.judgement = Judgement.MISS
-        rhythm.resolve(session, note)
-        self.assertEqual((session.combo, session.perfect_streak), (0, 0))
-        # Only the speed bonus survives a miss.
-        self.assertAlmostEqual(session.multiplier, round(1.0 + (session.speed - 1.0) * config.SPEED_BONUS, 1))
-        self.assertLess(session.multiplier, before)
 
-    def test_grades(self):
-        self.assertEqual([rhythm.grade(a) for a in (1.0, 0.9, 0.75, 0.6, 0.1)], ["S", "A", "B", "C", "D"])
+class RushTest(unittest.TestCase):
+    def test_quick_signs_are_perfect_and_the_clock_ends_it(self):
+        session = rush.RushSession(list("AB") * 200, frozenset(range(1, 400, 2)), 5.0, 3.0)
+        game_s = 0.0
+        while not session.is_finished():
+            rush.update(session, game_s, HIGH)
+            game_s += STEP_S
+        self.assertGreater(len(session.tally.results), 10)
+        self.assertTrue(all(j == Judgement.PERFECT for _, j in session.tally.results))
+        self.assertGreater(session.bonus_s, 0)
 
-    def test_beat_phase_is_zero_on_note(self):
-        session = RhythmSession(list("ABC"))
-        rhythm.spawn_notes(session, 100.0)
-        due_s = session.due_times[1]
-        self.assertAlmostEqual(session.beat_phase(due_s), 0.0)
-        self.assertAlmostEqual(session.beat_phase(due_s + session.beat_s() / 2), 0.5)
+    def test_fuse_burns_out_to_a_miss(self):
+        session = rush.RushSession(list("AB"), frozenset({1}), 30.0, 1.0)
+        game_s = 0.0
+        while not session.tally.results:
+            rush.update(session, game_s, None)
+            game_s += STEP_S
+        self.assertEqual(session.tally.results[0][1], Judgement.MISS)
 
 
 if __name__ == "__main__":

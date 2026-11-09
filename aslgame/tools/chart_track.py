@@ -1,4 +1,4 @@
-"""Writes a chart for a song in media/: finds its tempo and first beat, then fills it with signs."""
+"""Writes a chart for a song in media/: finds its tempo and first beat, and names the word deck signed to it."""
 
 import argparse
 import json
@@ -10,13 +10,13 @@ import numpy as np  # noqa: E402
 import pygame  # noqa: E402
 
 from aslgame import config  # noqa: E402
+from aslgame.game.words import DECKS_BY_NAME  # noqa: E402
 
 HOP_SAMPLES = 441
 MIN_BPM, MAX_BPM, BPM_STEP = 100.0, 180.0, 0.25
 REFINE_RANGE_BPM, REFINE_STEP_BPM = 1.0, 0.05
 # Notes start once the beat is this strong compared to the loudest part of the song.
 LOUD_FRACTION = 0.5
-END_MARGIN_BEATS = 4
 
 
 def load_mono(path):
@@ -75,8 +75,7 @@ def main():
     parser = argparse.ArgumentParser(description="Write a chart for a song in media/.")
     parser.add_argument("media", help="file name inside media/")
     parser.add_argument("title")
-    parser.add_argument("--text", default=" ".join(config.LEARN_WORDS), help="words to sign, repeated to fill the song")
-    parser.add_argument("--beats-per-note", type=int, default=4)
+    parser.add_argument("--deck", default="everything", choices=sorted(DECKS_BY_NAME), help="word deck signed to the song")
     parser.add_argument("--bpm", type=float, help="set the tempo when detection picks double or half time")
     args = parser.parse_args()
 
@@ -91,26 +90,17 @@ def main():
     # Start on a bar line, and leave room for the approach ring.
     first_beat = max(first_beat + (-first_beat) % 4, config.APPROACH_BEATS + 1)
     first_note_s = phase_s + first_beat * beat_s
-    note_count = int((duration_s - first_note_s) / beat_s - END_MARGIN_BEATS) // args.beats_per_note
-
-    words = args.text.upper().split()
-    text, letters = [], 0
-    while letters < note_count:
-        word = words[len(text) % len(words)][: note_count - letters]
-        text.append(word)
-        letters += len(word)
 
     chart = {
         "title": args.title,
         "media": args.media,
         "bpm": round(float(bpm), 2),
         "first_note_s": round(float(first_note_s), 3),
-        "beats_per_note": args.beats_per_note,
-        "text": " ".join(text),
+        "deck": args.deck,
     }
     name = os.path.splitext(args.media)[0]
     (config.CHARTS_DIR / f"{name}.json").write_text(json.dumps(chart, indent=2) + "\n")
-    print(f"{args.title}: {bpm:.2f} BPM, first note {first_note_s:.2f} s, {letters} signs over {duration_s:.0f} s")
+    print(f"{args.title}: {bpm:.2f} BPM, first note {first_note_s:.2f} s, {duration_s:.0f} s long")
 
 
 if __name__ == "__main__":

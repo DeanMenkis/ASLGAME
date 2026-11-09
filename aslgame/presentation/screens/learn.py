@@ -9,7 +9,7 @@ from aslgame import theme
 from aslgame.game import match_detector
 from aslgame.game.app_flow import Action
 from aslgame.game.match_detector import DetectorState, MatchDetector
-from aslgame.game.rhythm import Judgement
+from aslgame.game.scoring import Judgement
 from aslgame.game.sign_queue import make_queue
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.common import (
