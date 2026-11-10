@@ -6,19 +6,20 @@ MARGIN_PX = GRID_PX * 4
 
 # Palette
 BACKGROUND = (20, 17, 15)
-INK = (240, 232, 216)
-INK_DIM = (165, 154, 140)
+# Panels, menus and buttons are paper with ink on it, the same as the menu and the play screen.
+INK = (34, 30, 28)
+INK_DIM = (110, 100, 92)
 ACCENT = (240, 172, 56)
 GHOST = (255, 255, 255)
 LIVE_HAND = (0, 200, 255)
 PANEL = (0, 0, 0, 160)
 SHADE = (20, 14, 10, 175)
-SURFACE = (30, 26, 23, 228)
-SURFACE_RAISED = (54, 48, 43)
-SURFACE_HOVER = (72, 64, 57)
-BORDER = (104, 94, 84)
-ACCENT_INK = (30, 24, 20)
-DISABLED = (100, 92, 84)
+SURFACE = (236, 228, 212, 250)
+SURFACE_RAISED = (236, 228, 212)
+SURFACE_HOVER = (214, 203, 182)
+BORDER = (110, 100, 92)
+ACCENT_INK = (236, 228, 212)
+DISABLED = (165, 154, 140)
 
 # Type
 # System font families in order of preference; pygame falls back to its own font if none exist.
@@ -165,9 +166,9 @@ FLAME_GOLD = (250, 190, 60)
 EMBER_DARK = (70, 14, 0)
 ASH = (196, 192, 186)
 # Camera grade: the tint multiplied over the washed camera when cold, hot, and just put out.
-GRADE_COLD = (255, 240, 214)
-GRADE_HOT = (255, 206, 160)
-GRADE_ASH = (214, 214, 214)
+GRADE_COLD = (255, 248, 236)
+GRADE_HOT = (255, 226, 196)
+GRADE_ASH = (226, 224, 222)
 # Flame core color by heat: deep red, orange, yellow-white, then blue-white at the very top.
 FLAME_CORES = ((0.0, (200, 50, 10)), (0.5, (255, 140, 30)), (0.85, (255, 230, 160)), (1.0, (175, 205, 255)))
 FLAME_BODY = (255, 130, 30)

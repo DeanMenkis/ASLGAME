@@ -11,6 +11,7 @@ from aslgame.presentation.screens.common import JUDGEMENT_TEXT, is_key, make_sha
 from aslgame.presentation.ui import Button, make_panel
 
 CARD_SIZE_PX = (theme.GRID_PX * 110, theme.GRID_PX * 80)
+GRADE_RADIUS_PX = theme.GRID_PX * 11
 WEAK_PALM_PX = theme.GRID_PX * 5
 WEAK_SPACING_PX = theme.GRID_PX * 22
 BUTTON_WIDTH_PX = theme.GRID_PX * 24
@@ -31,14 +32,17 @@ class ResultsScreen:
         self._focus = 0
 
     def _build(self, fonts, results, signs, new_best):
-        """The whole card is drawn once: a paper sheet, the grade as a hanko seal, the numbers in ink."""
-        card = make_panel(CARD_SIZE_PX, (*theme.PAPER, 248), theme.GRID_PX)
+        """The whole card is drawn once: a paper sheet, the grade painted in a brushed circle, the numbers in ink."""
+        card = ink.torn_slip(CARD_SIZE_PX, (*theme.PAPER, 250), seed=11)
         serif = theme.SERIF_FAMILIES
         center_x_px = CARD_SIZE_PX[0] * 3 // 5
-        draw_hanko(card, results.grade, (theme.GRID_PX * 16, theme.GRID_PX * 17))
+        grade_center = (theme.GRID_PX * 17, theme.GRID_PX * 18)
+        draw_grade(card, results.grade, grade_center)
         if new_best:
-            best = ink.make_stamp("new best", pygame.font.SysFont(serif, 30, italic=True), theme.INK_BLACK, -4, 5)
-            card.blit(best, best.get_rect(center=(theme.GRID_PX * 16, theme.GRID_PX * 31)))
+            best = pygame.font.SysFont(serif, 30, italic=True).render("new best", True, theme.SEAL)
+            best_rect = best.get_rect(center=(grade_center[0], grade_center[1] + GRADE_RADIUS_PX + theme.GRID_PX * 5))
+            card.blit(best, best_rect)
+            ink.draw_brush_line(card, best_rect.left, best_rect.bottom + 2, best_rect.width, theme.SEAL, 5)
         y_px = theme.GRID_PX * 8
         for surface in (
             pygame.font.SysFont(serif, 72).render(f"{results.score:,}", True, theme.INK_BLACK),
@@ -97,9 +101,14 @@ def draw_counts(card, fonts, results, center_x_px, y_px):
     return pieces[0].get_height()
 
 
-def draw_hanko(card, grade, center):
-    """The grade pressed in as a hanko seal: a vermilion block, gold for S, with the letter in paper."""
-    font = pygame.font.SysFont(theme.SERIF_FAMILIES, 150, bold=True)
-    color = theme.FLAME_GOLD if grade == "S" else theme.SEAL
-    seal = ink.make_stamp(grade, font, color, -6, ord(grade))
-    card.blit(seal, seal.get_rect(center=center))
+def draw_grade(card, grade, center):
+    """The grade painted, not stamped: a brushed ensō with the letter inside in serif.
+    S burns in fire colours, A is vermilion, the rest are ink; the letter itself is the grade, so colour only adds to it."""
+    ink.draw_enso(card, center, GRADE_RADIUS_PX, theme.GRID_PX * 3, seed=ord(grade))
+    font = pygame.font.SysFont(theme.SERIF_FAMILIES, 150, italic=True)
+    if grade == "S":
+        letter = ink.fire_text(font, grade, theme.FLAME_GOLD, theme.SEAL, edge_px=3)
+    else:
+        letter = font.render(grade, True, theme.SEAL if grade == "A" else theme.INK_BLACK)
+    # Nudged right a little, since an italic letter leans left of its box.
+    card.blit(letter, letter.get_rect(center=(center[0] + theme.GRID_PX // 2, center[1])))

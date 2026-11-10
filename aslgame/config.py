@@ -115,18 +115,22 @@ ON_BEAT_WINDOW_S = 0.09
 ON_BEAT_BONUS = 1.5
 
 # Ink and fire. The multiplier heats the screen: ink at first, then embers, flames, and ablaze; a miss puts it out.
-FIRE_START_MULT = 1.8
-FIRE_FULL_MULT = 7.0
+# Low enough that a few clean signs light it: embers after about 5 in a row, flames after about 15, ablaze after about 30
+# (fewer with Perfects).
+FIRE_START_MULT = 1.1
+FIRE_FULL_MULT = 3.0
 HEAT_RISE_PER_S = 0.9
 HEAT_FALL_PER_S = 0.5
-HEAT_STAGES = (0.15, 0.45, 0.75)  # embers, flames, ablaze
-# At the multiplier cap the fire burns blue-white.
-BLUE_FIRE_MULT = 9.5
-# After a fire goes out the camera drains to grey, then recovers over this long.
-ASH_S = 1.6
-# Share of grey in the camera when cold and when ablaze.
-GRADE_GRAY_COLD = 0.85
-GRADE_GRAY_HOT = 0.3
+HEAT_STAGES = (0.08, 0.35, 0.7)  # embers, flames, ablaze
+# A long hot streak burns blue-white.
+BLUE_FIRE_MULT = 5.0
+# After a fire goes out the camera dims and loses some colour, then recovers over this long.
+ASH_S = 1.2
+# The camera keeps its own colour. Cold is a touch muted, ablaze a touch richer (negative means more saturated),
+# and a fire going out drains at most this much colour for a moment.
+GRADE_GRAY_COLD = 0.1
+GRADE_GRAY_HOT = -0.15
+GRADE_GRAY_ASH = 0.45
 # Fire is drawn at a quarter size and scaled up, which blurs it into glow for free.
 FIRE_LAYER_SCALE = 4
 FIRE_BUOYANCY = 260.0

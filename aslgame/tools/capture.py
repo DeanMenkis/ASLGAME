@@ -79,7 +79,7 @@ def main():
     name = parser.parse_args().name
 
     runtime = Runtime(f"{config.WINDOW_TITLE} capture {name}")
-    label = runtime.fonts.large.render(name, True, theme.INK)
+    label = runtime.fonts.large.render(name, True, theme.PAPER)
     capture = Capture()
     shown_count = -1
     count_surface = None
@@ -101,7 +101,7 @@ def main():
             draw_hand(runtime.screen, hand.points_px, theme.LIVE_HAND, theme.LIVE_LINE_PX, theme.LIVE_JOINT_RADIUS_PX, True)
         if capture.sample_count() != shown_count:
             shown_count = capture.sample_count()
-            count_surface = runtime.fonts.small.render(str(shown_count), True, theme.INK)
+            count_surface = runtime.fonts.small.render(str(shown_count), True, theme.PAPER)
         draw(runtime.screen, capture, now_s, label, count_surface)
         runtime.end_frame()
     runtime.close()

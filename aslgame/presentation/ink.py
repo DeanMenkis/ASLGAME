@@ -12,8 +12,7 @@ import numpy as np
 import pygame
 
 from aslgame import config, theme
-from aslgame.hand import FINGERS, WRIST
-from aslgame.presentation.hand_shape import stamp_hand
+from aslgame.hand import FINGERS, PALM_OUTLINE, WRIST
 
 HEAT_STOPS = ((0.0, theme.INK_BLACK), (0.35, theme.SEAL), (0.7, theme.EMBER), (1.0, theme.FLAME_GOLD))
 LUMA = np.array([0.299, 0.587, 0.114], dtype=np.float32)
@@ -34,9 +33,9 @@ def heat_color(heat):
 
 
 def grade_matrix(heat, ash):
-    """The camera grade as one 3x3 color matrix: mostly grey and warm when cold, color back when hot, grey after a fire."""
+    """The camera grade as one 3x3 color matrix: true colour with a warm cast, richer when hot, briefly muted after a fire."""
     gray = config.GRADE_GRAY_COLD + (config.GRADE_GRAY_HOT - config.GRADE_GRAY_COLD) * heat
-    gray = max(gray, ash)
+    gray = max(gray, ash * config.GRADE_GRAY_ASH)
     tint = lerp_color(lerp_color(theme.GRADE_COLD, theme.GRADE_HOT, heat), theme.GRADE_ASH, ash)
     mixing = (1 - gray) * np.eye(3, dtype=np.float32) + gray * np.tile(LUMA, (3, 1))
     return (np.array(tint, dtype=np.float32)[:, None] / 255.0 * mixing).astype(np.float32)
@@ -200,17 +199,100 @@ def torn_band(size_px, color, seed):
     return band
 
 
+def draw_enso(surface, center, radius_px, width_px, seed=3):
+    """A brushed circle: thick where the brush lands, thinning out, with the gap a real ensō leaves."""
+    rng = np.random.default_rng(seed)
+    start = -math.pi * 0.35
+    sweep = math.pi * 1.86
+    steps = 220
+    wobble = rng.uniform(-1, 1, 6)
+    for index in range(steps):
+        t = index / steps
+        angle = start + sweep * t
+        r = radius_px * (1 + 0.025 * math.sin(angle * 3 + wobble[0]) + 0.015 * math.sin(angle * 5 + wobble[1]))
+        thickness = width_px * (0.35 + 0.65 * math.sin(math.pi * min(1.0, t * 1.15)) ** 0.6) * (1 - 0.5 * t)
+        x, y = center[0] + math.cos(angle) * r, center[1] + math.sin(angle) * r
+        alpha = int(230 * (1 - 0.45 * t))
+        pygame.draw.circle(surface, (*theme.INK_BLACK, alpha), (x, y), max(1.0, thickness / 2))
+        if rng.random() < 0.35 and t > 0.5:
+            # Dry brush: bristles break up near the end of the stroke.
+            pygame.draw.circle(surface, (*theme.PAPER, 160), (x + rng.uniform(-thickness, thickness) / 3,
+                                                            y + rng.uniform(-thickness, thickness) / 3), thickness / 6)
+
+
+def draw_brush_line(surface, left, y_px, width_px, color, seed):
+    """A short ink stroke used to underline a choice or a word."""
+    rng = np.random.default_rng(seed)
+    for index in range(width_px):
+        t = index / width_px
+        thickness = 7 * (1 - 0.6 * t) + rng.uniform(-0.8, 0.8)
+        pygame.draw.circle(surface, color, (left + index, y_px + math.sin(t * 2.4) * 2), max(1.0, thickness / 2))
+
+
+def torn_slip(size_px, color, seed):
+    """A paper slip torn on all four sides, with a soft ink shadow below it. The surface is a few pixels larger than size_px."""
+    width, height = size_px
+    rng = np.random.default_rng(seed)
+
+    def tear():
+        bite = rng.uniform(0, 4)
+        return bite + 4 if rng.random() < 0.08 else bite
+
+    points = []
+    x = 0.0
+    while x < width:
+        points.append((x, tear()))
+        x += rng.uniform(5, 14)
+    y = 0.0
+    while y < height:
+        points.append((width - tear(), y))
+        y += rng.uniform(5, 14)
+    x = float(width)
+    while x > 0:
+        points.append((x, height - tear()))
+        x -= rng.uniform(5, 14)
+    y = float(height)
+    while y > 0:
+        points.append((tear(), y))
+        y -= rng.uniform(5, 14)
+    shadow_px = 4
+    slip = pygame.Surface((width + shadow_px, height + shadow_px), pygame.SRCALPHA)
+    pygame.draw.polygon(slip, (*theme.INK_BLACK, 60), [(px + 2, py + shadow_px) for px, py in points])
+    pygame.draw.polygon(slip, color, points)
+    return slip
+
+
 def ink_hand(normalized, palm_px, color, finger_tints=None):
-    """A hand as solid ink with faint paper finger lines, so folded fingers still read. Returns (surface, wrist)."""
-    pad_px = int(palm_px) + 4
+    """A hand as an ink line drawing on paper: the palm and each finger outlined in ink and filled with paper (or a tint),
+    drawn farthest first so fingers folded toward the viewer sit over the palm. Returns (surface, wrist)."""
+    edge_px = max(2, round(palm_px * 0.045))
+    pad_px = int(palm_px * 0.5) + edge_px * 2
     points = normalized[:, :2] * palm_px
     origin = points.min(axis=0) - pad_px
     size = (points.max(axis=0) - origin + pad_px).astype(int)
     xy = [tuple(p) for p in (points - origin).tolist()]
+    depth = normalized[:, 2] if normalized.shape[1] > 2 else np.zeros(len(normalized))
     surface = pygame.Surface(size, pygame.SRCALPHA)
-    stamp_hand(surface, xy, palm_px, (*color, 255), finger_tints)
-    for joints in FINGERS.values():
-        pygame.draw.lines(surface, (*theme.PAPER, 120), False, [xy[j] for j in joints], 2)
+    ink = (*color, 255)
+    # Farthest first; in hand coordinates a larger z is farther from the viewer.
+    parts = [("Palm", PALM_OUTLINE)] + list(FINGERS.items())
+    parts.sort(key=lambda part: -float(np.mean(depth[list(part[1])])))
+    for name, joints in parts:
+        fill = (*finger_tints[name], 255) if finger_tints and name in finger_tints else (*theme.PAPER, 255)
+        if name == "Palm":
+            outline = [xy[j] for j in joints]
+            pygame.draw.polygon(surface, fill, outline)
+            pygame.draw.lines(surface, ink, True, outline, edge_px)
+            for point in outline:
+                pygame.draw.circle(surface, ink, point, edge_px // 2)
+            continue
+        width_px = max(4, int(palm_px * (theme.THUMB_WIDTH_PALMS if name == "Thumb" else theme.FINGER_WIDTH_PALMS)))
+        chain = [xy[j] for j in joints]
+        for layer_color, layer_px in ((ink, width_px + edge_px * 2), (fill, width_px)):
+            for start, end in zip(chain, chain[1:]):
+                pygame.draw.line(surface, layer_color, start, end, layer_px)
+            for point in chain:
+                pygame.draw.circle(surface, layer_color, point, layer_px // 2)
     return surface, (-origin).tolist()
 
 

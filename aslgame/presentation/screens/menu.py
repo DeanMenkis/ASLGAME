@@ -13,6 +13,7 @@ from aslgame.game.words import DECKS, DECKS_BY_NAME, pool
 from aslgame.matching import matcher
 from aslgame.matching.normalize import normalize
 from aslgame.presentation.draw import draw_text_centered
+from aslgame.presentation.ink import draw_brush_line, draw_enso, make_vignette
 from aslgame.presentation.screens.about import AboutPanel
 from aslgame.presentation.screens.common import is_key
 from aslgame.presentation.screens.help import HelpPanel
@@ -78,39 +79,12 @@ def make_paper(size_px):
         darker = int(rng.uniform(6, 16))
         fibre = (theme.PAPER[0] - darker, theme.PAPER[1] - darker, theme.PAPER[2] - darker, theme.PAPER_WASH[3])
         pygame.draw.line(paper, fibre, (x, y), (x + math.cos(angle) * length, y + math.sin(angle) * length))
-    for step in range(24):
-        pygame.draw.rect(paper, (120, 100, 80, 6), (-step * 4, -step * 4, width + step * 8, height + step * 8), 6)
-    return paper
-
-
-def draw_enso(surface, center, radius_px, width_px, seed=3):
-    """A brushed circle: thick where the brush lands, thinning out, with the gap a real ensō leaves."""
-    rng = np.random.default_rng(seed)
-    start = -math.pi * 0.35
-    sweep = math.pi * 1.86
-    steps = 220
-    wobble = rng.uniform(-1, 1, 6)
-    for index in range(steps):
-        t = index / steps
-        angle = start + sweep * t
-        r = radius_px * (1 + 0.025 * math.sin(angle * 3 + wobble[0]) + 0.015 * math.sin(angle * 5 + wobble[1]))
-        thickness = width_px * (0.35 + 0.65 * math.sin(math.pi * min(1.0, t * 1.15)) ** 0.6) * (1 - 0.5 * t)
-        x, y = center[0] + math.cos(angle) * r, center[1] + math.sin(angle) * r
-        alpha = int(230 * (1 - 0.45 * t))
-        pygame.draw.circle(surface, (*theme.INK_BLACK, alpha), (x, y), max(1.0, thickness / 2))
-        if rng.random() < 0.35 and t > 0.5:
-            # Dry brush: bristles break up near the end of the stroke.
-            pygame.draw.circle(surface, (*theme.PAPER, 160), (x + rng.uniform(-thickness, thickness) / 3,
-                                                            y + rng.uniform(-thickness, thickness) / 3), thickness / 6)
-
-
-def draw_brush_line(surface, left, y_px, width_px, color, seed):
-    """A short ink stroke used to underline the chosen mode."""
-    rng = np.random.default_rng(seed)
-    for index in range(width_px):
-        t = index / width_px
-        thickness = 7 * (1 - 0.6 * t) + rng.uniform(-0.8, 0.8)
-        pygame.draw.circle(surface, color, (left + index, y_px + math.sin(t * 2.4) * 2), max(1.0, thickness / 2))
+    # Opaque, so nothing from an earlier frame shows through; the edges darken like old paper.
+    sheet = pygame.Surface(size_px)
+    sheet.fill(theme.PAPER)
+    sheet.blit(paper, (0, 0))
+    sheet.blit(make_vignette(size_px, (120, 100, 80), 0.35), (0, 0))
+    return sheet
 
 
 def draw_seal(surface, center, size_px, font):
@@ -360,8 +334,13 @@ class MenuScreen:
                 draw_brush_line(row, theme.GRID_PX * 2, ROW_PX - theme.GRID_PX, theme.GRID_PX * 8, (*theme.SEAL, 255), id(item) % 97)
             font = self._fonts.serif_mode if selected else self._fonts.serif_body
             label = font.render(item.label, True, theme.INK_BLACK if selected else theme.INK_SOFT)
-            row.blit(label, label.get_rect(midleft=(theme.GRID_PX * 2, ROW_PX // 2)))
             note = self._fonts.small.render(item.note, True, theme.INK_FAINT)
+            # A long selected name shrinks to fit beside its note instead of running into it.
+            room_px = LIST_WIDTH_PX - note.get_width() - theme.GRID_PX * 6
+            if label.get_width() > room_px:
+                scale = room_px / label.get_width()
+                label = pygame.transform.smoothscale(label, (room_px, int(label.get_height() * scale)))
+            row.blit(label, label.get_rect(midleft=(theme.GRID_PX * 2, ROW_PX // 2)))
             row.blit(note, note.get_rect(midright=(LIST_WIDTH_PX - theme.GRID_PX * 2, ROW_PX // 2)))
             self._rows[key] = row
         return self._rows[key]

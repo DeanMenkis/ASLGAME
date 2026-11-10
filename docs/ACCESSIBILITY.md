@@ -14,7 +14,7 @@ Audit of every cue in the game against the rules in the architecture doc: nothin
 | Score and multiplier | Rolling score and "x2.4" in the top bar, "+300" pops on each hit | Text and motion | None |
 | Combo milestone | "10 combo" banner | Text | Sparkle |
 | Heat (multiplier) | Ink warms to vermilion, ember, gold; fire rises from the bottom | The multiplier number is always shown | Crackle, whoosh |
-| Fire put out by a miss | "x5 out" banner, smoke, falling ash, grey camera | Text | Hiss |
+| Fire put out by a miss | "x5 out" banner, smoke, falling ash, a dimmed camera | Text | Hiss |
 | Fuse running out | The stroke shortens and, in its last quarter, swells and pulses | Length and shape | None |
 | Progress through a word | Strip cells: filled is done, thick outline is now, thin outline is next | Fill and line weight | None |
 | Result per letter (rhythm, music) | Strip cell in green, yellow, orange, or red | Dots under the letter (3 Perfect, 2 Good, 1 OK) and a strike for Miss | None |

@@ -5,6 +5,8 @@ import time
 from dataclasses import dataclass
 
 os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
+# On macOS the click that focuses the window is dropped by default; let it through so the first click counts.
+os.environ.setdefault("SDL_MOUSE_FOCUS_CLICKTHROUGH", "1")
 
 # pygame must load before OpenCV: both bundle SDL2, and the first copy loaded wins on macOS.
 import pygame  # noqa: E402

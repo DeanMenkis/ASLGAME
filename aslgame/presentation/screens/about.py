@@ -3,7 +3,7 @@
 from aslgame import theme
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.overlay import Overlay
-from aslgame.presentation.ui import make_panel
+from aslgame.presentation.ink import torn_slip
 
 CREDITS = (
     "Letter shapes: ASL-Now fingerspelling dataset, MIT",
@@ -26,12 +26,12 @@ LINE_STEP_PX = theme.GRID_PX * 4
 
 
 def build_panel(fonts):
-    panel = make_panel(PANEL_SIZE_PX, theme.SURFACE)
+    panel = torn_slip(PANEL_SIZE_PX, theme.SURFACE, seed=24)
     draw_text_centered(panel, fonts.medium.render("About", True, theme.INK), (PANEL_SIZE_PX[0] // 2, theme.GRID_PX * 5))
     x_px = theme.GRID_PX * 5
     y_px = theme.GRID_PX * 10
     for title, lines in (("Credits", CREDITS), ("Limits", LIMITS)):
-        panel.blit(fonts.small.render(title.upper(), True, theme.ACCENT), (x_px, y_px))
+        panel.blit(fonts.small.render(title.upper(), True, theme.SEAL), (x_px, y_px))
         y_px += LINE_STEP_PX + theme.GRID_PX
         for line in lines:
             panel.blit(fonts.body.render(line, True, theme.INK), (x_px, y_px))

@@ -15,10 +15,12 @@ The interface should explain itself through form, not words. If a screen needs a
 
 ## Art direction: ink that catches fire
 
-Play starts as quiet ink: the camera washed to sepia, a torn paper band, brush-stroke rings, ink splats, and seal stamps for judgements. The multiplier is heat. As it climbs, the ink warms from black through vermilion and ember to gold, color bleeds back into the camera, and fire rises from the bottom edge: embers, flames, then ablaze, blue-white at the cap. A miss snuffs it: a hiss, smoke, embers cooling into ash, and the camera drained to grey for a moment. Calm and loud are one idea, and how hot the screen is says how well you are playing.
+Play starts as quiet ink: the camera in its own colour with a faint warm cast, torn paper for the band and the reference card, brush-stroke rings, ink splats, and seal stamps for judgements. The multiplier is heat. As it climbs, the ink warms from black through vermilion and ember to gold, the camera grows warmer and richer, and fire rises from the bottom edge: embers, flames, then ablaze, blue-white at the cap. A miss snuffs it: a hiss, smoke, embers cooling into ash, and the camera dimmed and muted for a moment. Calm and loud are one idea, and how hot the screen is says how well you are playing.
 
 - Paper, sumi ink, and vermilion are the base palette. Judgements use dye colors (vermilion, indigo, ochre, grey) and always carry text and dots.
 - Serif type for letters, numbers, and banners; bold sans only for small labels.
+- Every panel is paper: torn slips for the card, results, settings, keys, and pause, and paper buttons with a vermilion one for the main action.
+- The grade is painted, not stamped: the letter in serif inside a brushed ensō, the same circle as the menu.
 - Fire sits behind the hand, the ring, and the word tiles, so it never hides what to sign.
 - Effects respect the Fire setting; with it off the ink look stays and nothing burns or shakes.
 

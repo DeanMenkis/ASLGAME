@@ -14,4 +14,4 @@ class BootScreen:
 
     def draw(self, screen, now_s, hand):
         center_px = (screen.get_width() // 2, screen.get_height() // 2)
-        draw_ring(screen, center_px, theme.RING_RADIUS_PX, now_s % 1.0, theme.INK)
+        draw_ring(screen, center_px, theme.RING_RADIUS_PX, now_s % 1.0, theme.PAPER)

@@ -17,15 +17,14 @@ def clicked(event, rect):
 
 
 class Button:
-    """A rounded button. Focused (keyboard) or hovered (mouse) buttons are raised; primary buttons are filled with accent."""
+    """A paper and ink button. The primary one is vermilion; hovered buttons darken, the focused one has a vermilion edge."""
 
     def __init__(self, font, label, rect, primary=False, enabled=True):
         self.rect = pygame.Rect(rect)
         self.primary = primary
         self.enabled = enabled
-        ink = theme.ACCENT_INK if primary else theme.INK
-        self._label = font.render(label, True, ink)
-        self._disabled_label = font.render(label, True, theme.DISABLED)
+        self._label = font.render(label, True, theme.PAPER if primary else theme.INK_BLACK)
+        self._disabled_label = font.render(label, True, theme.INK_FAINT)
 
     def is_clicked(self, event):
         return self.enabled and clicked(event, self.rect)
@@ -35,18 +34,18 @@ class Button:
 
     def draw(self, screen, focused=False):
         active = focused or self.is_hovered()
+        radius = theme.GRID_PX // 2
         if not self.enabled:
-            pygame.draw.rect(screen, theme.SURFACE_RAISED, self.rect, theme.BORDER_PX, border_radius=theme.CORNER_PX)
+            pygame.draw.rect(screen, theme.PAPER_SHADE, self.rect, border_radius=radius)
             screen.blit(self._disabled_label, self._disabled_label.get_rect(center=self.rect.center))
             return
         if self.primary:
-            pygame.draw.rect(screen, theme.ACCENT, self.rect, border_radius=theme.CORNER_PX)
+            pygame.draw.rect(screen, theme.SEAL, self.rect, border_radius=radius)
             if active:
-                pygame.draw.rect(screen, theme.INK, self.rect, theme.BORDER_PX, border_radius=theme.CORNER_PX)
+                pygame.draw.rect(screen, theme.INK_BLACK, self.rect, 2, border_radius=radius)
         else:
-            pygame.draw.rect(screen, theme.SURFACE_HOVER if active else theme.SURFACE_RAISED, self.rect, border_radius=theme.CORNER_PX)
-            border = theme.ACCENT if focused else theme.BORDER
-            pygame.draw.rect(screen, border, self.rect, theme.BORDER_PX, border_radius=theme.CORNER_PX)
+            pygame.draw.rect(screen, theme.PAPER_SHADE if active else theme.PAPER, self.rect, border_radius=radius)
+            pygame.draw.rect(screen, theme.SEAL if focused else theme.INK_BLACK, self.rect, 2, border_radius=radius)
         screen.blit(self._label, self._label.get_rect(center=self.rect.center))
 
 

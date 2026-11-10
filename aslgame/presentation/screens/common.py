@@ -11,7 +11,7 @@ from aslgame.matching import matcher
 from aslgame.matching.normalize import normalize, palm_size
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.hand_shape import GhostRenderer, draw_finger_fixes
-from aslgame.presentation.ink import ink_hand, torn_band
+from aslgame.presentation.ink import ink_hand, torn_band, torn_slip
 from aslgame.presentation.motion_path import draw_guide, draw_trail, guide_points
 from aslgame.presentation.ui import clicked, make_panel
 
@@ -19,6 +19,8 @@ CONFIRM_KEYS = (pygame.K_RETURN, pygame.K_SPACE)
 PAUSE_KEYS = (pygame.K_ESCAPE, pygame.K_p)
 JUDGEMENT_TEXT = {Judgement.PERFECT: "Perfect", Judgement.GOOD: "Good", Judgement.OK: "OK", Judgement.MISS: "Miss"}
 CARD_TOPLEFT_PX = (theme.MARGIN_PX, theme.TOP_BAR_HEIGHT_PX + theme.GRID_PX * 2)
+# A small hand drawing may grow this much to fill the card, never more, so strokes stay crisp.
+CARD_MAX_ZOOM = 1.4
 
 
 def is_key(event, keys):
@@ -124,40 +126,50 @@ class ReferenceCard:
 
     def _build_letter(self, name):
         """Recall mode: only the letter, large, with no picture of the shape."""
-        card = make_panel(theme.REFERENCE_CARD_SIZE_PX, (*theme.PAPER, 245), theme.GRID_PX // 2)
+        card = torn_slip(theme.REFERENCE_CARD_SIZE_PX, (*theme.PAPER, 250), seed=ord(name))
+        width_px, height_px = theme.REFERENCE_CARD_SIZE_PX
         letter = self._recall_font.render(name, True, theme.INK_BLACK)
-        draw_text_centered(card, letter, (card.get_width() // 2, card.get_height() // 2))
+        draw_text_centered(card, letter, (width_px // 2, height_px // 2))
         return card
 
     def _build(self, sign, finger_colors):
-        card = make_panel(theme.REFERENCE_CARD_SIZE_PX, (*theme.PAPER, 245), theme.GRID_PX // 2)
+        card = torn_slip(theme.REFERENCE_CARD_SIZE_PX, (*theme.PAPER, 250), seed=ord(sign.name))
         width_px, height_px = theme.REFERENCE_CARD_SIZE_PX
         draw_text_centered(card, self._letter_font.render(sign.name, True, theme.INK_BLACK), (width_px // 2, theme.GRID_PX * 5))
         rule_y = theme.GRID_PX * 10
         pygame.draw.line(card, theme.SEAL, (width_px // 2 - theme.GRID_PX * 3, rule_y), (width_px // 2 + theme.GRID_PX * 3, rule_y), 3)
         tints = theme.FINGER_TINTS if finger_colors else None
-        silhouette, wrist = ink_hand(sign.outline, theme.REFERENCE_PALM_PX, theme.INK_BLACK, tints)
-        bottom_px = height_px - theme.GRID_PX * 4
-        # Placed by the wrist, then pulled back inside the card if the shape runs over an edge.
-        rect = silhouette.get_rect(topleft=(width_px // 2 - wrist[0], bottom_px - wrist[1] - theme.REFERENCE_PALM_PX))
-        rect.clamp_ip(pygame.Rect(0, theme.GRID_PX * 11, width_px, height_px - theme.GRID_PX * 12))
-        card.blit(silhouette, rect)
+        drawing, wrist = ink_hand(sign.outline, theme.REFERENCE_PALM_PX, theme.INK_BLACK, tints)
+        # Cropped to the drawn hand and fitted to the space under the rule, so every letter sits centred and whole,
+        # sideways ones (G, H, P, Q) included.
+        bounds = drawing.get_bounding_rect()
+        drawing = drawing.subsurface(bounds)
+        box = pygame.Rect(theme.GRID_PX * 2, theme.GRID_PX * 12, width_px - theme.GRID_PX * 4, height_px - theme.GRID_PX * 16)
+        scale = min(box.width / bounds.width, box.height / bounds.height, CARD_MAX_ZOOM)
+        drawing = pygame.transform.smoothscale(drawing, (round(bounds.width * scale), round(bounds.height * scale)))
+        rect = card.blit(drawing, drawing.get_rect(center=box.center))
         motion = MOTION_SIGNS.get(sign.name)
         if motion is not None:
             tip = sign.outline[motion.tip, :2] * theme.REFERENCE_PALM_PX
-            start = (rect.left + wrist[0] + tip[0], rect.top + wrist[1] + tip[1])
-            draw_guide(card, guide_points(motion, start, theme.REFERENCE_PALM_PX * theme.CARD_PATH_SCALE, False))
+            start = (rect.left + (wrist[0] + tip[0] - bounds.left) * scale, rect.top + (wrist[1] + tip[1] - bounds.top) * scale)
+            draw_guide(card, guide_points(motion, start, theme.REFERENCE_PALM_PX * theme.CARD_PATH_SCALE * scale, False))
         return card
 
     def draw(self, screen, name, progress=None, letter_only=False):
-        """progress, from 0 to 1, fills a vermilion bar along the card's bottom edge."""
+        """progress, from 0 to 1, draws a vermilion line along the inside of the slip's lower edge."""
         key = (name, "letter" if letter_only else self._settings.finger_colors)
         if key not in self._cards:
             self._cards[key] = self._build_letter(name) if letter_only else self._build(self._signs[name], key[1])
-        rect = screen.blit(self._cards[key], CARD_TOPLEFT_PX)
+        screen.blit(self._cards[key], CARD_TOPLEFT_PX)
         if progress:
-            fill = pygame.Rect(rect.left, rect.bottom - theme.GRID_PX, int(rect.width * min(1.0, progress)), theme.GRID_PX)
-            pygame.draw.rect(screen, theme.SEAL, fill)
+            width_px, height_px = theme.REFERENCE_CARD_SIZE_PX
+            left_px = CARD_TOPLEFT_PX[0] + theme.GRID_PX * 2
+            y_px = CARD_TOPLEFT_PX[1] + height_px - theme.GRID_PX * 2
+            length_px = width_px - theme.GRID_PX * 4
+            pygame.draw.line(screen, theme.PAPER_SHADE, (left_px, y_px), (left_px + length_px, y_px), 4)
+            end_px = left_px + int(length_px * min(1.0, progress))
+            pygame.draw.line(screen, theme.SEAL, (left_px, y_px), (end_px, y_px), 4)
+            pygame.draw.circle(screen, theme.SEAL, (end_px, y_px + 1), 3)
 
 
 class TopBar:

@@ -39,7 +39,7 @@ class DebugOverlay:
         screen.blit(self._panel, (theme.MARGIN_PX, screen.get_height() - theme.MARGIN_PX - self._panel.get_height()))
 
     def _render(self, lines):
-        surfaces = [self._font.render(line, True, theme.INK) for line in lines]
+        surfaces = [self._font.render(line, True, theme.PAPER) for line in lines]
         line_height_px = self._font.get_linesize()
         width_px = max(surface.get_width() for surface in surfaces) + theme.GRID_PX * 2
         height_px = line_height_px * len(surfaces) + theme.GRID_PX * 2

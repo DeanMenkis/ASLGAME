@@ -5,7 +5,8 @@ import pygame
 from aslgame import theme
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.common import is_key, make_shade
-from aslgame.presentation.ui import Button, Toggle, make_panel
+from aslgame.presentation.ink import torn_slip
+from aslgame.presentation.ui import Button, Toggle
 
 PANEL_SIZE_PX = (theme.GRID_PX * 48, theme.GRID_PX * 60)
 ROW_WIDTH_PX = theme.GRID_PX * 36
@@ -18,7 +19,7 @@ class SettingsPanel:
         self.wants_about = False
         self._settings = settings
         self._shade = make_shade(size_px)
-        self._panel = make_panel(PANEL_SIZE_PX)
+        self._panel = torn_slip(PANEL_SIZE_PX, theme.SURFACE, seed=21)
         self._rect = self._panel.get_rect(center=(size_px[0] // 2, size_px[1] // 2))
         draw_text_centered(self._panel, fonts.medium.render("Settings", True, theme.INK), (PANEL_SIZE_PX[0] // 2, theme.GRID_PX * 6))
         rows = []

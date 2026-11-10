@@ -161,3 +161,19 @@ Washing the camera to sepia with pygame cost about 14 ms a frame. The camera thr
 ## Fire is drawn small and scaled up
 
 Flames and sparks are drawn on a quarter-size layer and scaled up with additive blending, which blurs them into glow without a blur pass. A full run with fire measured about 5 ms of drawing at the median and 11 ms at the 95th percentile, inside a 60 FPS frame.
+
+## The camera keeps its colour
+
+Play testing found the grey camera dull and out of place next to warm paper and fire. The camera now keeps its own colour with a faint warm cast, gets warmer and slightly richer as the fire builds, and only dims for a moment when a fire goes out.
+
+## Fire lights early
+
+With heat starting at x1.8 a player rarely saw any fire. Heat now runs from x1.1 to x3.0: embers after about 5 clean signs in a row, flames after about 15, ablaze after about 30, sooner with Perfects. Blue fire comes at x5.
+
+## The grade is painted, and every panel is paper
+
+The grade as a seal stamp read as odd. It is now the letter in serif inside a brushed ensō: fire colours for S, vermilion for A, ink for the rest. The reference card, results, settings, keys, about, and pause panels are torn paper slips, and buttons are paper and ink, so nothing left from the old dark panels breaks the look.
+
+## The reference hand is a line drawing
+
+Solid ink hands with paper finger lines turned folded letters (A, E, M, N, S, T) into scribbles. The card now draws each finger outlined in ink and filled with paper, farthest first so folded fingers sit over the palm, cropped to the drawing and fitted in the card so sideways letters stay centred.
