@@ -16,6 +16,7 @@ from aslgame.presentation.screens.common import (
     CONFIRM_KEYS, PAUSE_KEYS, FixHint, Ghost, ReferenceCard, TargetScorer, TopBar, draw_motion, idle_wrist, is_key,
 )
 from aslgame.game.motion import MOTION_SIGNS, MotionState
+from aslgame.presentation import ink
 from aslgame.presentation.strip import Strip
 from aslgame.presentation.ui import Button
 
@@ -43,14 +44,14 @@ class LearnScreen:
         self.outcomes = []  # FROM_MEMORY or WITH_HINT per finished sign, in recall mode
         searching = "Sign it from memory" if recall else "Match the outline"
         self._labels = {
-            DetectorState.NO_HAND: fonts.medium.render("Show your hand", True, theme.INK),
-            DetectorState.SEARCHING: fonts.medium.render(searching, True, theme.INK),
-            DetectorState.HOLDING: fonts.medium.render("Hold it", True, theme.ACCENT),
-            DetectorState.MATCHED: fonts.medium.render("Hold it", True, theme.ACCENT),
+            DetectorState.NO_HAND: fonts.serif_mode.render("Show your hand", True, theme.INK_BLACK),
+            DetectorState.SEARCHING: fonts.serif_mode.render(searching, True, theme.INK_BLACK),
+            DetectorState.HOLDING: fonts.serif_mode.render("Hold it", True, theme.SEAL),
+            DetectorState.MATCHED: fonts.serif_mode.render("Hold it", True, theme.SEAL),
         }
-        self._draw_labels = {name: fonts.medium.render(f"Draw the {name}", True, theme.ACCENT) for name in MOTION_SIGNS}
+        self._draw_labels = {name: fonts.serif_mode.render(f"Draw the {name}", True, theme.SEAL) for name in MOTION_SIGNS}
         self._idle_wrist = idle_wrist(size_px)
-        self._done_label = fonts.medium.render("Done", True, theme.ACCENT)
+        self._done_label = fonts.serif_mode.render("Done", True, theme.SEAL)
         self._done_detail = None
         menu_rect = (0, 0, theme.GRID_PX * 24, theme.BUTTON_HEIGHT_PX)
         self._menu_button = Button(fonts.body, "Back to menu", menu_rect, primary=True)
@@ -89,12 +90,16 @@ class LearnScreen:
         if self.queue.is_done() and self.recall:
             remembered = self.outcomes.count(FROM_MEMORY)
             text = f"{remembered} of {len(self.outcomes)} from memory"
-            self._done_detail = self._fonts.body.render(text, True, theme.INK)
+            self._done_detail = ink.halo_text(self._fonts.serif_mode, text, theme.INK_BLACK)
 
     def _shows_shape(self):
         return not self.recall or self._hint_on
 
+    def camera_grade(self):
+        return ink.grade_matrix(0.0, 0.0)
+
     def draw(self, screen, now_s, hand):
+        ink.vignettes(screen.get_size()).draw(screen, 0.0)
         self._top_bar.draw(screen)
         self._strip.draw(screen, self.outcomes if self.recall else None)
         title_center_px = (screen.get_width() // 2, theme.TOP_BAR_HEIGHT_PX // 2)

@@ -7,9 +7,9 @@ from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.common import is_key, make_shade
 from aslgame.presentation.ui import Button, Toggle, make_panel
 
-PANEL_SIZE_PX = (theme.GRID_PX * 48, theme.GRID_PX * 50)
+PANEL_SIZE_PX = (theme.GRID_PX * 48, theme.GRID_PX * 60)
 ROW_WIDTH_PX = theme.GRID_PX * 36
-TOGGLES = (("finger_colors", "Finger colors"), ("sound", "Sound"))
+TOGGLES = (("finger_colors", "Finger colors"), ("sound", "Sound"), ("fire", "Fire"))
 
 
 class SettingsPanel:

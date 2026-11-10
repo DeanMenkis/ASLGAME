@@ -6,7 +6,7 @@ from aslgame import theme
 from aslgame.game.app_flow import Action
 from aslgame.game.scoring import Judgement
 from aslgame.presentation.draw import draw_text_centered
-from aslgame.presentation.hand_shape import render_silhouette
+from aslgame.presentation import ink
 from aslgame.presentation.screens.common import JUDGEMENT_TEXT, is_key, make_shade
 from aslgame.presentation.ui import Button, make_panel
 
@@ -31,35 +31,34 @@ class ResultsScreen:
         self._focus = 0
 
     def _build(self, fonts, results, signs, new_best):
-        """The whole card is drawn once."""
-        card = make_panel(CARD_SIZE_PX)
+        """The whole card is drawn once: a paper sheet, the grade as a hanko seal, the numbers in ink."""
+        card = make_panel(CARD_SIZE_PX, (*theme.PAPER, 248), theme.GRID_PX)
+        serif = theme.SERIF_FAMILIES
         center_x_px = CARD_SIZE_PX[0] * 3 // 5
-        draw_grade_seal(card, fonts, results.grade, (theme.GRID_PX * 15, theme.GRID_PX * 16))
+        draw_hanko(card, results.grade, (theme.GRID_PX * 16, theme.GRID_PX * 17))
         if new_best:
-            best = fonts.small.render("NEW BEST", True, theme.ACCENT_INK)
-            tag = pygame.Rect(0, 0, best.get_width() + theme.GRID_PX * 2, best.get_height() + theme.GRID_PX)
-            tag.midtop = (theme.GRID_PX * 15, theme.GRID_PX * 27)
-            pygame.draw.rect(card, theme.ACCENT, tag, border_radius=theme.GRID_PX // 2)
-            draw_text_centered(card, best, tag.center)
+            best = ink.make_stamp("new best", pygame.font.SysFont(serif, 30, italic=True), theme.INK_BLACK, -4, 5)
+            card.blit(best, best.get_rect(center=(theme.GRID_PX * 16, theme.GRID_PX * 31)))
         y_px = theme.GRID_PX * 8
         for surface in (
-            fonts.large.render(f"{results.score:,}", True, theme.INK),
-            fonts.medium.render(f"{results.accuracy:.0%} accuracy    {results.max_combo} best combo", True, theme.INK),
-            fonts.body.render(f"x{results.max_multiplier:.1f} peak    {results.words_cleared} clean words", True, theme.INK_DIM),
+            pygame.font.SysFont(serif, 72).render(f"{results.score:,}", True, theme.INK_BLACK),
+            pygame.font.SysFont(serif, 32).render(f"{results.accuracy:.0%} accuracy    {results.max_combo} best combo", True, theme.INK_BLACK),
+            pygame.font.SysFont(serif, 26, italic=True).render(f"×{results.max_multiplier:.1f} at its hottest    {results.words_cleared} clean words",
+                                                               True, theme.INK_SOFT),
         ):
             draw_text_centered(card, surface, (center_x_px, y_px))
             y_px += surface.get_height() + theme.GRID_PX * 2
         y_px += draw_counts(card, fonts, results, center_x_px, y_px) + theme.GRID_PX * 2
         if results.weakest:
             y_px += theme.GRID_PX * 2
-            draw_text_centered(card, fonts.small.render("PRACTISE", True, theme.ACCENT), (center_x_px, y_px))
+            draw_text_centered(card, pygame.font.SysFont(serif, 26, italic=True).render("practise", True, theme.SEAL), (center_x_px, y_px))
             count = len(results.weakest)
             for index, (sign, accuracy) in enumerate(results.weakest):
                 x_px = center_x_px + (index - (count - 1) / 2) * WEAK_SPACING_PX
-                silhouette, wrist = render_silhouette(signs[sign].outline, WEAK_PALM_PX, False)
+                silhouette, wrist = ink.ink_hand(signs[sign].outline, WEAK_PALM_PX, theme.INK_BLACK)
                 wrist_y_px = y_px + theme.GRID_PX * 20
                 card.blit(silhouette, (x_px - wrist[0], wrist_y_px - wrist[1]))
-                label = fonts.body.render(f"{sign}  {accuracy:.0%}", True, theme.INK)
+                label = pygame.font.SysFont(serif, 26).render(f"{sign}  {accuracy:.0%}", True, theme.INK_BLACK)
                 draw_text_centered(card, label, (x_px, wrist_y_px + theme.GRID_PX * 4))
         return card
 
@@ -98,13 +97,9 @@ def draw_counts(card, fonts, results, center_x_px, y_px):
     return pieces[0].get_height()
 
 
-GRADE_COLORS = {"S": (255, 210, 60), "A": (70, 205, 115), "B": (120, 220, 255), "C": (245, 145, 50), "D": (235, 75, 65)}
-
-
-def draw_grade_seal(card, fonts, grade, center):
-    """The grade stamped in a ring, like a seal: shape and letter, not color alone."""
-    color = GRADE_COLORS[grade]
-    radius = theme.GRID_PX * 10
-    pygame.draw.circle(card, color, center, radius, theme.GRID_PX)
-    pygame.draw.circle(card, color, center, radius - theme.GRID_PX * 2, 2)
-    draw_text_centered(card, fonts.display.render(grade, True, color), center)
+def draw_hanko(card, grade, center):
+    """The grade pressed in as a hanko seal: a vermilion block, gold for S, with the letter in paper."""
+    font = pygame.font.SysFont(theme.SERIF_FAMILIES, 150, bold=True)
+    color = theme.FLAME_GOLD if grade == "S" else theme.SEAL
+    seal = ink.make_stamp(grade, font, color, -6, ord(grade))
+    card.blit(seal, seal.get_rect(center=center))

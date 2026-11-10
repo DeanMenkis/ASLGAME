@@ -13,6 +13,15 @@ The interface should explain itself through form, not words. If a screen needs a
 - Restraint: remove anything that doesn't help the player sign. Less, but better.
 - Color is never the only signal (see [Architecture](ARCHITECTURE.md)).
 
+## Art direction: ink that catches fire
+
+Play starts as quiet ink: the camera washed to sepia, a torn paper band, brush-stroke rings, ink splats, and seal stamps for judgements. The multiplier is heat. As it climbs, the ink warms from black through vermilion and ember to gold, color bleeds back into the camera, and fire rises from the bottom edge: embers, flames, then ablaze, blue-white at the cap. A miss snuffs it: a hiss, smoke, embers cooling into ash, and the camera drained to grey for a moment. Calm and loud are one idea, and how hot the screen is says how well you are playing.
+
+- Paper, sumi ink, and vermilion are the base palette. Judgements use dye colors (vermilion, indigo, ochre, grey) and always carry text and dots.
+- Serif type for letters, numbers, and banners; bold sans only for small labels.
+- Fire sits behind the hand, the ring, and the word tiles, so it never hides what to sign.
+- Effects respect the Fire setting; with it off the ink look stays and nothing burns or shakes.
+
 References:
 
 - Don Norman, *The Design of Everyday Things*: affordances, signifiers, mapping, feedback

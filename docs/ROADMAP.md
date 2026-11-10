@@ -67,6 +67,7 @@ Built on the `arcade-overhaul` branch. Each item is ticked when its feature is f
 - [x] Rush mode: no beat, sign as fast as you can before the clock runs out
 - [x] Menu redesign: paper, ink, and a live hand reader
 - [x] Results with a grade seal, and best scores kept between runs
+- [x] Art direction: ink that catches fire, from the menu through play to results
 - [ ] Play test all of the above with a camera and tune the numbers
 
 ## Open questions

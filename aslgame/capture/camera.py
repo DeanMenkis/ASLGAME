@@ -18,6 +18,7 @@ class Frame:
     rgb: np.ndarray
     captured_s: float
     brightness: float  # mean level from 0 to 255
+    display: np.ndarray | None = None  # graded copy for the screen; tracking always uses rgb
 
 
 class Camera:
@@ -33,6 +34,8 @@ class Camera:
         )
         self.frames = Latest()
         self.fps = 0.0
+        # A 3x3 color matrix set by the game each frame, or None. Applied here, off the frame loop.
+        self.grade_matrix = None
         self._stop = threading.Event()
         self._thread = threading.Thread(target=self._run, name="camera", daemon=True)
 
@@ -57,7 +60,9 @@ class Camera:
             rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
             # A sparse sample is enough to judge the light, and costs almost nothing.
             brightness = float(rgb[::config.BRIGHTNESS_SAMPLE_STEP, ::config.BRIGHTNESS_SAMPLE_STEP].mean())
-            self.frames.publish(Frame(rgb, captured_s, brightness))
+            matrix = self.grade_matrix
+            display = cv2.transform(rgb, matrix) if matrix is not None else None
+            self.frames.publish(Frame(rgb, captured_s, brightness, display))
             self.fps = smooth_fps(self.fps, captured_s - last_s)
             last_s = captured_s
 

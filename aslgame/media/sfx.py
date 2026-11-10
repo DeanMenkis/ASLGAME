@@ -47,6 +47,33 @@ def _click():
     return (rng.uniform(-1, 1, count) * 0.3 + _tone(2400, 0.03, 120)[:count]) * _envelope(count, 0.001, 150)
 
 
+def _hiss(duration_s):
+    """Steam: bright noise that fades, for a fire put out."""
+    count = int(duration_s * config.AUDIO_RATE_HZ)
+    noise = np.random.default_rng(3).uniform(-1, 1, count)
+    return np.diff(noise, prepend=0.0) * _envelope(count, 0.01, 2.8) * 0.3
+
+
+def _whoosh(duration_s):
+    """A rush of air as the fire catches: low noise that swells, then dies."""
+    count = int(duration_s * config.AUDIO_RATE_HZ)
+    t = np.arange(count) / config.AUDIO_RATE_HZ
+    low = np.convolve(np.random.default_rng(4).uniform(-1, 1, count), np.ones(60) / 60, mode="same")
+    swell = np.minimum(1.0, t / 0.2) * np.exp(-np.maximum(0.0, t - 0.2) * 5)
+    return low * swell * 5.0
+
+
+def _crackle(duration_s):
+    """A few dry pops, for embers catching."""
+    count = int(duration_s * config.AUDIO_RATE_HZ)
+    rng = np.random.default_rng(5)
+    wave = np.zeros(count)
+    for start in rng.integers(0, count - 400, 9):
+        pop = rng.uniform(-1, 1, 400) * np.exp(-np.arange(400) / 40)
+        wave[start:start + 400] += pop * rng.uniform(0.3, 0.8)
+    return wave
+
+
 def _waves():
     waves = {
         "good": _tone(B5, 0.2, 14),
@@ -62,6 +89,9 @@ def _waves():
         "tier": _sequence([E5, B5, E6, GS6, B6, E6 * 2], 0.035, 0.3, 10),
         "word": _sequence([B5, E6, GS6], 0.05, 0.3, 12),
         "break": _buzz(0.45),
+        "hiss": _hiss(0.9),
+        "ignite": _whoosh(0.7),
+        "ember": _crackle(0.5),
     }
     # Perfect climbs a major scale as the combo grows, so a long streak sounds like it is rising.
     for step, ratio in enumerate(MAJOR_SCALE):

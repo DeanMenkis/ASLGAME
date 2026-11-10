@@ -77,13 +77,13 @@ ICON_BUTTON_PX = GRID_PX * 7
 KEY_CHIP_MIN_WIDTH_PX = GRID_PX * 10
 
 # Ghost hand silhouette
-GHOST_FILL = (255, 255, 255, 100)
+GHOST_FILL = (240, 232, 214, 110)
 GHOST_MATCHED_FILL = (240, 172, 56, 110)
-GHOST_EDGE_DARK = (10, 10, 12, 220)
-GHOST_EDGE_LIGHT = (255, 255, 255)
+GHOST_EDGE_DARK = (28, 24, 22, 230)
+GHOST_EDGE_LIGHT = (240, 232, 214)
 GHOST_EDGE_DARK_PX = 8
 GHOST_EDGE_LIGHT_PX = 3
-GHOST_INNER = (10, 10, 12, 110)
+GHOST_INNER = (28, 24, 22, 110)
 GHOST_INNER_PX = 2
 FINGER_FIX = (255, 105, 90)
 FINGER_FIX_PX = 7
@@ -95,6 +95,7 @@ GHOST_SIZE_STEP_PX = 4
 GHOST_CACHE_SIZE = 48
 REFERENCE_CARD_SIZE_PX = (GRID_PX * 26, GRID_PX * 32)
 REFERENCE_PALM_PX = GRID_PX * 8
+CARD_LETTER_PX = 72
 
 # Finger colors option: one tint per finger, from the Okabe-Ito palette, which stays distinct with color blindness.
 FINGER_TINTS = {
@@ -106,11 +107,12 @@ FINGER_TINTS = {
 }
 
 # Judgements. Each also has a shape: dots under the letter (3, 2, 1), or a strike for a miss.
+# Traditional ink and dye colors: vermilion, indigo, ochre, and grey sumi. Each also has text and a shape.
 JUDGEMENT_COLORS = {
-    "PERFECT": (70, 205, 115),
-    "GOOD": (245, 210, 60),
-    "OK": (245, 145, 50),
-    "MISS": (235, 75, 65),
+    "PERFECT": (196, 56, 40),
+    "GOOD": (44, 82, 140),
+    "OK": (176, 128, 52),
+    "MISS": (96, 90, 86),
 }
 JUDGEMENT_DOTS = {"PERFECT": 3, "GOOD": 2, "OK": 1, "MISS": 0}
 STRIP_DOT_RADIUS_PX = 4
@@ -121,7 +123,7 @@ STRIP_LABEL_LIFT_PX = GRID_PX // 2
 HINT_BUTTON_WIDTH_PX = GRID_PX * 14
 
 # Motion signs (J, Z)
-GUIDE = (120, 220, 255)
+GUIDE = (232, 96, 60)
 TRAIL = (240, 172, 56)
 GUIDE_POINTS = 32
 GUIDE_LINE_PX = 4
@@ -156,3 +158,19 @@ FONT_SIZE_SERIF_TITLE_PX = 92
 FONT_SIZE_SERIF_MODE_PX = 44
 ENSO_RADIUS_PX = GRID_PX * 17
 ENSO_WIDTH_PX = GRID_PX * 3
+
+# Ink and fire
+EMBER = (232, 96, 28)
+FLAME_GOLD = (250, 190, 60)
+EMBER_DARK = (70, 14, 0)
+ASH = (196, 192, 186)
+# Camera grade: the tint multiplied over the washed camera when cold, hot, and just put out.
+GRADE_COLD = (255, 240, 214)
+GRADE_HOT = (255, 206, 160)
+GRADE_ASH = (214, 214, 214)
+# Flame core color by heat: deep red, orange, yellow-white, then blue-white at the very top.
+FLAME_CORES = ((0.0, (200, 50, 10)), (0.5, (255, 140, 30)), (0.85, (255, 230, 160)), (1.0, (175, 205, 255)))
+FLAME_BODY = (255, 130, 30)
+FLAME_OUTER = (150, 30, 0)
+SPARK = (255, 200, 120)
+SMOKE = (58, 54, 50)

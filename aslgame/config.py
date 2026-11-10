@@ -114,6 +114,36 @@ FLOW_GOOD_FRACTION = 0.65
 ON_BEAT_WINDOW_S = 0.09
 ON_BEAT_BONUS = 1.5
 
+# Ink and fire. The multiplier heats the screen: ink at first, then embers, flames, and ablaze; a miss puts it out.
+FIRE_START_MULT = 1.8
+FIRE_FULL_MULT = 7.0
+HEAT_RISE_PER_S = 0.9
+HEAT_FALL_PER_S = 0.5
+HEAT_STAGES = (0.15, 0.45, 0.75)  # embers, flames, ablaze
+# At the multiplier cap the fire burns blue-white.
+BLUE_FIRE_MULT = 9.5
+# After a fire goes out the camera drains to grey, then recovers over this long.
+ASH_S = 1.6
+# Share of grey in the camera when cold and when ablaze.
+GRADE_GRAY_COLD = 0.85
+GRADE_GRAY_HOT = 0.3
+# Fire is drawn at a quarter size and scaled up, which blurs it into glow for free.
+FIRE_LAYER_SCALE = 4
+FIRE_BUOYANCY = 260.0
+FIRE_MAX_PARTICLES = 700
+FIRE_BOTTOM_RATE = 240.0  # flames a second along the bottom when fully ablaze
+FIRE_TIP_RATE = 70.0  # flames a second at the fuse's burning tip
+SPARK_RATE = 45.0
+SMOKE_LIFE_S = 1.8
+ASH_FLAKE_LIFE_S = 2.8
+# Brush strokes
+BRUSH_STEPS = 140
+BRUSH_STRANDS = 6
+BRUSH_DRY_FROM = 0.8
+SPLAT_LIFE_S = 1.2
+STAMP_LIFE_S = 0.85
+SLAM_S = 0.09
+
 # Countdown before a timed run
 COUNTDOWN_STEPS = 3
 COUNTDOWN_STEP_S = 0.6

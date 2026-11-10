@@ -14,9 +14,10 @@ ARC_STEPS = 96
 
 
 def draw_camera(screen, frame):
-    height_px, width_px = frame.rgb.shape[:2]
+    pixels = frame.display if frame.display is not None else frame.rgb
+    height_px, width_px = pixels.shape[:2]
     # frombuffer wraps the array without copying it.
-    image = pygame.image.frombuffer(frame.rgb.data, (width_px, height_px), "RGB")
+    image = pygame.image.frombuffer(pixels.data, (width_px, height_px), "RGB")
     screen.blit(image, (0, 0))
 
 

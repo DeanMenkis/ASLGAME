@@ -149,3 +149,15 @@ In play testing, beat-locked Music felt like it hung: a quick signer had to wait
 ## One look from menu to play
 
 The paper menu felt apart from the cold grey play screens. Play now uses warm ink panels, paper-colored text, a saffron accent, and serif letters on the card and strip, with a vermilion mark under the target letter. Bold sans type is kept only for arcade banners and score, where punch matters more than calm.
+
+## Ink that catches fire
+
+Four directions were mocked up over a real camera frame: ink, ink on fire, neon arcade, and bright flat. Neon hid the room and felt generic; flat had no intensity. Ink on fire turns the calm menu and loud play into one arc driven by the multiplier, so it replaced the warm arcade restyle.
+
+## The camera is graded on its own thread
+
+Washing the camera to sepia with pygame cost about 14 ms a frame. The camera thread now applies the grade as one 3x3 color matrix with OpenCV (about half a millisecond), to a copy used only for display. Tracking still sees the untouched frame.
+
+## Fire is drawn small and scaled up
+
+Flames and sparks are drawn on a quarter-size layer and scaled up with additive blending, which blurs them into glow without a blur pass. A full run with fire measured about 5 ms of drawing at the median and 11 ms at the 95th percentile, inside a 60 FPS frame.

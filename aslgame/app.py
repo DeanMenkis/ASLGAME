@@ -143,6 +143,12 @@ class App:
             now_s = time.perf_counter()
             hand = runtime.result.hand if runtime.result else None
             action = action or screen.update(now_s, runtime.result)
+            # The camera thread grades frames for the screen that wants a look; overlays keep the look under them.
+            grade = getattr(screen, "camera_grade", None)
+            if grade is not None:
+                runtime.camera.grade_matrix = grade()
+            elif self.state not in (AppState.PAUSED, AppState.RESULTS):
+                runtime.camera.grade_matrix = None
             screen.draw(runtime.screen, now_s, hand)
             self.light_warning.update(now_s, runtime.frame)
             if self.state in PLAY_STATES:

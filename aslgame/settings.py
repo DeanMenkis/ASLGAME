@@ -8,6 +8,8 @@ from dataclasses import asdict, dataclass, fields
 class Settings:
     finger_colors: bool = False
     sound: bool = True
+    # Flames, smoke, and shake. Off keeps the ink look without moving fire, for anyone who finds it too much.
+    fire: bool = True
 
 
 def load_settings(path):
