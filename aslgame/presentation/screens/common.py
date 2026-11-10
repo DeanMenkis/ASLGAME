@@ -123,14 +123,15 @@ class ReferenceCard:
     def _build_letter(self, fonts, name):
         """Recall mode: only the letter, large, with no picture of the shape."""
         card = make_panel(theme.REFERENCE_CARD_SIZE_PX)
-        letter = fonts.display.render(name, True, theme.INK)
+        letter = pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_DISPLAY_PX).render(name, True, theme.INK)
         draw_text_centered(card, letter, (card.get_width() // 2, card.get_height() // 2))
         return card
 
     def _build(self, fonts, sign, finger_colors):
         card = make_panel(theme.REFERENCE_CARD_SIZE_PX)
         width_px, height_px = theme.REFERENCE_CARD_SIZE_PX
-        draw_text_centered(card, fonts.large.render(sign.name, True, theme.INK), (width_px // 2, theme.GRID_PX * 6))
+        draw_text_centered(card, fonts.serif_mode.render(sign.name, True, theme.INK), (width_px // 2, theme.GRID_PX * 6))
+        pygame.draw.line(card, theme.SEAL, (width_px // 2 - theme.GRID_PX * 3, theme.GRID_PX * 10), (width_px // 2 + theme.GRID_PX * 3, theme.GRID_PX * 10), 3)
         silhouette, wrist = render_silhouette(sign.outline, theme.REFERENCE_PALM_PX, False, finger_colors)
         bottom_px = height_px - theme.GRID_PX * 4
         # Placed by the wrist, then pulled back inside the card if the shape runs over an edge.

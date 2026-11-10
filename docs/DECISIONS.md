@@ -145,3 +145,7 @@ The menu moved to a warm paper look with serif type, a brushed ensō, and a verm
 ## Music plays like Rush
 
 In play testing, beat-locked Music felt like it hung: a quick signer had to wait for each sign's beat. Music now uses the Rush engine on the song's clock. The next sign appears the moment one lands, each sign's fuse is a few beats long (6, 4, 3 by level), speed sets the judgement, and a sign that lands on a beat pays an ON BEAT bonus. The fuse ring breathes with the beat. Rhythm mode keeps the beat-locked rings for players who want strict timing.
+
+## One look from menu to play
+
+The paper menu felt apart from the cold grey play screens. Play now uses warm ink panels, paper-colored text, a saffron accent, and serif letters on the card and strip, with a vermilion mark under the target letter. Bold sans type is kept only for arcade banners and score, where punch matters more than calm.

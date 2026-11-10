@@ -10,6 +10,7 @@ from aslgame.hand import BONES
 # pygame angles run counterclockwise from the right, so the top is a quarter turn.
 TOP_ANGLE = math.pi / 2
 FULL_TURN = 2 * math.pi
+ARC_STEPS = 96
 
 
 def draw_camera(screen, frame):
@@ -32,12 +33,16 @@ def draw_ring(screen, center_px, radius_px, fraction, color):
     """An arc clockwise from the top. fraction 1.0 is a full ring."""
     if fraction <= 0:
         return
-    rect = pygame.Rect(0, 0, radius_px * 2, radius_px * 2)
-    rect.center = center_px
     if fraction >= 1:
         pygame.draw.circle(screen, color, center_px, radius_px, theme.RING_LINE_PX)
         return
-    pygame.draw.arc(screen, color, rect, TOP_ANGLE - FULL_TURN * fraction, TOP_ANGLE, theme.RING_LINE_PX)
+    # A polyline with round caps: pygame's thick arcs leave pixel gaps.
+    steps = max(2, int(ARC_STEPS * fraction))
+    points = [(center_px[0] + math.cos(TOP_ANGLE - FULL_TURN * fraction * i / steps) * radius_px,
+               center_px[1] - math.sin(TOP_ANGLE - FULL_TURN * fraction * i / steps) * radius_px) for i in range(steps + 1)]
+    pygame.draw.lines(screen, color, False, points, theme.RING_LINE_PX)
+    for point in (points[0], points[-1]):
+        pygame.draw.circle(screen, color, point, theme.RING_LINE_PX // 2)
 
 
 def draw_text_centered(screen, surface, center_px):
