@@ -24,6 +24,7 @@ class Action(Enum):
     START_MUSIC = auto()
     START_RUSH = auto()
     RETRY = auto()
+    PRACTISE = auto()  # play again on the Practise deck
     FINISH = auto()
     PAUSE = auto()
     RESUME = auto()
@@ -63,6 +64,7 @@ def next_state(state, action, play_state):
     """
     if action == Action.QUIT:
         return AppState.QUIT
-    if (state, action) in ((AppState.PAUSED, Action.RESUME), (AppState.RESULTS, Action.RETRY)):
+    if (state, action) in ((AppState.PAUSED, Action.RESUME), (AppState.RESULTS, Action.RETRY),
+                           (AppState.RESULTS, Action.PRACTISE)):
         return play_state
     return TRANSITIONS.get((state, action), state)

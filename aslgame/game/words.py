@@ -15,6 +15,7 @@ class Deck:
     title: str
     words: tuple
     ordered: bool = False  # signed in the order written, at every level
+    by_need: bool = False  # words are drawn by how much their letters need practice
 
 
 def _deck(name, title, text):
@@ -82,7 +83,9 @@ DECKS = (
         DYNAMITE FEARLESS SUPERSONIC"""),
 )
 EVERYTHING = Deck("everything", "Everything", tuple(sorted({word for deck in DECKS[1:] for word in deck.words})))
-DECKS = DECKS + (EVERYTHING,)
+# Every word, dealt so the letters the player finds hard come up most.
+PRACTISE = Deck("practise", "Practise", EVERYTHING.words, by_need=True)
+DECKS = DECKS[:1] + (PRACTISE,) + DECKS[1:] + (EVERYTHING,)
 DECKS_BY_NAME = {deck.name: deck for deck in DECKS}
 
 
@@ -102,18 +105,34 @@ def pool(deck, level, sign_names):
             if (deck.ordered or level_of(word) == level) and all(letter in sign_names for letter in word)]
 
 
-def draw_words(deck, level, min_signs, rng, sign_names):
-    """Words for one run with at least min_signs letters in all: shuffled, with no word twice in a row."""
+def word_need(word, letter_need):
+    """How much a word is worth practising: the mean need of its letters, sharpened so weak letters stand out."""
+    return (sum(letter_need(letter) for letter in word) / len(word)) ** config.PRACTISE_SHARPNESS + config.PRACTISE_BASE_WEIGHT
+
+
+def shuffled(words, rng, weight=None):
+    """A shuffle. With weight, heavier words tend to come first, and every word still appears once."""
+    if weight is None:
+        batch = list(words)
+        rng.shuffle(batch)
+        return batch
+    return sorted(words, key=lambda word: rng.random() ** (1.0 / weight(word)), reverse=True)
+
+
+def draw_words(deck, level, min_signs, rng, sign_names, letter_need=None):
+    """Words for one run with at least min_signs letters in all: shuffled, with no word twice in a row.
+
+    letter_need gives each letter's need for practice, from 0 to 1; only a deck drawn by need uses it.
+    """
     words = pool(deck, level, sign_names)
     if not words:
         return []
+    weight = (lambda word: word_need(word, letter_need)) if deck.by_need and letter_need else None
     drawn, letters = [], 0
     while letters < min_signs:
-        batch = list(words)
-        if not deck.ordered:
-            rng.shuffle(batch)
-            if drawn and len(batch) > 1 and batch[0] == drawn[-1]:
-                batch.append(batch.pop(0))
+        batch = list(words) if deck.ordered else shuffled(words, rng, weight)
+        if not deck.ordered and drawn and len(batch) > 1 and batch[0] == drawn[-1]:
+            batch.append(batch.pop(0))
         for word in batch:
             drawn.append(word)
             letters += len(word)

@@ -177,3 +177,11 @@ The grade as a seal stamp read as odd. It is now the letter in serif inside a br
 ## The reference hand is a line drawing
 
 Solid ink hands with paper finger lines turned folded letters (A, E, M, N, S, T) into scribbles. The card now draws each finger outlined in ink and filled with paper, farthest first so folded fingers sit over the palm, cropped to the drawing and fitted in the card so sideways letters stay centred.
+
+## The game remembers each letter
+
+Results named the weakest signs of one run and then forgot them, so nothing told a player what to practise next. Each letter now keeps a score between runs that moves toward every new result: it starts in the middle, two Perfects make it known, a miss makes it weak again, and a letter only ever signed slowly never counts as known. Recall and the timed modes count, finished or abandoned; Learn does not, since copying an outline shows nothing about memory. The menu shows the alphabet under the best score: faint until tested, ink once known, a vermilion dot under a weak letter.
+
+## A Practise deck, dealt by need
+
+Practise is a deck like any other, so it works in every mode and level and keeps its own best scores. It holds every word and deals them by need: a word's weight is the mean need of its letters to the fourth power, which about doubles how often weak letters come up while every word can still appear. Untested letters count as needing some practice, so a new player is led through the whole alphabet. Its menu row names the letters it will deal, weakest first, and the results screen offers Practise whenever a run showed letters to work on.

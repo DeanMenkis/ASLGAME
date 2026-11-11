@@ -70,6 +70,13 @@ Built on the `arcade-overhaul` branch. Each item is ticked when its feature is f
 - [x] Art direction: ink that catches fire, from the menu through play to results
 - [ ] Play test all of the above with a camera and tune the numbers
 
+## Phase 8: A game that teaches
+
+- [x] Letter mastery: every letter's record is kept between runs and shown as an alphabet in the menu
+- [x] Practise deck: words dealt by how much their letters need work, in every mode
+- [x] Practise button on the results screen
+- [ ] Play test: check that two Perfects for known and one miss for weak feel fair
+
 ## Open questions
 
 - Review of the letter templates by a fluent signer

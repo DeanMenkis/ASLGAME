@@ -48,6 +48,8 @@ The first run takes a few minutes to set up, then the game opens. To play again 
 - **Music**: sign along to a song. Rhythm mode with a soundtrack.
 - **Rush**: no beat. Sign each letter before its fuse burns out; clean words add time.
 
+The game remembers how well you sign each letter. The alphabet in the menu shows which letters you know and which need work, and the Practise deck deals words that use your weak letters, in any mode.
+
 Timing cues are always visual. Sound is never required to play.
 
 ## Contributors

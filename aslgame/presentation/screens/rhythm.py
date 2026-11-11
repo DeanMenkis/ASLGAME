@@ -69,6 +69,11 @@ class RhythmScreen:
     def tally(self):
         return self.session.tally
 
+    @property
+    def results(self):
+        """(sign, judgement) of every sign resolved so far."""
+        return self.session.tally.results
+
     def camera_grade(self):
         return ink.grade_matrix(self._fx.heat, self._fx.ash)
 

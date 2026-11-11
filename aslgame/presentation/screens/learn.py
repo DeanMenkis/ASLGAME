@@ -60,6 +60,14 @@ class LearnScreen:
         hint_rect.midright = (self._top_bar.pause_rect.left - theme.GRID_PX * 2, self._top_bar.pause_rect.centery)
         self._hint_button = Button(fonts.small, "Hint  Tab", hint_rect)
 
+    @property
+    def results(self):
+        """(sign, judgement) of every sign finished so far. Learn shows the shape, so only Recall tests the letter."""
+        if not self.recall:
+            return []
+        text, positions = self.queue.text, self.queue.positions
+        return [(text[positions[index]], outcome) for index, outcome in enumerate(self.outcomes)]
+
     def handle_event(self, event):
         if is_key(event, PAUSE_KEYS) or self._top_bar.pause_clicked(event):
             return Action.PAUSE

@@ -19,3 +19,4 @@ venv/
 # Local player settings
 settings.json
 records.json
+letters.json

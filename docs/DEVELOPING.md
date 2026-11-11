@@ -11,4 +11,4 @@ Commands are shown for Mac. On Windows, use `.venv\Scripts\python` in place of `
 - `.venv/bin/python -m aslgame.tools.capture A`: record templates for sign A. Space records a burst after a short countdown, Backspace drops the last burst. Saved to `data/signs/` on close.
 - `.venv/bin/python -m unittest`: tests that need no camera or window.
 - F3 toggles the performance overlay and the tracked skeleton. On a Mac keyboard, hold fn.
-- Words live in themed decks in `aslgame/game/words.py`; level is set by word length. Best scores are kept in `records.json` (not committed).
+- Words live in themed decks in `aslgame/game/words.py`; level is set by word length. Best scores are kept in `records.json` and letter mastery in `letters.json` (neither is committed; delete `letters.json` to start the alphabet over).

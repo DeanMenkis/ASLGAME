@@ -9,6 +9,7 @@ CHARTS_DIR = ROOT_DIR / "data" / "charts"
 MEDIA_DIR = ROOT_DIR / "media"
 SETTINGS_PATH = ROOT_DIR / "settings.json"
 RECORDS_PATH = ROOT_DIR / "records.json"
+LETTERS_PATH = ROOT_DIR / "letters.json"
 
 # Camera
 CAMERA_INDEX = 0
@@ -62,6 +63,18 @@ FINGER_HINT_LIMIT = 0.55
 
 # Learn and Recall draw words from a deck until a run has about this many signs.
 LEARN_RUN_SIGNS = 18
+
+# Letter mastery, kept between runs. Each letter's score starts in the middle and moves this share of the way
+# toward every new result, so two Perfects make a letter known and one miss makes it weak again.
+MASTERY_START = 0.5
+MASTERY_RATE = 0.3
+MASTERY_KNOWN = 0.75
+# The Practise deck: an untested letter needs this much practice (a weak one needs up to 1, a known one none).
+# A word's weight is its letters' mean need raised to this power, which about doubles how often weak letters come up,
+# and every word keeps a small weight so the deck never runs dry.
+MASTERY_UNTESTED_NEED = 0.4
+PRACTISE_SHARPNESS = 4
+PRACTISE_BASE_WEIGHT = 0.0005
 
 # Levels: Easy, Medium, Hard. Each sets how many beats a sign gets and which words are drawn.
 LEVEL_NAMES = ("Easy", "Medium", "Hard")

@@ -9,7 +9,9 @@ import pygame
 from aslgame import config, theme
 from aslgame.game.app_flow import Action
 from aslgame.game.motion import MOTION_SIGNS
-from aslgame.game.words import DECKS, DECKS_BY_NAME, pool
+from aslgame.game import mastery
+from aslgame.game.mastery import Mastery
+from aslgame.game.words import ALPHABET, DECKS, DECKS_BY_NAME, pool
 from aslgame.matching import matcher
 from aslgame.matching.normalize import normalize
 from aslgame.presentation.draw import draw_text_centered
@@ -32,6 +34,10 @@ RIGHT_CENTER_X_PX = theme.GRID_PX * 116
 ENSO_CENTER_Y_PX = theme.GRID_PX * 36
 CHIP_HEIGHT_PX = theme.GRID_PX * 5
 READ_MIN_SCORE = 0.7
+ALPHABET_STEP_PX = 22
+ALPHABET_FONT_PX = 22
+ALPHABET_SIZE_PX = (ALPHABET_STEP_PX * len(ALPHABET), theme.GRID_PX * 5)
+PRACTISE_NOTE_LETTERS = 6
 
 
 @dataclass(frozen=True)
@@ -58,8 +64,31 @@ MODES = (
 )
 
 
-def deck_items():
-    return [Item(deck.title, deck, f"{len(deck.words)} words" if not deck.ordered else "26 letters") for deck in DECKS]
+def deck_note(deck, letters):
+    if deck.ordered:
+        return "26 letters"
+    if not deck.by_need:
+        return f"{len(deck.words)} words"
+    # The Practise deck names the letters it will deal, weakest first.
+    weak = mastery.weak_letters(letters)[:PRACTISE_NOTE_LETTERS]
+    return "  ".join(weak) if weak else f"{mastery.known_count(letters)} of {len(ALPHABET)} known"
+
+
+def deck_items(letters):
+    return [Item(deck.title, deck, deck_note(deck, letters)) for deck in DECKS]
+
+
+def make_alphabet(font, letters):
+    """The alphabet as the player knows it: faint until tested, ink once known, and a vermilion dot under a weak letter."""
+    row = pygame.Surface(ALPHABET_SIZE_PX, pygame.SRCALPHA)
+    for index, letter in enumerate(ALPHABET):
+        state = mastery.state(letters, letter)
+        x_px = index * ALPHABET_STEP_PX + ALPHABET_STEP_PX // 2
+        label = font.render(letter, True, theme.INK_FAINT if state == Mastery.UNTESTED else theme.INK_BLACK)
+        row.blit(label, label.get_rect(midtop=(x_px, 0)))
+        if state == Mastery.WEAK:
+            pygame.draw.circle(row, theme.SEAL, (x_px, ALPHABET_SIZE_PX[1] - 5), 3)
+    return row
 
 
 def song_items(charts, track_lengths):
@@ -130,12 +159,13 @@ def length_label(length_s):
 
 
 class MenuScreen:
-    def __init__(self, fonts, signs, charts, track_lengths, settings, records, size_px, sfx):
+    def __init__(self, fonts, signs, charts, track_lengths, settings, records, letters, size_px, sfx):
         self._signs = signs
         self._still = {name: sign for name, sign in signs.items() if name not in MOTION_SIGNS}
         self._records = records
         self._track_lengths = track_lengths
-        self.lists = [song_items(charts, track_lengths) if mode.songs else deck_items() for mode in MODES]
+        self._letters = letters
+        self._songs = song_items(charts, track_lengths)
         self.mode = 0
         self.selected = [0 for _ in MODES]
         self.first_row = [0 for _ in MODES]
@@ -171,7 +201,6 @@ class MenuScreen:
         self._help_chip = Chip(fonts.body, "?", (size_px[0] - LEFT_PX - theme.GRID_PX * 6, TITLE_Y_PX - CHIP_HEIGHT_PX // 2, theme.GRID_PX * 6, CHIP_HEIGHT_PX))
         self._settings_chip = Chip(fonts.small, "Settings", (self._help_chip.rect.left - theme.GRID_PX * 15, self._help_chip.rect.top,
                                                             theme.GRID_PX * 14, CHIP_HEIGHT_PX))
-        self._rows = {}
         self._reader_result = None
         self._read_letter = None
         self._read_score = 0.0
@@ -179,6 +208,15 @@ class MenuScreen:
         self._reader_font = pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_DISPLAY_PX + 40)
         self._reader_hint = fonts.serif_body.render("sign any letter", True, theme.INK_FAINT)
         self._best_cache = {}
+        self._alphabet_font = pygame.font.SysFont(theme.SERIF_FAMILIES, ALPHABET_FONT_PX)
+        self.refresh()
+
+    def refresh(self):
+        """Called after every run: letter mastery has changed, so the Practise note and the alphabet are redrawn."""
+        decks = deck_items(self._letters)
+        self.lists = [self._songs if mode.songs else decks for mode in MODES]
+        self._rows = {}
+        self._alphabet = make_alphabet(self._alphabet_font, self._letters)
 
     # Selection
 
@@ -384,6 +422,7 @@ class MenuScreen:
         draw_text_centered(screen, self._start_label, self._start_rect.center)
         best = self._best_surface()
         draw_text_centered(screen, best, (RIGHT_CENTER_X_PX, self._start_rect.bottom + theme.GRID_PX * 2))
+        screen.blit(self._alphabet, self._alphabet.get_rect(midtop=(RIGHT_CENTER_X_PX, self._start_rect.bottom + theme.GRID_PX * 5)))
         self._help.draw(screen)
         self._about.draw(screen)
         self._settings_panel.draw(screen)

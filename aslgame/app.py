@@ -8,7 +8,7 @@ import time
 import pygame
 
 from aslgame import config, theme
-from aslgame.game import rush, scoring
+from aslgame.game import mastery, rush, scoring
 from aslgame.game.app_flow import PLAY_STATES, TIMED_STATES, Action, AppState, next_state
 from aslgame.game.chart import load_charts
 from aslgame.game.clock import GameClock
@@ -40,6 +40,7 @@ class App:
         self.signs = with_motion_letters(load_signs(config.SIGNS_DIR))
         self.settings = load_settings(config.SETTINGS_PATH)
         self.records = load_records(config.RECORDS_PATH)
+        self.letters = mastery.clean(load_records(config.LETTERS_PATH))
         self.runtime = Runtime(config.WINDOW_TITLE)
         self.sfx = Sfx(self.settings)
         self.charts = load_charts(config.CHARTS_DIR)
@@ -53,7 +54,8 @@ class App:
         fonts = self.runtime.fonts
         self.light_warning = LightWarning(fonts, self.size_px)
         track_lengths = {name: sound.get_length() for name, sound in self.tracks.items()}
-        self.menu = MenuScreen(fonts, self.signs, self.charts, track_lengths, self.settings, self.records, self.size_px, self.sfx)
+        self.menu = MenuScreen(fonts, self.signs, self.charts, track_lengths, self.settings, self.records, self.letters,
+                               self.size_px, self.sfx)
         self.screens = {
             AppState.BOOT: BootScreen(),
             AppState.MENU: self.menu,
@@ -66,26 +68,29 @@ class App:
         fonts = self.runtime.fonts
         self.stop_music()
         start_s = now_s + COUNTDOWN_S
+
+        def draw(deck, min_signs):
+            return draw_words(deck, level, min_signs, self.rng, self.signs, lambda letter: mastery.need(self.letters, letter))
+
         if state in (AppState.LEARN, AppState.RECALL):
-            words = draw_words(item, level, config.LEARN_RUN_SIGNS, self.rng, self.signs)
+            words = draw(item, config.LEARN_RUN_SIGNS)
             self.screens[state] = LearnScreen(fonts, self.signs, " ".join(words), self.size_px, self.settings, self.sfx,
                                               recall=state == AppState.RECALL)
         elif state == AppState.RHYTHM:
             beats = config.LEVEL_BEATS_PER_NOTE[level]
-            words = draw_words(item, level, signs_for(length_s, config.RHYTHM_BPM * config.SPEED_MAX, beats), self.rng, self.signs)
+            words = draw(item, signs_for(length_s, config.RHYTHM_BPM * config.SPEED_MAX, beats))
             session = RhythmSession([c for w in words for c in w], word_ends(words), beats_per_note=beats,
                                     last_due_s=length_s - config.HIT_WINDOW_S - config.FEEDBACK_S)
             self.screens[state] = RhythmScreen(fonts, self.signs, make_queue(" ".join(words)), session, GameClock(start_s),
                                                self.size_px, self.settings, self.sfx, length_s)
         elif state == AppState.MUSIC:
-            deck = DECKS_BY_NAME[item.deck]
-            words = draw_words(deck, level, rush.signs_for(length_s), self.rng, self.signs)
+            words = draw(DECKS_BY_NAME[item.deck], rush.signs_for(length_s))
             session = rush.flow_session([c for w in words for c in w], word_ends(words), item, level, length_s)
             self.player = MediaPlayer(self.tracks[item.name], start_s, length_s)
             self.screens[state] = RhythmScreen(fonts, self.signs, make_queue(" ".join(words)), session, self.player, self.size_px,
                                                self.settings, self.sfx, length_s)
         elif state == AppState.RUSH:
-            words = draw_words(item, level, rush.signs_for(length_s), self.rng, self.signs)
+            words = draw(item, rush.signs_for(length_s))
             session = rush.RushSession([c for w in words for c in w], word_ends(words), float(length_s), config.RUSH_FUSE_S[level])
             self.screens[state] = RhythmScreen(fonts, self.signs, make_queue(" ".join(words)), session, GameClock(start_s),
                                                self.size_px, self.settings, self.sfx, length_s)
@@ -103,12 +108,17 @@ class App:
         if new_state == self.state:
             return
         self.sfx.play("complete" if new_state == AppState.RESULTS else "click")
+        in_run = self.state in PLAY_STATES or self.state == AppState.PAUSED
+        if in_run and new_state not in PLAY_STATES and new_state != AppState.PAUSED:
+            # However a run ends, finished or abandoned, the letters signed in it count.
+            mastery.record(self.letters, self.screens[self.play_state].results)
+            self.menu.refresh()
         if self.state == AppState.MENU and new_state in PLAY_STATES:
             menu = self.menu
             played = (menu.selected_item().value, menu.level, menu.run_length_s(), menu.record_key())
             self.start_play(new_state, played, now_s)
         elif self.state == AppState.RESULTS and new_state in PLAY_STATES:
-            self.start_play(new_state, self.played, now_s)
+            self.start_play(new_state, mastery.practise_run(self.played) if action == Action.PRACTISE else self.played, now_s)
         elif new_state == AppState.PAUSED and self.state in TIMED_STATES:
             self.screens[self.state].pause(now_s)
         elif self.state == AppState.PAUSED and new_state in TIMED_STATES:
@@ -167,6 +177,7 @@ class App:
         # Written after the loop so the frame loop never touches the disk.
         save_settings(config.SETTINGS_PATH, self.settings)
         save_records(config.RECORDS_PATH, self.records)
+        save_records(config.LETTERS_PATH, self.letters)
 
 
 def main():

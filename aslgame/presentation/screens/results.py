@@ -15,6 +15,7 @@ GRADE_RADIUS_PX = theme.GRID_PX * 11
 WEAK_PALM_PX = theme.GRID_PX * 5
 WEAK_SPACING_PX = theme.GRID_PX * 22
 BUTTON_WIDTH_PX = theme.GRID_PX * 24
+ACTIONS = {"Retry": Action.RETRY, "Practise": Action.PRACTISE, "Menu": Action.TO_MENU}
 
 
 class ResultsScreen:
@@ -23,12 +24,13 @@ class ResultsScreen:
         self._card = self._build(fonts, results, signs, new_best)
         self._card_rect = self._card.get_rect(center=(size_px[0] // 2, size_px[1] // 2))
         bottom_px = self._card_rect.bottom - theme.GRID_PX * 4 - theme.BUTTON_HEIGHT_PX
-        retry = pygame.Rect(0, bottom_px, BUTTON_WIDTH_PX, theme.BUTTON_HEIGHT_PX)
-        retry.right = self._card_rect.centerx - theme.GRID_PX
-        menu = retry.copy()
-        menu.left = self._card_rect.centerx + theme.GRID_PX
-        self._buttons = [Button(fonts.body, "Retry", retry, primary=True), Button(fonts.body, "Menu", menu)]
-        self._actions = [Action.RETRY, Action.TO_MENU]
+        # Practise is offered when the run showed letters to work on.
+        labels = ["Retry", "Practise", "Menu"] if results.weakest else ["Retry", "Menu"]
+        self._actions = [ACTIONS[label] for label in labels]
+        step_px = BUTTON_WIDTH_PX + theme.GRID_PX * 2
+        left_px = self._card_rect.centerx - (step_px * len(labels) - theme.GRID_PX * 2) // 2
+        self._buttons = [Button(fonts.body, label, (left_px + index * step_px, bottom_px, BUTTON_WIDTH_PX, theme.BUTTON_HEIGHT_PX),
+                                primary=index == 0) for index, label in enumerate(labels)]
         self._focus = 0
 
     def _build(self, fonts, results, signs, new_best):
@@ -71,8 +73,10 @@ class ResultsScreen:
             return Action.RETRY
         if is_key(event, (pygame.K_m, pygame.K_ESCAPE)):
             return Action.TO_MENU
+        if is_key(event, (pygame.K_p,)) and Action.PRACTISE in self._actions:
+            return Action.PRACTISE
         if is_key(event, (pygame.K_LEFT, pygame.K_RIGHT)):
-            self._focus = 1 - self._focus
+            self._focus = (self._focus + (1 if event.key == pygame.K_RIGHT else -1)) % len(self._buttons)
         elif is_key(event, (pygame.K_RETURN, pygame.K_SPACE)):
             return self._actions[self._focus]
         for index, button in enumerate(self._buttons):

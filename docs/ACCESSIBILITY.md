@@ -18,6 +18,7 @@ Audit of every cue in the game against the rules in the architecture doc: nothin
 | Fuse running out | The stroke shortens and, in its last quarter, swells and pulses | Length and shape | None |
 | Progress through a word | Strip cells: filled is done, thick outline is now, thin outline is next | Fill and line weight | None |
 | Result per letter (rhythm, music) | Strip cell in green, yellow, orange, or red | Dots under the letter (3 Perfect, 2 Good, 1 OK) and a strike for Miss | None |
+| Letter mastery (menu alphabet) | Faint letter is untested, ink is known, a dot under the letter is weak | The dot, and the weak letters named on the Practise row | None |
 | Unplayable menu row | Dimmed, with "Needs ..." | Text | None |
 | Settings toggles (in the Settings panel) | "On" or "Off" in the label | Text | Click |
 | J and Z path | Dashed guide with an arrowhead and a moving dot; the player's stroke as a trail | Shape and motion | None |

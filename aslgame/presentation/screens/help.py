@@ -10,7 +10,7 @@ SECTIONS = (
     ("Menu", (("Left  Right", "Mode"), ("Up  Down", "Choose"), ("1 2 3  Tab", "Level"), ("L", "Length"), ("Enter", "Begin"), ("Esc", "Quit"))),
     ("Playing", (("Esc  P", "Pause"), ("Tab", "Hint in Recall"))),
     ("Paused", (("Esc  Space", "Resume"), ("M", "Menu"))),
-    ("Results", (("R", "Retry"), ("M", "Menu"))),
+    ("Results", (("R", "Retry"), ("P", "Practise"), ("M", "Menu"))),
     ("Anywhere", (("C", "Finger colors"), ("S", "Sound"), ("F", "Fullscreen"), ("F3", "Performance"))),
 )
 LEFT_COLUMN_SECTIONS = 3
