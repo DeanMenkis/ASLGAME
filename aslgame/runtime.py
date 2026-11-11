@@ -23,24 +23,30 @@ from aslgame.tracking.tracker import Tracker  # noqa: E402
 class Fonts:
     small: pygame.font.Font
     body: pygame.font.Font
+    label: pygame.font.Font
     medium: pygame.font.Font
     large: pygame.font.Font
     display: pygame.font.Font
-    serif_body: pygame.font.Font
-    serif_mode: pygame.font.Font
-    serif_title: pygame.font.Font
+    slab_body: pygame.font.Font
+    slab_mode: pygame.font.Font
+    slab_title: pygame.font.Font
 
 
 def make_fonts():
+    """Sans for small text, condensed caps for labels, and a bold slab, the wood type, for everything that shouts."""
+    def slab(size_px):
+        return pygame.font.SysFont(theme.SLAB_FAMILIES, size_px, bold=True)
+
     return Fonts(
-        small=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_SMALL_PX),
-        body=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_BODY_PX),
-        medium=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_MEDIUM_PX, bold=True),
-        large=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_LARGE_PX, bold=True),
-        display=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_DISPLAY_PX, bold=True),
-        serif_body=pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_BODY_PX),
-        serif_mode=pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_SERIF_MODE_PX),
-        serif_title=pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_SERIF_TITLE_PX, italic=True),
+        small=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_SMALL_PX, bold=True),
+        body=pygame.font.SysFont(theme.FONT_FAMILIES, theme.FONT_SIZE_BODY_PX, bold=True),
+        label=pygame.font.SysFont(theme.LABEL_FAMILIES, theme.FONT_SIZE_LABEL_PX, bold=True),
+        medium=slab(theme.FONT_SIZE_MEDIUM_PX),
+        large=slab(theme.FONT_SIZE_LARGE_PX),
+        display=slab(theme.FONT_SIZE_DISPLAY_PX),
+        slab_body=slab(theme.FONT_SIZE_SLAB_BODY_PX),
+        slab_mode=slab(theme.FONT_SIZE_SLAB_MODE_PX),
+        slab_title=slab(theme.FONT_SIZE_SLAB_TITLE_PX),
     )
 
 

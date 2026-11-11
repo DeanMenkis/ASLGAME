@@ -44,7 +44,7 @@ def render_silhouette(normalized, palm_px, matched, finger_colors=False):
     for name, joints in FINGERS.items():
         pygame.draw.lines(surface, theme.GHOST_INNER, False, [xy[j] for j in joints], theme.GHOST_INNER_PX)
     if len(edge) > 2:
-        light = theme.ACCENT if matched else theme.GHOST_EDGE_LIGHT
+        light = theme.YELLOW if matched else theme.GHOST_EDGE_LIGHT
         pygame.draw.lines(surface, theme.GHOST_EDGE_DARK, True, edge, theme.GHOST_EDGE_DARK_PX)
         pygame.draw.lines(surface, light, True, edge, theme.GHOST_EDGE_LIGHT_PX)
     return surface, (-origin).tolist()

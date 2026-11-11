@@ -8,8 +8,10 @@ from dataclasses import asdict, dataclass, fields
 class Settings:
     finger_colors: bool = False
     sound: bool = True
-    # Flames, smoke, and shake. Off keeps the ink look without moving fire, for anyone who finds it too much.
-    fire: bool = True
+    # Rising dots, flying paper, shake, and slipping plates. Off keeps the print look and holds it still.
+    motion: bool = True
+    # The camera printed in the game's inks. Off shows the plain camera picture, for anyone who sees their hand better that way.
+    print_camera: bool = True
 
 
 def load_settings(path):

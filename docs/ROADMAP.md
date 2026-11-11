@@ -77,6 +77,16 @@ Built on the `arcade-overhaul` branch. Each item is ticked when its feature is f
 - [x] Practise button on the results screen
 - [ ] Play test: check that two Perfects for known and one miss for weak feel fair
 
+## Phase 9: The print shop
+
+- [x] New art direction: paper and three spot inks, the camera printed live, wood type, hard shadows
+- [x] Heat as a third ink: yellow joins the print, dots rise, a miss slips the plates
+- [x] Menu as a poster with a live proof of the camera and the alphabet as a case of type
+- [x] Results as a proof sheet with the run's clean words printed as a broadside
+- [x] Motion and Print camera settings
+- [ ] Play test with a camera: is the hand easy enough to read in the print, and are the ink strengths right in a dim room
+- [ ] New demo clip and screenshots for the README
+
 ## Open questions
 
 - Review of the letter templates by a fluent signer

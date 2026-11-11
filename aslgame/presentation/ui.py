@@ -4,8 +4,11 @@ import pygame
 
 from aslgame import theme
 
+SHADOW_PX = 4
+LIFT_PX = 2
 
-def make_panel(size_px, color=theme.SURFACE, radius_px=theme.CORNER_PX):
+
+def make_panel(size_px, color=theme.PAPER, radius_px=theme.CORNER_PX):
     """A rounded, translucent card. Made once and blitted each frame."""
     panel = pygame.Surface(size_px, pygame.SRCALPHA)
     pygame.draw.rect(panel, color, panel.get_rect(), border_radius=radius_px)
@@ -17,14 +20,14 @@ def clicked(event, rect):
 
 
 class Button:
-    """A paper and ink button. The primary one is vermilion; hovered buttons darken, the focused one has a vermilion edge."""
+    """A paper button with an ink edge and a hard shadow. The main one is red. Hovered or focused, it lifts off its shadow."""
 
     def __init__(self, font, label, rect, primary=False, enabled=True):
         self.rect = pygame.Rect(rect)
         self.primary = primary
         self.enabled = enabled
-        self._label = font.render(label, True, theme.PAPER if primary else theme.INK_BLACK)
-        self._disabled_label = font.render(label, True, theme.INK_FAINT)
+        self._label = font.render(label, True, theme.PAPER if primary else theme.BLUE)
+        self._disabled_label = font.render(label, True, theme.BLUE_FAINT)
 
     def is_clicked(self, event):
         return self.enabled and clicked(event, self.rect)
@@ -33,20 +36,18 @@ class Button:
         return self.enabled and self.rect.collidepoint(pygame.mouse.get_pos())
 
     def draw(self, screen, focused=False):
-        active = focused or self.is_hovered()
         radius = theme.GRID_PX // 2
         if not self.enabled:
             pygame.draw.rect(screen, theme.PAPER_SHADE, self.rect, border_radius=radius)
             screen.blit(self._disabled_label, self._disabled_label.get_rect(center=self.rect.center))
             return
-        if self.primary:
-            pygame.draw.rect(screen, theme.SEAL, self.rect, border_radius=radius)
-            if active:
-                pygame.draw.rect(screen, theme.INK_BLACK, self.rect, 2, border_radius=radius)
-        else:
-            pygame.draw.rect(screen, theme.PAPER_SHADE if active else theme.PAPER, self.rect, border_radius=radius)
-            pygame.draw.rect(screen, theme.SEAL if focused else theme.INK_BLACK, self.rect, 2, border_radius=radius)
-        screen.blit(self._label, self._label.get_rect(center=self.rect.center))
+        lift_px = LIFT_PX if focused or self.is_hovered() else 0
+        face = self.rect.move(-lift_px, -lift_px)
+        pygame.draw.rect(screen, theme.PLUM if self.primary else theme.BLUE, self.rect.move(SHADOW_PX, SHADOW_PX), border_radius=radius)
+        pygame.draw.rect(screen, theme.RED if self.primary else theme.PAPER, face, border_radius=radius)
+        edge = theme.YELLOW if focused and self.primary else theme.RED if focused else theme.PLUM if self.primary else theme.BLUE
+        pygame.draw.rect(screen, edge, face, 3, border_radius=radius)
+        screen.blit(self._label, self._label.get_rect(center=face.center))
 
 
 def button_width(font, label):
@@ -66,12 +67,12 @@ def stack_buttons(font, labels, center_x_px, top_px, width_px=None):
 
 def draw_key_chip(screen, font, text, midleft_px):
     """A key cap with its name, so a key reads as a key."""
-    label = font.render(text, True, theme.INK)
+    label = font.render(text, True, theme.BLUE)
     width_px = max(theme.KEY_CHIP_MIN_WIDTH_PX, label.get_width() + theme.GRID_PX * 2)
     rect = pygame.Rect(0, 0, width_px, label.get_height() + theme.GRID_PX)
     rect.midleft = midleft_px
-    pygame.draw.rect(screen, theme.SURFACE_RAISED, rect, border_radius=theme.GRID_PX)
-    pygame.draw.rect(screen, theme.BORDER, rect, theme.BORDER_PX, border_radius=theme.GRID_PX)
+    pygame.draw.rect(screen, theme.PAPER, rect, border_radius=theme.GRID_PX)
+    pygame.draw.rect(screen, theme.BLUE, rect, theme.BORDER_PX, border_radius=theme.GRID_PX)
     screen.blit(label, label.get_rect(center=rect.center))
     return rect
 

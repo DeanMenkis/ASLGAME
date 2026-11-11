@@ -1,16 +1,16 @@
-"""Settings panel: finger colors, sound, and the About page. Opened from the menu."""
+"""Settings panel: finger colors, sound, motion, the printed camera, and the About page. Opened from the menu."""
 
 import pygame
 
 from aslgame import theme
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.common import is_key, make_shade
-from aslgame.presentation.ink import torn_slip
+from aslgame.presentation.press import sticker
 from aslgame.presentation.ui import Button, Toggle
 
-PANEL_SIZE_PX = (theme.GRID_PX * 48, theme.GRID_PX * 60)
+PANEL_SIZE_PX = (theme.GRID_PX * 48, theme.GRID_PX * 69)
 ROW_WIDTH_PX = theme.GRID_PX * 36
-TOGGLES = (("finger_colors", "Finger colors"), ("sound", "Sound"), ("fire", "Fire"))
+TOGGLES = (("finger_colors", "Finger colors"), ("sound", "Sound"), ("motion", "Motion"), ("print_camera", "Print camera"))
 
 
 class SettingsPanel:
@@ -19,9 +19,9 @@ class SettingsPanel:
         self.wants_about = False
         self._settings = settings
         self._shade = make_shade(size_px)
-        self._panel = torn_slip(PANEL_SIZE_PX, theme.SURFACE, seed=21)
+        self._panel = sticker(PANEL_SIZE_PX)
         self._rect = self._panel.get_rect(center=(size_px[0] // 2, size_px[1] // 2))
-        draw_text_centered(self._panel, fonts.medium.render("Settings", True, theme.INK), (PANEL_SIZE_PX[0] // 2, theme.GRID_PX * 6))
+        draw_text_centered(self._panel, fonts.medium.render("Settings", True, theme.BLUE), (PANEL_SIZE_PX[0] // 2, theme.GRID_PX * 6))
         rows = []
         top_px = self._rect.top + theme.GRID_PX * 12
         for index in range(len(TOGGLES) + 2):
@@ -77,7 +77,7 @@ class SettingsPanel:
         for index, (name, toggle) in enumerate(self._toggles):
             toggle.draw(screen, getattr(self._settings, name))
             if index == self._focus:
-                pygame.draw.rect(screen, theme.INK, toggle.rect.inflate(theme.GRID_PX, theme.GRID_PX), theme.BORDER_PX,
-                                 border_radius=theme.CORNER_PX)
+                pygame.draw.rect(screen, theme.RED, toggle.rect.inflate(theme.GRID_PX * 2, theme.GRID_PX * 2), theme.BORDER_PX + 1,
+                                 border_radius=theme.GRID_PX)
         self._about.draw(screen, focused=self._focus == len(self._toggles))
         self._done.draw(screen, focused=self._focus == len(self._toggles) + 1)

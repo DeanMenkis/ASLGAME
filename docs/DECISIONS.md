@@ -185,3 +185,19 @@ Results named the weakest signs of one run and then forgot them, so nothing told
 ## A Practise deck, dealt by need
 
 Practise is a deck like any other, so it works in every mode and level and keeps its own best scores. It holds every word and deals them by need: a word's weight is the mean need of its letters to the fourth power, which about doubles how often weak letters come up while every word can still appear. Untested letters count as needing some practice, so a new player is led through the whole alphabet. Its menu row names the letters it will deal, weakest first, and the results screen offers Practise whenever a run showed letters to work on.
+
+## The print shop replaces ink and fire
+
+Ink and fire was calm and well made, but it was a borrowed look: brush circles and seals say nothing about fingerspelling. Spelling is type, so the game became a press. The camera is printed in spot inks, panels are paper stickers with hard shadows, letters are wood type, and heat adds ink instead of flames. The fire, smoke, ash, brush strokes, and torn paper were removed rather than kept beside the new look, so there is one visual language.
+
+## The camera is printed in soft dots, not hard ones
+
+A true halftone of the camera, every pixel either ink or paper, looked striking and hid the player's fingers. Each plate is now half smooth tone and half soft dots, printed at half size and scaled up. The face and hand stay readable and the dots still show. It costs about 6 ms a frame on the camera thread; tracking still sees the untouched picture. A setting shows the plain camera for anyone who prefers it.
+
+## Heat is a third ink
+
+At rest the print has two inks. The yellow plate fades in with the multiplier, so the room goes from a blue and red print to full color, and a miss takes the color away again. This keeps the idea that how the screen looks says how well you are playing, without a particle system: the dots at the bottom are three pre-drawn sheets printed with multiply blending. A full run draws in about 3 ms a frame at the median, less than the fire did.
+
+## Results print the run
+
+The run's clean words are kept in order and printed on the results sheet as a broadside. The score says how well the run went; the poster shows what was actually spelled, and a run with no clean word leaves the sheet blank.

@@ -61,13 +61,13 @@ def update(capture, now_s, pressed_key, result_version, hand):
 def draw(screen, capture, now_s, label, count_surface):
     if capture.state == CaptureState.COUNTDOWN:
         remaining = (capture.countdown_ends_s - now_s) / config.CAPTURE_COUNTDOWN_S
-        draw_ring(screen, RING_CENTER_PX, max(1, int(theme.RING_RADIUS_PX * remaining)), 1.0, theme.ACCENT)
+        draw_ring(screen, RING_CENTER_PX, max(1, int(theme.RING_RADIUS_PX * remaining)), 1.0, theme.YELLOW)
     elif capture.state == CaptureState.RECORDING:
-        draw_ring(screen, RING_CENTER_PX, theme.RING_RADIUS_PX, 1.0, theme.INK_DIM)
+        draw_ring(screen, RING_CENTER_PX, theme.RING_RADIUS_PX, 1.0, theme.BLUE_SOFT)
         fraction = len(capture.burst) / config.CAPTURE_SAMPLES_PER_BURST
-        draw_ring(screen, RING_CENTER_PX, theme.RING_RADIUS_PX, fraction, theme.ACCENT)
+        draw_ring(screen, RING_CENTER_PX, theme.RING_RADIUS_PX, fraction, theme.YELLOW)
     else:
-        draw_ring(screen, RING_CENTER_PX, theme.RING_RADIUS_PX, 1.0, theme.INK_DIM)
+        draw_ring(screen, RING_CENTER_PX, theme.RING_RADIUS_PX, 1.0, theme.BLUE_SOFT)
     draw_text_centered(screen, label, RING_CENTER_PX)
     count_x_px = RING_CENTER_PX[0] + theme.RING_RADIUS_PX + theme.GRID_PX * 2
     screen.blit(count_surface, (count_x_px, RING_CENTER_PX[1] - count_surface.get_height() // 2))

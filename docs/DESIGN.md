@@ -13,16 +13,20 @@ The interface should explain itself through form, not words. If a screen needs a
 - Restraint: remove anything that doesn't help the player sign. Less, but better.
 - Color is never the only signal (see [Architecture](ARCHITECTURE.md)).
 
-## Art direction: ink that catches fire
+## Art direction: the print shop
 
-Play starts as quiet ink: the camera in its own colour with a faint warm cast, torn paper for the band and the reference card, brush-stroke rings, ink splats, and seal stamps for judgements. The multiplier is heat. As it climbs, the ink warms from black through vermilion and ember to gold, the camera grows warmer and richer, and fire rises from the bottom edge: embers, flames, then ablaze, blue-white at the cap. A miss snuffs it: a hiss, smoke, embers cooling into ash, and the camera dimmed and muted for a moment. Calm and loud are one idea, and how hot the screen is says how well you are playing.
+Fingerspelling is spelling, so the game is a press and the player is setting type. Everything on screen is uncoated paper and three spot inks, blue, red, and yellow, printed a little out of register. Nothing is black: the darkest color is blue printed over red. The look borrows from risograph gig posters and wood type broadsides, and puts a live camera inside them.
 
-- Paper, sumi ink, and vermilion are the base palette. Judgements use dye colors (vermilion, indigo, ochre, grey) and always carry text and dots.
-- Serif type for letters, numbers, and banners; bold sans only for small labels.
-- Every panel is paper: torn slips for the card, results, settings, keys, and pause, and paper buttons with a vermilion one for the main action.
-- The grade is painted, not stamped: the letter in serif inside a brushed ensō, the same circle as the menu.
-- Fire sits behind the hand, the ring, and the word tiles, so it never hides what to sign.
-- Effects respect the Fire setting; with it off the ink look stays and nothing burns or shakes.
+- **The camera is printed.** Shadows go to the blue plate, skin and warm things to the red, each as soft halftone dots. The player sees themself as a two-color print.
+- **Color is the reward.** The multiplier is heat. As it climbs the yellow plate joins the print and the room turns full color, halftone dots rise from the bottom edge in one ink, then two, then three, and loose dots lift off. A miss is a misprint: the plates slip out of register, the yellow drops out, and the dots fall away.
+- **Type is wood type.** Letters, numbers, and titles are a bold slab; labels are condensed capitals. Big type is printed twice, red under blue, so both plates show.
+- **Panels are paper stickers** with a blue edge and a hard blue shadow, never soft. Buttons lift off their shadow when hovered or focused.
+- **Timing is registration.** In Rhythm a red ring closes on the blue ring around the hand; when the two plates meet, that is the beat. The fuse in Music and Rush is an arc of ink that leaves dots where it has been.
+- **The word strip is type blocks.** Each signed letter is printed in its judgement's ink, with dots and text as well as color.
+- **The menu is a poster.** Flat discs of ink drift behind it, the camera sits in a proof frame with trim marks, and the letter it reads is set on a yellow star. The alphabet is a case of type: a solid block is a letter you know.
+- **The results are a proof sheet.** The grade sits in a registration mark, and the words signed without a miss are printed as a broadside, each line stretched to the full measure, so every run ends with a poster of what was spelled.
+- Ink drawn over the camera always has the picture knocked out to paper around it, so it reads on any room.
+- Effects respect the Motion setting; with it off the print holds still. Print camera off shows the plain camera.
 
 References:
 

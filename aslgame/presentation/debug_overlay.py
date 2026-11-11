@@ -45,6 +45,6 @@ class DebugOverlay:
         height_px = line_height_px * len(surfaces) + theme.GRID_PX * 2
         if self._panel is None or self._panel.get_size() != (width_px, height_px):
             self._panel = pygame.Surface((width_px, height_px), pygame.SRCALPHA)
-        self._panel.fill(theme.PANEL)
+        self._panel.fill((*theme.BLUE, 225))
         for row, surface in enumerate(surfaces):
             self._panel.blit(surface, (theme.GRID_PX, theme.GRID_PX + row * line_height_px))

@@ -127,37 +127,38 @@ FLOW_GOOD_FRACTION = 0.65
 ON_BEAT_WINDOW_S = 0.09
 ON_BEAT_BONUS = 1.5
 
-# Ink and fire. The multiplier heats the screen: ink at first, then embers, flames, and ablaze; a miss puts it out.
-# Low enough that a few clean signs light it: embers after about 5 in a row, flames after about 15, ablaze after about 30
-# (fewer with Perfects).
-FIRE_START_MULT = 1.1
-FIRE_FULL_MULT = 3.0
+# The press. The multiplier is heat: the camera is printed in blue and red at first, a yellow plate joins as heat rises,
+# and halftone dots climb from the bottom edge. A miss slips the plates out of register and the heat is gone.
+# Low enough that a few clean signs show it: about 5 in a row to start, about 30 for full heat (fewer with Perfects).
+HEAT_START_MULT = 1.1
+HEAT_FULL_MULT = 3.0
 HEAT_RISE_PER_S = 0.9
 HEAT_FALL_PER_S = 0.5
-HEAT_STAGES = (0.08, 0.35, 0.7)  # embers, flames, ablaze
-# A long hot streak burns blue-white.
-BLUE_FIRE_MULT = 5.0
-# After a fire goes out the camera dims and loses some colour, then recovers over this long.
-ASH_S = 1.2
-# The camera keeps its own colour. Cold is a touch muted, ablaze a touch richer (negative means more saturated),
-# and a fire going out drains at most this much colour for a moment.
-GRADE_GRAY_COLD = 0.1
-GRADE_GRAY_HOT = -0.15
-GRADE_GRAY_ASH = 0.45
-# Fire is drawn at a quarter size and scaled up, which blurs it into glow for free.
-FIRE_LAYER_SCALE = 4
-FIRE_BUOYANCY = 260.0
-FIRE_MAX_PARTICLES = 700
-FIRE_BOTTOM_RATE = 240.0  # flames a second along the bottom when fully ablaze
-FIRE_TIP_RATE = 70.0  # flames a second at the fuse's burning tip
-SPARK_RATE = 45.0
-SMOKE_LIFE_S = 1.8
-ASH_FLAKE_LIFE_S = 2.8
-# Brush strokes
-BRUSH_STEPS = 140
-BRUSH_STRANDS = 6
-BRUSH_DRY_FROM = 0.8
-SPLAT_LIFE_S = 1.2
+HEAT_STAGES = (0.08, 0.35, 0.7)  # warm, hot, full colour
+# From this multiplier the press runs flat out: the dots at the bottom overprint in all three inks.
+FULL_PRESS_MULT = 5.0
+# After a miss the plates slide back into register over this long.
+SLIP_S = 1.2
+# Camera print. Printed at 1/PRINT_SCALE size and scaled up. Each plate is part smooth tone and part dots.
+PRINT_SCALE = 2
+PRINT_PITCH_PX = 3.5
+PRINT_ANGLES_DEG = (15, 75, 45)  # blue, red, yellow
+PRINT_DOTS = 0.5
+PRINT_DOT_CONTRAST = 2.5
+PRINT_MAX_INK = 0.9
+PRINT_BLUE_GAIN = 1.1
+PRINT_BLUE_CURVE = 2.3
+PRINT_RED_GAIN = 2.0
+PRINT_RED_HEAT_GAIN = 0.6
+PRINT_YELLOW_GAIN = 2.4
+PRINT_YELLOW_BASE = 0.25
+PRINT_SLIP_PX = 22
+# Dots rising from the bottom edge: how tall the field is at full heat, and the spacing of its dots.
+DOT_FIELD_HEIGHT_PX = 260
+DOT_FIELD_PITCH_PX = 20
+# Paper chads thrown by hits once the press is warm.
+CHADS_MAX = 260
+CHAD_LIFE_S = 1.1
 STAMP_LIFE_S = 0.85
 SLAM_S = 0.09
 
@@ -176,13 +177,9 @@ WORD_BONUS_PER_SIGN = 50
 WORD_BONUS_MIN_SIGNS = 2
 COMBO_MILESTONES = (10, 25, 50, 100, 200)
 # Arcade effects
-PARTICLES_PER_HIT = 14
-PARTICLES_PER_TIER = 4
-PARTICLES_MAX_BURST = 60
 PARTICLE_SPEED_MIN = 150.0
 PARTICLE_SPEED_MAX = 420.0
 PARTICLE_GRAVITY = 600.0
-PARTICLE_LIFE_S = 0.7
 POP_LIFE_S = 0.9
 BANNER_LIFE_S = 1.1
 WORD_BANNER_LIFE_S = 1.3
@@ -190,10 +187,6 @@ SHOCKWAVE_LIFE_S = 0.4
 SCORE_ROLL_RATE = 0.15
 PULSE_S = 0.3
 SHAKE_S = 0.22
-# Embers rise from the multiplier from this tier up, this many a second per tier.
-EMBER_MIN_TIER = 3
-EMBERS_PER_TIER_PER_S = 5.0
-EMBER_LIFE_S = 0.9
 # The hit sound climbs one step of its scale every this many hits in a combo.
 PITCH_STEP_COMBO = 4
 GRADES = (("S", 0.95), ("A", 0.88), ("B", 0.75), ("C", 0.55), ("D", 0.0))

@@ -12,10 +12,10 @@ SUN_RAYS = 8
 
 class LightWarning:
     def __init__(self, fonts, size_px):
-        label = fonts.body.render("More light", True, theme.INK)
+        label = fonts.body.render("More light", True, theme.BLUE)
         icon_px = theme.GRID_PX * 4
         width_px = icon_px + theme.GRID_PX * 3 + label.get_width() + theme.GRID_PX * 4
-        self._panel = make_panel((width_px, theme.BUTTON_HEIGHT_PX), theme.SURFACE)
+        self._panel = make_panel((width_px, theme.BUTTON_HEIGHT_PX), theme.PAPER)
         center = (theme.GRID_PX * 2 + icon_px // 2, theme.BUTTON_HEIGHT_PX // 2)
         draw_sun(self._panel, center, icon_px // 2)
         self._panel.blit(label, label.get_rect(midleft=(center[0] + icon_px // 2 + theme.GRID_PX * 2, center[1])))
@@ -35,9 +35,9 @@ class LightWarning:
 
 def draw_sun(surface, center, radius_px):
     """A sun icon, so the warning reads without the words."""
-    pygame.draw.circle(surface, theme.ACCENT, center, radius_px // 2)
+    pygame.draw.circle(surface, theme.YELLOW, center, radius_px // 2)
     for index in range(SUN_RAYS):
         angle = 2 * math.pi * index / SUN_RAYS
         inner = (center[0] + math.cos(angle) * radius_px * 0.7, center[1] + math.sin(angle) * radius_px * 0.7)
         outer = (center[0] + math.cos(angle) * radius_px, center[1] + math.sin(angle) * radius_px)
-        pygame.draw.line(surface, theme.ACCENT, inner, outer, theme.BORDER_PX)
+        pygame.draw.line(surface, theme.YELLOW, inner, outer, theme.BORDER_PX)

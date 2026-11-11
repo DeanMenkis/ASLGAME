@@ -8,6 +8,7 @@ import time
 import pygame
 
 from aslgame import config, theme
+from aslgame.capture.print_look import Look
 from aslgame.game import mastery, rush, scoring
 from aslgame.game.app_flow import PLAY_STATES, TIMED_STATES, Action, AppState, next_state
 from aslgame.game.chart import load_charts
@@ -153,21 +154,23 @@ class App:
             now_s = time.perf_counter()
             hand = runtime.result.hand if runtime.result else None
             action = action or screen.update(now_s, runtime.result)
-            # The camera thread grades frames for the screen that wants a look; overlays keep the look under them.
-            grade = getattr(screen, "camera_grade", None)
-            if grade is not None:
-                runtime.camera.grade_matrix = grade()
+            # The camera thread prints frames in the look the screen asks for; overlays keep the look under them.
+            look = getattr(screen, "camera_look", None)
+            if not self.settings.print_camera:
+                runtime.camera.look = None
+            elif look is not None:
+                runtime.camera.look = look()
             elif self.state not in (AppState.PAUSED, AppState.RESULTS):
-                runtime.camera.grade_matrix = None
+                runtime.camera.look = Look()
             screen.draw(runtime.screen, now_s, hand)
             self.light_warning.update(now_s, runtime.frame)
             if self.state in PLAY_STATES:
                 self.light_warning.draw(runtime.screen, now_s)
             if runtime.debug.visible:
                 # Where the game thinks the mouse is, and where it saw the last click.
-                pygame.draw.circle(runtime.screen, theme.ACCENT, pygame.mouse.get_pos(), 12, 2)
+                pygame.draw.circle(runtime.screen, theme.YELLOW, pygame.mouse.get_pos(), 12, 2)
                 if last_click is not None:
-                    pygame.draw.circle(runtime.screen, theme.FINGER_FIX, last_click, 6)
+                    pygame.draw.circle(runtime.screen, theme.RED, last_click, 6)
             if runtime.debug.visible and hand is not None:
                 draw_hand(runtime.screen, hand.points_px, theme.LIVE_HAND, theme.LIVE_LINE_PX, theme.LIVE_JOINT_RADIUS_PX, True)
             runtime.end_frame()

@@ -1,4 +1,5 @@
-"""Menu: paper and ink. Pick a mode, a deck or song, a level, and a length. Sign at the camera and the ensō reads it."""
+"""Menu: a poster. Pick a mode, a deck or song, a level, and a length. The proof at the right is the camera, printed live;
+sign at it and the letter it reads is set beside it."""
 
 import math
 from dataclasses import dataclass
@@ -15,29 +16,39 @@ from aslgame.game.words import ALPHABET, DECKS, DECKS_BY_NAME, pool
 from aslgame.matching import matcher
 from aslgame.matching.normalize import normalize
 from aslgame.presentation.draw import draw_text_centered
-from aslgame.presentation.ink import draw_brush_line, draw_enso, make_vignette
+from aslgame.presentation import press
 from aslgame.presentation.screens.about import AboutPanel
 from aslgame.presentation.screens.common import is_key
 from aslgame.presentation.screens.help import HelpPanel
 from aslgame.presentation.screens.settings import SettingsPanel
-from aslgame.presentation.ui import clicked
+from aslgame.presentation.ui import Button, clicked
 from aslgame.records import record_key
 
 LEFT_PX = theme.MARGIN_PX * 2
 TITLE_Y_PX = theme.GRID_PX * 9
 MODES_Y_PX = theme.GRID_PX * 20
-LIST_TOP_PX = theme.GRID_PX * 28
+LIST_TOP_PX = theme.GRID_PX * 27
 ROW_PX = theme.GRID_PX * 7
 MAX_ROWS = 8
 LIST_WIDTH_PX = theme.GRID_PX * 62
 RIGHT_CENTER_X_PX = theme.GRID_PX * 116
-ENSO_CENTER_Y_PX = theme.GRID_PX * 36
+# The proof: the camera at 16:9 inside a paper frame with trim marks.
+PROOF_PICTURE_PX = (theme.GRID_PX * 54, theme.GRID_PX * 54 * 9 // 16)
+PROOF_FRAME_PX = theme.GRID_PX
+PROOF_TOP_PX = theme.GRID_PX * 14
+READ_RADIUS_PX = theme.GRID_PX * 8
 CHIP_HEIGHT_PX = theme.GRID_PX * 5
 READ_MIN_SCORE = 0.7
+ALPHABET_CELL_PX = (20, 28)
 ALPHABET_STEP_PX = 22
 ALPHABET_FONT_PX = 22
-ALPHABET_SIZE_PX = (ALPHABET_STEP_PX * len(ALPHABET), theme.GRID_PX * 5)
 PRACTISE_NOTE_LETTERS = 6
+# Three discs of ink behind everything: (ink, radius, center, drift radius, drift speed). They slide over each other slowly.
+DISCS = (
+    (theme.YELLOW, 300, (1190, 70), 26, 0.23),
+    (theme.tint(theme.BLUE, 0.45), 150, (-20, 790), 18, 0.31),
+    (theme.tint(theme.RED, 0.7), 150, (1300, 300), 24, 0.17),
+)
 
 
 @dataclass(frozen=True)
@@ -79,15 +90,23 @@ def deck_items(letters):
 
 
 def make_alphabet(font, letters):
-    """The alphabet as the player knows it: faint until tested, ink once known, and a vermilion dot under a weak letter."""
-    row = pygame.Surface(ALPHABET_SIZE_PX, pygame.SRCALPHA)
+    """The alphabet as a case of type: a blue block is a known letter, an outlined one with a red dot is weak,
+    and a faint one has not been tested yet."""
+    width_px, height_px = ALPHABET_CELL_PX
+    row = pygame.Surface((ALPHABET_STEP_PX * len(ALPHABET), height_px + 10), pygame.SRCALPHA)
     for index, letter in enumerate(ALPHABET):
         state = mastery.state(letters, letter)
-        x_px = index * ALPHABET_STEP_PX + ALPHABET_STEP_PX // 2
-        label = font.render(letter, True, theme.INK_FAINT if state == Mastery.UNTESTED else theme.INK_BLACK)
-        row.blit(label, label.get_rect(midtop=(x_px, 0)))
+        cell = pygame.Rect(index * ALPHABET_STEP_PX + (ALPHABET_STEP_PX - width_px) // 2, 0, width_px, height_px)
+        if state == Mastery.KNOWN:
+            pygame.draw.rect(row, theme.BLUE, cell, border_radius=2)
+            label = font.render(letter, True, theme.PAPER)
+        else:
+            pygame.draw.rect(row, theme.PAPER, cell, border_radius=2)
+            pygame.draw.rect(row, theme.BLUE if state == Mastery.WEAK else theme.BLUE_FAINT, cell, 2, border_radius=2)
+            label = font.render(letter, True, theme.BLUE if state == Mastery.WEAK else theme.BLUE_FAINT)
+        row.blit(label, label.get_rect(center=(cell.centerx, cell.centery + 2)))
         if state == Mastery.WEAK:
-            pygame.draw.circle(row, theme.SEAL, (x_px, ALPHABET_SIZE_PX[1] - 5), 3)
+            pygame.draw.circle(row, theme.RED, (cell.centerx, height_px + 6), 3)
     return row
 
 
@@ -97,52 +116,37 @@ def song_items(charts, track_lengths):
 
 
 def make_paper(size_px):
-    """Warm paper with faint fibres and a soft vignette, made once."""
+    """Uncoated paper with faint fibres, made once."""
     rng = np.random.default_rng(7)
-    paper = pygame.Surface(size_px, pygame.SRCALPHA)
-    paper.fill(theme.PAPER_WASH)
+    sheet = pygame.Surface(size_px)
+    sheet.fill(theme.PAPER)
     width, height = size_px
     for _ in range(900):
         x, y = rng.uniform(0, width), rng.uniform(0, height)
         angle, length = rng.uniform(0, math.pi), rng.uniform(4, 22)
-        darker = int(rng.uniform(6, 16))
-        fibre = (theme.PAPER[0] - darker, theme.PAPER[1] - darker, theme.PAPER[2] - darker, theme.PAPER_WASH[3])
-        pygame.draw.line(paper, fibre, (x, y), (x + math.cos(angle) * length, y + math.sin(angle) * length))
-    # Opaque, so nothing from an earlier frame shows through; the edges darken like old paper.
-    sheet = pygame.Surface(size_px)
-    sheet.fill(theme.PAPER)
-    sheet.blit(paper, (0, 0))
-    sheet.blit(make_vignette(size_px, (120, 100, 80), 0.35), (0, 0))
+        darker = int(rng.uniform(4, 12))
+        fibre = tuple(channel - darker for channel in theme.PAPER)
+        pygame.draw.line(sheet, fibre, (x, y), (x + math.cos(angle) * length, y + math.sin(angle) * length))
     return sheet
 
 
-def draw_seal(surface, center, size_px, font):
-    """The red artist's seal, a little off-square."""
-    rect = pygame.Rect(0, 0, size_px, size_px)
-    rect.center = center
-    pygame.draw.rect(surface, theme.SEAL, rect, border_radius=4)
-    pygame.draw.rect(surface, theme.PAPER, rect.inflate(-8, -8), 2, border_radius=3)
-    draw_text_centered(surface, font.render("ASL", True, theme.PAPER), rect.center)
-
-
 class Chip:
-    """A small paper button: ink outline, filled with ink when chosen."""
+    """A small paper button: blue outline, filled with blue when chosen."""
 
     def __init__(self, font, label, rect):
         self.rect = pygame.Rect(rect)
         self._on = font.render(label, True, theme.PAPER)
-        self._off = font.render(label, True, theme.INK_BLACK)
-        self._dim = font.render(label, True, theme.INK_FAINT)
+        self._off = font.render(label, True, theme.BLUE)
+        self._dim = font.render(label, True, theme.BLUE_FAINT)
 
     def draw(self, screen, chosen, enabled=True):
         hovered = enabled and self.rect.collidepoint(pygame.mouse.get_pos())
         if chosen and enabled:
-            pygame.draw.rect(screen, theme.INK_BLACK, self.rect, border_radius=3)
+            pygame.draw.rect(screen, theme.BLUE, self.rect, border_radius=3)
             label = self._on
         else:
-            if hovered:
-                pygame.draw.rect(screen, theme.PAPER_SHADE, self.rect, border_radius=3)
-            pygame.draw.rect(screen, theme.INK_SOFT if enabled else theme.INK_FAINT, self.rect, 1, border_radius=3)
+            pygame.draw.rect(screen, theme.PAPER_SHADE if hovered else theme.PAPER, self.rect, border_radius=3)
+            pygame.draw.rect(screen, theme.BLUE if enabled else theme.BLUE_FAINT, self.rect, 2, border_radius=3)
             label = self._off if enabled else self._dim
         draw_text_centered(screen, label, self.rect.center)
 
@@ -176,25 +180,32 @@ class MenuScreen:
         self._fonts = fonts
         self._size_px = size_px
         self._paper = make_paper(size_px)
-        draw_enso(self._paper, (RIGHT_CENTER_X_PX, ENSO_CENTER_Y_PX), theme.ENSO_RADIUS_PX, theme.ENSO_WIDTH_PX)
-        title = fonts.serif_title.render("ASLGAME", True, theme.INK_BLACK)
-        self._paper.blit(title, title.get_rect(midleft=(LEFT_PX, TITLE_Y_PX)))
-        draw_seal(self._paper, (LEFT_PX + title.get_width() + theme.GRID_PX * 5, TITLE_Y_PX), theme.GRID_PX * 7, fonts.small)
+        self._discs = [press.disc(radius, ink) for ink, radius, _, _, _ in DISCS]
+        self._title = press.overprint_text(fonts.slab_title, "ASLGAME", theme.BLUE, theme.RED, (6, 6))
+        self._title_rect = self._title.get_rect(midleft=(LEFT_PX, TITLE_Y_PX))
+        mode_font = pygame.font.SysFont(theme.LABEL_FAMILIES, 40, bold=True)
         self._mode_rects, self._mode_labels = [], []
         x_px = LEFT_PX
         for index, mode in enumerate(MODES):
-            on = fonts.serif_mode.render(mode.name, True, theme.INK_BLACK)
-            off = fonts.serif_mode.render(mode.name, True, theme.INK_FAINT)
+            on = mode_font.render(mode.name.upper(), True, theme.BLUE)
+            off = mode_font.render(mode.name.upper(), True, theme.BLUE_FAINT)
             self._mode_labels.append((on, off))
             self._mode_rects.append(on.get_rect(midleft=(x_px, MODES_Y_PX)))
-            x_px += on.get_width() + theme.GRID_PX * 5
-        self._levels = chip_row(fonts.small, config.LEVEL_NAMES, RIGHT_CENTER_X_PX, ENSO_CENTER_Y_PX + theme.ENSO_RADIUS_PX + theme.GRID_PX * 3,
+            x_px += on.get_width() + theme.GRID_PX * 4
+        picture_w, picture_h = PROOF_PICTURE_PX
+        self._picture = pygame.Surface(PROOF_PICTURE_PX)
+        self._picture_rect = pygame.Rect(0, PROOF_TOP_PX + PROOF_FRAME_PX, picture_w, picture_h)
+        self._picture_rect.centerx = RIGHT_CENTER_X_PX
+        self._proof = press.sticker((picture_w + PROOF_FRAME_PX * 2, picture_h + PROOF_FRAME_PX * 2))
+        self._read_disc = press.starburst(READ_RADIUS_PX, 16, theme.YELLOW, 0.86, theme.BLUE)
+        self._read_center = (self._picture_rect.right - theme.GRID_PX * 2, self._picture_rect.bottom - theme.GRID_PX * 2)
+        self._levels = chip_row(fonts.small, config.LEVEL_NAMES, RIGHT_CENTER_X_PX, self._picture_rect.bottom + theme.GRID_PX * 5,
                                 theme.GRID_PX * 13)
         self._lengths = chip_row(fonts.small, [length_label(s) for s in config.LENGTHS_S], RIGHT_CENTER_X_PX,
-                                 self._levels[0].rect.bottom + theme.GRID_PX * 2, theme.GRID_PX * 9)
-        self._start_rect = pygame.Rect(0, 0, theme.GRID_PX * 30, theme.GRID_PX * 7)
-        self._start_rect.midtop = (RIGHT_CENTER_X_PX, self._lengths[0].rect.bottom + theme.GRID_PX * 2)
-        self._start_label = fonts.serif_mode.render("Begin", True, theme.PAPER)
+                                 self._levels[0].rect.bottom + theme.GRID_PX, theme.GRID_PX * 9)
+        self._start = Button(fonts.slab_mode, "BEGIN", (0, 0, theme.GRID_PX * 30, theme.GRID_PX * 8), primary=True)
+        self._start.rect.midtop = (RIGHT_CENTER_X_PX, self._lengths[0].rect.bottom + theme.GRID_PX * 2)
+        self._start_rect = self._start.rect
         self._help = HelpPanel(fonts, size_px)
         self._about = AboutPanel(fonts, size_px)
         self._settings_panel = SettingsPanel(fonts, settings, size_px)
@@ -205,10 +216,10 @@ class MenuScreen:
         self._read_letter = None
         self._read_score = 0.0
         self._read_surfaces = {}
-        self._reader_font = pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_DISPLAY_PX + 40)
-        self._reader_hint = fonts.serif_body.render("sign any letter", True, theme.INK_FAINT)
+        self._reader_font = pygame.font.SysFont(theme.SLAB_FAMILIES, 96, bold=True)
         self._best_cache = {}
-        self._alphabet_font = pygame.font.SysFont(theme.SERIF_FAMILIES, ALPHABET_FONT_PX)
+        self._alphabet_font = pygame.font.SysFont(theme.LABEL_FAMILIES, ALPHABET_FONT_PX, bold=True)
+        self._row_font = pygame.font.SysFont(theme.SLAB_FAMILIES, 32, bold=True)
         self.refresh()
 
     def refresh(self):
@@ -350,7 +361,7 @@ class MenuScreen:
     # Hand reader
 
     def update(self, now_s, result):
-        """Reads the player's hand once per tracking result and shows the closest letter in the ensō."""
+        """Reads the player's hand once per tracking result and sets the closest letter on the proof."""
         if result is self._reader_result:
             return None
         self._reader_result = result
@@ -365,21 +376,25 @@ class MenuScreen:
     # Drawing
 
     def _row_surface(self, item, selected):
+        """The chosen row is a solid blue block with its name reversed out in paper; the others are plain type."""
         key = (id(item), selected)
         if key not in self._rows:
             row = pygame.Surface((LIST_WIDTH_PX, ROW_PX), pygame.SRCALPHA)
             if selected:
-                draw_brush_line(row, theme.GRID_PX * 2, ROW_PX - theme.GRID_PX, theme.GRID_PX * 8, (*theme.SEAL, 255), id(item) % 97)
-            font = self._fonts.serif_mode if selected else self._fonts.serif_body
-            label = font.render(item.label, True, theme.INK_BLACK if selected else theme.INK_SOFT)
-            note = self._fonts.small.render(item.note, True, theme.INK_FAINT)
+                block = pygame.Rect(0, 3, LIST_WIDTH_PX - theme.SHADOW_PX, ROW_PX - 6 - theme.SHADOW_PX)
+                pygame.draw.rect(row, theme.RED, block.move(theme.SHADOW_PX, theme.SHADOW_PX), border_radius=3)
+                pygame.draw.rect(row, theme.BLUE, block, border_radius=3)
+            font = self._row_font if selected else self._fonts.slab_body
+            label = font.render(item.label, True, theme.PAPER if selected else theme.BLUE)
+            note = self._fonts.small.render(item.note, True, theme.PAPER if selected else theme.BLUE_SOFT)
             # A long selected name shrinks to fit beside its note instead of running into it.
-            room_px = LIST_WIDTH_PX - note.get_width() - theme.GRID_PX * 6
+            room_px = LIST_WIDTH_PX - note.get_width() - theme.GRID_PX * 7
             if label.get_width() > room_px:
                 scale = room_px / label.get_width()
                 label = pygame.transform.smoothscale(label, (room_px, int(label.get_height() * scale)))
-            row.blit(label, label.get_rect(midleft=(theme.GRID_PX * 2, ROW_PX // 2)))
-            row.blit(note, note.get_rect(midright=(LIST_WIDTH_PX - theme.GRID_PX * 2, ROW_PX // 2)))
+            center_y = ROW_PX // 2 - (theme.SHADOW_PX // 2 if selected else 0)
+            row.blit(label, label.get_rect(midleft=(theme.GRID_PX * 2, center_y)))
+            row.blit(note, note.get_rect(midright=(LIST_WIDTH_PX - theme.GRID_PX * 3, center_y)))
             self._rows[key] = row
         return self._rows[key]
 
@@ -388,17 +403,22 @@ class MenuScreen:
         best = self._records.get(key)
         cache_key = (key, None if best is None else best["score"])
         if cache_key not in self._best_cache:
-            text = "no best yet" if best is None else f"best  {best['score']:,}   {best['grade']}"
-            self._best_cache[cache_key] = self._fonts.serif_body.render(text, True, theme.INK_SOFT)
+            text = "NO BEST YET" if best is None else f"BEST  {best['score']:,}   {best['grade']}"
+            self._best_cache[cache_key] = self._fonts.label.render(text, True, theme.BLUE)
         return self._best_cache[cache_key]
 
     def draw(self, screen, now_s, hand):
+        # The camera is already on the screen; take the proof's picture from it before the paper covers it.
+        pygame.transform.smoothscale(screen, PROOF_PICTURE_PX, self._picture)
         screen.blit(self._paper, (0, 0))
+        self._draw_discs(screen, now_s)
+        screen.blit(self._title, self._title_rect)
+        press.draw_registration(screen, (self._title_rect.right + theme.GRID_PX * 5, TITLE_Y_PX), theme.GRID_PX * 2, theme.RED)
         for index, rect in enumerate(self._mode_rects):
             on, off = self._mode_labels[index]
             screen.blit(on if index == self.mode else off, rect)
             if index == self.mode:
-                draw_brush_line(screen, rect.left, rect.bottom + 2, rect.width, theme.SEAL, index)
+                press.underline(screen, rect.left, rect.bottom - 4, rect.width)
         self._settings_chip.draw(screen, False)
         self._help_chip.draw(screen, False)
         mouse = pygame.mouse.get_pos()
@@ -406,35 +426,44 @@ class MenuScreen:
             rect = self._row_rect(index)
             is_selected = index == self.selected[self.mode]
             if not is_selected and rect.collidepoint(mouse):
-                pygame.draw.rect(screen, theme.PAPER_SHADE, rect, border_radius=3)
+                pygame.draw.rect(screen, theme.PAPER_SHADE, rect.inflate(0, -6), border_radius=3)
             screen.blit(self._row_surface(self.items()[index], is_selected), rect)
         self._draw_scroll_marks(screen)
-        self._draw_reader(screen, now_s)
+        self._draw_proof(screen)
         for index, chip in enumerate(self._levels):
             chip.draw(screen, index == self.level)
         for index, chip in enumerate(self._lengths):
             chip.draw(screen, index == self.length_index, self.current().timed)
-        playable = self.playable()
-        hovered = self._start_rect.collidepoint(mouse)
-        pygame.draw.rect(screen, theme.SEAL if playable else theme.INK_FAINT, self._start_rect, border_radius=4)
-        if hovered and playable:
-            pygame.draw.rect(screen, theme.INK_BLACK, self._start_rect, 2, border_radius=4)
-        draw_text_centered(screen, self._start_label, self._start_rect.center)
+        self._start.enabled = self.playable()
+        self._start.draw(screen)
         best = self._best_surface()
-        draw_text_centered(screen, best, (RIGHT_CENTER_X_PX, self._start_rect.bottom + theme.GRID_PX * 2))
-        screen.blit(self._alphabet, self._alphabet.get_rect(midtop=(RIGHT_CENTER_X_PX, self._start_rect.bottom + theme.GRID_PX * 5)))
+        draw_text_centered(screen, best, (RIGHT_CENTER_X_PX, self._start_rect.bottom + theme.GRID_PX * 3 + 2))
+        screen.blit(self._alphabet, self._alphabet.get_rect(midtop=(RIGHT_CENTER_X_PX, self._start_rect.bottom + theme.GRID_PX * 6)))
         self._help.draw(screen)
         self._about.draw(screen)
         self._settings_panel.draw(screen)
 
-    def _draw_reader(self, screen, now_s):
-        center = (RIGHT_CENTER_X_PX, ENSO_CENTER_Y_PX)
+    def _draw_discs(self, screen, now_s):
+        """Flat discs of ink that drift a little, so the inks slide across each other where they overlap."""
+        moving = self._settings.motion
+        for surface, (_, radius, (x, y), reach, speed) in zip(self._discs, DISCS):
+            angle = now_s * speed * 2 * math.pi if moving else 0.0
+            at = (x + math.cos(angle) * reach - radius, y + math.sin(angle * 0.7) * reach - radius)
+            screen.blit(surface, at, special_flags=pygame.BLEND_RGB_MULT)
+
+    def _draw_proof(self, screen):
+        """The camera, printed, in a paper frame with trim marks; the letter it reads is set on a star at its corner."""
+        frame = self._picture_rect.inflate(PROOF_FRAME_PX * 2, PROOF_FRAME_PX * 2)
+        screen.blit(self._proof, frame)
+        screen.blit(self._picture, self._picture_rect)
+        press.draw_crop_marks(screen, frame.inflate(theme.SHADOW_PX, theme.SHADOW_PX).move(theme.SHADOW_PX // 2, theme.SHADOW_PX // 2),
+                              theme.BLUE)
         if self._read_letter is None:
-            draw_text_centered(screen, self._reader_hint, center)
             return
         if self._read_letter not in self._read_surfaces:
-            self._read_surfaces[self._read_letter] = self._reader_font.render(self._read_letter, True, theme.INK_BLACK)
-        draw_text_centered(screen, self._read_surfaces[self._read_letter], center)
+            self._read_surfaces[self._read_letter] = self._reader_font.render(self._read_letter, True, theme.BLUE)
+        screen.blit(self._read_disc, self._read_disc.get_rect(center=self._read_center))
+        draw_text_centered(screen, self._read_surfaces[self._read_letter], self._read_center)
 
     def _draw_scroll_marks(self, screen):
         first = self.first_row[self.mode]
@@ -442,7 +471,7 @@ class MenuScreen:
         size_px = theme.GRID_PX
         if first > 0:
             y_px = LIST_TOP_PX - theme.GRID_PX
-            pygame.draw.polygon(screen, theme.INK_FAINT, [(x_px - size_px, y_px), (x_px + size_px, y_px), (x_px, y_px - size_px)])
+            pygame.draw.polygon(screen, theme.BLUE, [(x_px - size_px, y_px), (x_px + size_px, y_px), (x_px, y_px - size_px)])
         if first + MAX_ROWS < len(self.items()):
             y_px = LIST_TOP_PX + MAX_ROWS * ROW_PX + theme.GRID_PX
-            pygame.draw.polygon(screen, theme.INK_FAINT, [(x_px - size_px, y_px), (x_px + size_px, y_px), (x_px, y_px + size_px)])
+            pygame.draw.polygon(screen, theme.BLUE, [(x_px - size_px, y_px), (x_px + size_px, y_px), (x_px, y_px + size_px)])

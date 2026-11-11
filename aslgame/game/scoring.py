@@ -50,6 +50,7 @@ class Tally:
     max_multiplier: float = 1.0
     last_points: int = 0
     words_cleared: int = 0
+    clean_words: list = field(default_factory=list)  # every word signed without a miss, in order
     word: str = ""  # letters of the current word so far
     word_clean: bool = True
     results: list = field(default_factory=list)  # (sign, judgement) of every resolved sign
@@ -101,6 +102,7 @@ def finish_word(tally):
         points = int(config.WORD_BONUS_PER_SIGN * len(tally.word) * tally.multiplier)
         tally.score += points
         tally.words_cleared += 1
+        tally.clean_words.append(tally.word)
         tally.events.append(Event(EventKind.WORD, points=points, multiplier=tally.multiplier, word=tally.word))
     tally.word = ""
     tally.word_clean = True
@@ -125,6 +127,7 @@ class Results:
     counts: dict
     weakest: list  # (sign, accuracy), weakest first
     grade: str
+    words: tuple = ()  # the words signed without a miss, in order
 
 
 def summarize(tally):
@@ -137,4 +140,4 @@ def summarize(tally):
     sign_accuracy = sorted(((sign, sum(v) / len(v)) for sign, v in per_sign.items()), key=lambda item: item[1])
     weakest = [item for item in sign_accuracy if item[1] < 1.0][: config.RESULTS_WEAKEST_COUNT]
     return Results(tally.score, tally.max_combo, tally.max_multiplier, tally.words_cleared, accuracy, counts, weakest,
-                   grade(accuracy))
+                   grade(accuracy), tuple(tally.clean_words))

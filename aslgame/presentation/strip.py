@@ -1,7 +1,7 @@
-"""Word strip: the words as paper tiles. Ink-filled is done, a vermilion frame is now, plain paper is next.
+"""Word strip: the words set in wood type blocks. A blue block is done, a red frame is now, bare paper is next.
 
-Judged tiles take their judgement's dye with dots for the grade (3, 2, 1), or a struck-through grey tile for a miss.
-Long text scrolls so the current tile stays in view.
+Judged blocks are printed in their judgement's ink with dots for the grade (3, 2, 1), or struck through for a miss.
+Long text scrolls so the current block stays in view.
 """
 
 import pygame
@@ -9,6 +9,7 @@ import pygame
 from aslgame import theme
 
 CELL_STEP_PX = theme.STRIP_CELL_PX + theme.STRIP_GAP_PX
+SHADOW_PX = 4
 
 
 class Strip:
@@ -25,13 +26,13 @@ class Strip:
             self._cell_x.append(x_px)
             x_px += CELL_STEP_PX
             # Rendered once here so drawing never renders text.
-            self._ink[char] = font.render(char, True, theme.INK_BLACK)
+            self._ink[char] = font.render(char, True, theme.BLUE)
             self._paper[char] = font.render(char, True, theme.PAPER)
         self._width_px = x_px - theme.STRIP_GAP_PX
         self._view_width_px = min(self._width_px, screen_size_px[0] - theme.MARGIN_PX * 2)
         self._view_left_px = (screen_size_px[0] - self._view_width_px) // 2
         self.top_px = screen_size_px[1] - theme.MARGIN_PX - theme.STRIP_CELL_PX
-        pad = theme.STRIP_CURRENT_LINE_PX + 2
+        pad = theme.STRIP_CURRENT_LINE_PX + SHADOW_PX
         self._clip = pygame.Rect(self._view_left_px - pad, self.top_px - pad, self._view_width_px + pad * 2, theme.STRIP_CELL_PX + pad * 2)
 
     def _scroll_px(self):
@@ -57,19 +58,24 @@ class Strip:
                 draw_judged_cell(screen, rect, judgements[sign_index].name, self._paper[char], self._ink[char])
                 continue
             if sign_index < self._queue.current:
-                pygame.draw.rect(screen, theme.INK_BLACK, rect, border_radius=3)
+                pygame.draw.rect(screen, theme.BLUE, rect, border_radius=3)
                 label = self._paper[char]
+            elif sign_index == self._queue.current:
+                # The block being set stands off the strip on its own shadow.
+                pygame.draw.rect(screen, theme.BLUE, rect.move(SHADOW_PX, SHADOW_PX), border_radius=3)
+                pygame.draw.rect(screen, theme.PAPER, rect, border_radius=3)
+                pygame.draw.rect(screen, theme.RED, rect, theme.STRIP_CURRENT_LINE_PX, border_radius=3)
+                label = self._ink[char]
             else:
                 pygame.draw.rect(screen, theme.PAPER, rect, border_radius=3)
-                if sign_index == self._queue.current:
-                    pygame.draw.rect(screen, theme.SEAL, rect.inflate(6, 6), theme.STRIP_CURRENT_LINE_PX, border_radius=4)
+                pygame.draw.rect(screen, theme.BLUE_FAINT, rect, theme.STRIP_LINE_PX, border_radius=3)
                 label = self._ink[char]
             screen.blit(label, label.get_rect(center=rect.center))
         screen.set_clip(previous_clip)
 
 
 def draw_judged_cell(screen, rect, judgement_name, paper_label, ink_label):
-    """A finished sign in its judgement's dye, with paper dots for hits and a strike for a miss."""
+    """A finished sign printed in its judgement's ink, with dots for hits and a strike for a miss."""
     color = theme.JUDGEMENT_COLORS[judgement_name]
     dots = theme.JUDGEMENT_DOTS[judgement_name]
     if dots == 0:
@@ -77,9 +83,11 @@ def draw_judged_cell(screen, rect, judgement_name, paper_label, ink_label):
         screen.blit(ink_label, ink_label.get_rect(center=rect.center))
         pygame.draw.line(screen, color, rect.bottomleft, rect.topright, theme.STRIP_CURRENT_LINE_PX)
         return
+    on_color = theme.JUDGEMENT_TEXT_COLORS[judgement_name]
+    label = paper_label if on_color == theme.PAPER else ink_label
     pygame.draw.rect(screen, color, rect, border_radius=3)
-    screen.blit(paper_label, paper_label.get_rect(center=(rect.centerx, rect.centery - theme.STRIP_LABEL_LIFT_PX)))
+    screen.blit(label, label.get_rect(center=(rect.centerx, rect.centery - theme.STRIP_LABEL_LIFT_PX)))
     dot_y_px = rect.bottom - theme.STRIP_DOT_RADIUS_PX * 3
     first_x_px = rect.centerx - (dots - 1) * theme.STRIP_DOT_STEP_PX / 2
     for index in range(dots):
-        pygame.draw.circle(screen, theme.PAPER, (first_x_px + index * theme.STRIP_DOT_STEP_PX, dot_y_px), theme.STRIP_DOT_RADIUS_PX)
+        pygame.draw.circle(screen, on_color, (first_x_px + index * theme.STRIP_DOT_STEP_PX, dot_y_px), theme.STRIP_DOT_RADIUS_PX)

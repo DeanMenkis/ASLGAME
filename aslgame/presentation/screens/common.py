@@ -11,7 +11,7 @@ from aslgame.matching import matcher
 from aslgame.matching.normalize import normalize, palm_size
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.hand_shape import GhostRenderer, draw_finger_fixes
-from aslgame.presentation.ink import ink_hand, torn_band, torn_slip
+from aslgame.presentation.press import band, line_hand, sticker
 from aslgame.presentation.motion_path import draw_guide, draw_trail, guide_points
 from aslgame.presentation.ui import clicked, make_panel
 
@@ -114,32 +114,32 @@ class Ghost:
 
 
 class ReferenceCard:
-    """A paper slip with the target letter in serif and its handshape in ink, still while the hand moves."""
+    """A paper card with the target letter in wood type and its handshape drawn in blue, still while the hand moves."""
 
     def __init__(self, fonts, signs, names, settings):
         # Cards are built the first time each is shown (about a millisecond), so long words start without a pause.
         self._signs = signs
         self._cards = {}
         self._settings = settings
-        self._letter_font = pygame.font.SysFont(theme.SERIF_FAMILIES, theme.CARD_LETTER_PX)
-        self._recall_font = pygame.font.SysFont(theme.SERIF_FAMILIES, theme.FONT_SIZE_DISPLAY_PX)
+        self._letter_font = pygame.font.SysFont(theme.SLAB_FAMILIES, theme.CARD_LETTER_PX, bold=True)
+        self._recall_font = pygame.font.SysFont(theme.SLAB_FAMILIES, theme.FONT_SIZE_DISPLAY_PX, bold=True)
 
     def _build_letter(self, name):
         """Recall mode: only the letter, large, with no picture of the shape."""
-        card = torn_slip(theme.REFERENCE_CARD_SIZE_PX, (*theme.PAPER, 250), seed=ord(name))
+        card = sticker(theme.REFERENCE_CARD_SIZE_PX)
         width_px, height_px = theme.REFERENCE_CARD_SIZE_PX
-        letter = self._recall_font.render(name, True, theme.INK_BLACK)
+        letter = self._recall_font.render(name, True, theme.BLUE)
         draw_text_centered(card, letter, (width_px // 2, height_px // 2))
         return card
 
     def _build(self, sign, finger_colors):
-        card = torn_slip(theme.REFERENCE_CARD_SIZE_PX, (*theme.PAPER, 250), seed=ord(sign.name))
+        card = sticker(theme.REFERENCE_CARD_SIZE_PX)
         width_px, height_px = theme.REFERENCE_CARD_SIZE_PX
-        draw_text_centered(card, self._letter_font.render(sign.name, True, theme.INK_BLACK), (width_px // 2, theme.GRID_PX * 5))
+        draw_text_centered(card, self._letter_font.render(sign.name, True, theme.BLUE), (width_px // 2, theme.GRID_PX * 5))
         rule_y = theme.GRID_PX * 10
-        pygame.draw.line(card, theme.SEAL, (width_px // 2 - theme.GRID_PX * 3, rule_y), (width_px // 2 + theme.GRID_PX * 3, rule_y), 3)
+        pygame.draw.line(card, theme.RED, (width_px // 2 - theme.GRID_PX * 3, rule_y), (width_px // 2 + theme.GRID_PX * 3, rule_y), 3)
         tints = theme.FINGER_TINTS if finger_colors else None
-        drawing, wrist = ink_hand(sign.outline, theme.REFERENCE_PALM_PX, theme.INK_BLACK, tints)
+        drawing, wrist = line_hand(sign.outline, theme.REFERENCE_PALM_PX, theme.BLUE, tints)
         # Cropped to the drawn hand and fitted to the space under the rule, so every letter sits centred and whole,
         # sideways ones (G, H, P, Q) included.
         bounds = drawing.get_bounding_rect()
@@ -156,7 +156,7 @@ class ReferenceCard:
         return card
 
     def draw(self, screen, name, progress=None, letter_only=False):
-        """progress, from 0 to 1, draws a vermilion line along the inside of the slip's lower edge."""
+        """progress, from 0 to 1, draws a red line along the inside of the card's lower edge."""
         key = (name, "letter" if letter_only else self._settings.finger_colors)
         if key not in self._cards:
             self._cards[key] = self._build_letter(name) if letter_only else self._build(self._signs[name], key[1])
@@ -166,19 +166,18 @@ class ReferenceCard:
             left_px = CARD_TOPLEFT_PX[0] + theme.GRID_PX * 2
             y_px = CARD_TOPLEFT_PX[1] + height_px - theme.GRID_PX * 2
             length_px = width_px - theme.GRID_PX * 4
-            pygame.draw.line(screen, theme.PAPER_SHADE, (left_px, y_px), (left_px + length_px, y_px), 4)
+            pygame.draw.line(screen, theme.PAPER_SHADE, (left_px, y_px), (left_px + length_px, y_px), 6)
             end_px = left_px + int(length_px * min(1.0, progress))
-            pygame.draw.line(screen, theme.SEAL, (left_px, y_px), (end_px, y_px), 4)
-            pygame.draw.circle(screen, theme.SEAL, (end_px, y_px + 1), 3)
+            pygame.draw.line(screen, theme.RED, (left_px, y_px), (end_px, y_px), 6)
 
 
 class TopBar:
-    """A torn paper band along the top of play screens, with an inked pause button at the right."""
+    """A paper band along the top of play screens, its lower edge breaking into dots, with a pause button at the right."""
 
     def __init__(self, size_px):
-        self._panel = torn_band((size_px[0], theme.TOP_BAR_HEIGHT_PX), (*theme.PAPER, 240), seed=1)
+        self._panel = band((size_px[0], theme.TOP_BAR_HEIGHT_PX))
         self.pause_rect = pygame.Rect(0, 0, theme.ICON_BUTTON_PX, theme.ICON_BUTTON_PX)
-        self.pause_rect.midright = (size_px[0] - theme.MARGIN_PX, theme.TOP_BAR_HEIGHT_PX // 2 - 4)
+        self.pause_rect.midright = (size_px[0] - theme.MARGIN_PX, theme.TOP_BAR_CENTER_Y_PX)
 
     def pause_clicked(self, event):
         return clicked(event, self.pause_rect)
@@ -187,11 +186,11 @@ class TopBar:
         screen.blit(self._panel, (0, 0))
         if self.pause_rect.collidepoint(pygame.mouse.get_pos()):
             pygame.draw.rect(screen, theme.PAPER_SHADE, self.pause_rect, border_radius=theme.GRID_PX // 2)
-        pygame.draw.rect(screen, theme.INK_SOFT, self.pause_rect, 1, border_radius=theme.GRID_PX // 2)
+        pygame.draw.rect(screen, theme.BLUE, self.pause_rect, 3, border_radius=theme.GRID_PX // 2)
         bar = pygame.Rect(0, 0, theme.GRID_PX, theme.ICON_BUTTON_PX // 2)
         for offset_px in (-theme.GRID_PX, theme.GRID_PX):
             bar.center = (self.pause_rect.centerx + offset_px, self.pause_rect.centery)
-            pygame.draw.rect(screen, theme.INK_BLACK, bar, border_radius=theme.GRID_PX // 4)
+            pygame.draw.rect(screen, theme.BLUE, bar, border_radius=theme.GRID_PX // 4)
 
 
 class FixHint:
@@ -205,7 +204,7 @@ class FixHint:
     @staticmethod
     def _chip(font, name):
         label = font.render(name, True, theme.PAPER)
-        chip = make_panel((label.get_width() + theme.GRID_PX * 5, label.get_height() + theme.GRID_PX), (*theme.INK_BLACK, 230), theme.GRID_PX)
+        chip = make_panel((label.get_width() + theme.GRID_PX * 5, label.get_height() + theme.GRID_PX), (*theme.BLUE, 230), theme.GRID_PX)
         pygame.draw.circle(chip, theme.FINGER_FIX, (theme.GRID_PX * 1.5, chip.get_height() // 2), theme.GRID_PX // 2 + 1)
         chip.blit(label, (theme.GRID_PX * 3, theme.GRID_PX // 2))
         return chip

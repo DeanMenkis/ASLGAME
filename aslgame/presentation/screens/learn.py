@@ -16,7 +16,8 @@ from aslgame.presentation.screens.common import (
     CONFIRM_KEYS, PAUSE_KEYS, FixHint, Ghost, ReferenceCard, TargetScorer, TopBar, draw_motion, idle_wrist, is_key,
 )
 from aslgame.game.motion import MOTION_SIGNS, MotionState
-from aslgame.presentation import ink
+from aslgame.capture.print_look import Look
+from aslgame.presentation import press
 from aslgame.presentation.strip import Strip
 from aslgame.presentation.ui import Button
 
@@ -33,7 +34,7 @@ class LearnScreen:
         self.queue = make_queue(word)
         self._detector = MatchDetector()
         self._scorer = TargetScorer(signs)
-        self._strip = Strip(fonts.serif_mode, self.queue, size_px)
+        self._strip = Strip(fonts.slab_mode, self.queue, size_px)
         self._ghost = Ghost(size_px, settings)
         self._card = ReferenceCard(fonts, signs, set(self.queue.text) - {" "}, settings)
         self._top_bar = TopBar(size_px)
@@ -44,14 +45,14 @@ class LearnScreen:
         self.outcomes = []  # FROM_MEMORY or WITH_HINT per finished sign, in recall mode
         searching = "Sign it from memory" if recall else "Match the outline"
         self._labels = {
-            DetectorState.NO_HAND: fonts.serif_mode.render("Show your hand", True, theme.INK_BLACK),
-            DetectorState.SEARCHING: fonts.serif_mode.render(searching, True, theme.INK_BLACK),
-            DetectorState.HOLDING: fonts.serif_mode.render("Hold it", True, theme.SEAL),
-            DetectorState.MATCHED: fonts.serif_mode.render("Hold it", True, theme.SEAL),
+            DetectorState.NO_HAND: fonts.slab_mode.render("Show your hand", True, theme.BLUE),
+            DetectorState.SEARCHING: fonts.slab_mode.render(searching, True, theme.BLUE),
+            DetectorState.HOLDING: fonts.slab_mode.render("Hold it", True, theme.RED),
+            DetectorState.MATCHED: fonts.slab_mode.render("Hold it", True, theme.RED),
         }
-        self._draw_labels = {name: fonts.serif_mode.render(f"Draw the {name}", True, theme.SEAL) for name in MOTION_SIGNS}
+        self._draw_labels = {name: fonts.slab_mode.render(f"Draw the {name}", True, theme.RED) for name in MOTION_SIGNS}
         self._idle_wrist = idle_wrist(size_px)
-        self._done_label = fonts.serif_mode.render("Done", True, theme.SEAL)
+        self._done_label = fonts.slab_mode.render("Done", True, theme.RED)
         self._done_detail = None
         menu_rect = (0, 0, theme.GRID_PX * 24, theme.BUTTON_HEIGHT_PX)
         self._menu_button = Button(fonts.body, "Back to menu", menu_rect, primary=True)
@@ -98,19 +99,18 @@ class LearnScreen:
         if self.queue.is_done() and self.recall:
             remembered = self.outcomes.count(FROM_MEMORY)
             text = f"{remembered} of {len(self.outcomes)} from memory"
-            self._done_detail = ink.halo_text(self._fonts.serif_mode, text, theme.INK_BLACK)
+            self._done_detail = press.halo_text(self._fonts.slab_mode, text, theme.BLUE)
 
     def _shows_shape(self):
         return not self.recall or self._hint_on
 
-    def camera_grade(self):
-        return ink.grade_matrix(0.0, 0.0)
+    def camera_look(self):
+        return Look()
 
     def draw(self, screen, now_s, hand):
-        ink.vignettes(screen.get_size()).draw(screen, 0.0)
         self._top_bar.draw(screen)
         self._strip.draw(screen, self.outcomes if self.recall else None)
-        title_center_px = (screen.get_width() // 2, theme.TOP_BAR_HEIGHT_PX // 2)
+        title_center_px = (screen.get_width() // 2, theme.TOP_BAR_CENTER_Y_PX)
         if self.queue.is_done():
             draw_text_centered(screen, self._done_label, title_center_px)
             if self._done_detail is not None:

@@ -7,7 +7,7 @@ from aslgame.game.app_flow import Action
 from aslgame.presentation.draw import draw_text_centered
 from aslgame.presentation.screens.common import is_key, make_shade
 from aslgame.presentation.screens.help import HelpPanel
-from aslgame.presentation.ink import torn_slip
+from aslgame.presentation.press import sticker
 from aslgame.presentation.ui import stack_buttons
 
 CARD_SIZE_PX = (theme.GRID_PX * 44, theme.GRID_PX * 43)
@@ -17,9 +17,9 @@ BUTTON_WIDTH_PX = theme.GRID_PX * 30
 class PausedScreen:
     def __init__(self, fonts, size_px):
         self._shade = make_shade(size_px)
-        self._card = torn_slip(CARD_SIZE_PX, theme.SURFACE, seed=22)
+        self._card = sticker(CARD_SIZE_PX)
         self._card_rect = self._card.get_rect(center=(size_px[0] // 2, size_px[1] // 2))
-        self._title = fonts.large.render("Paused", True, theme.INK)
+        self._title = fonts.large.render("Paused", True, theme.BLUE)
         top_px = self._card_rect.top + theme.GRID_PX * 14
         self._buttons = stack_buttons(fonts.body, ["Resume", "Keys", "Menu"], self._card_rect.centerx, top_px, BUTTON_WIDTH_PX)
         self._actions = [Action.RESUME, None, Action.TO_MENU]
