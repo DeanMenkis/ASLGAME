@@ -67,11 +67,9 @@ class Mode:
 
 
 MODES = (
+    Mode("Music", Action.START_MUSIC, True, songs=True),
     Mode("Learn", Action.START_LEARN, False),
     Mode("Recall", Action.START_RECALL, False),
-    Mode("Rhythm", Action.START_RHYTHM, True),
-    Mode("Music", Action.START_MUSIC, True, songs=True),
-    Mode("Rush", Action.START_RUSH, True),
 )
 
 

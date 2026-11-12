@@ -8,9 +8,7 @@ class AppState(Enum):
     MENU = auto()
     LEARN = auto()
     RECALL = auto()
-    RHYTHM = auto()
     MUSIC = auto()
-    RUSH = auto()
     RESULTS = auto()
     PAUSED = auto()
     QUIT = auto()
@@ -20,9 +18,7 @@ class Action(Enum):
     READY = auto()
     START_LEARN = auto()
     START_RECALL = auto()
-    START_RHYTHM = auto()
     START_MUSIC = auto()
-    START_RUSH = auto()
     RETRY = auto()
     PRACTISE = auto()  # play again on the Practise deck
     FINISH = auto()
@@ -32,26 +28,19 @@ class Action(Enum):
     QUIT = auto()
 
 
-PLAY_STATES = (AppState.LEARN, AppState.RECALL, AppState.RHYTHM, AppState.MUSIC, AppState.RUSH)
-TIMED_STATES = (AppState.RHYTHM, AppState.MUSIC, AppState.RUSH)
+PLAY_STATES = (AppState.LEARN, AppState.RECALL, AppState.MUSIC)
 
 TRANSITIONS = {
     (AppState.BOOT, Action.READY): AppState.MENU,
     (AppState.MENU, Action.START_LEARN): AppState.LEARN,
     (AppState.MENU, Action.START_RECALL): AppState.RECALL,
-    (AppState.MENU, Action.START_RHYTHM): AppState.RHYTHM,
     (AppState.MENU, Action.START_MUSIC): AppState.MUSIC,
     (AppState.LEARN, Action.PAUSE): AppState.PAUSED,
     (AppState.LEARN, Action.TO_MENU): AppState.MENU,
     (AppState.RECALL, Action.PAUSE): AppState.PAUSED,
     (AppState.RECALL, Action.TO_MENU): AppState.MENU,
-    (AppState.RHYTHM, Action.PAUSE): AppState.PAUSED,
-    (AppState.RHYTHM, Action.FINISH): AppState.RESULTS,
     (AppState.MUSIC, Action.PAUSE): AppState.PAUSED,
     (AppState.MUSIC, Action.FINISH): AppState.RESULTS,
-    (AppState.MENU, Action.START_RUSH): AppState.RUSH,
-    (AppState.RUSH, Action.PAUSE): AppState.PAUSED,
-    (AppState.RUSH, Action.FINISH): AppState.RESULTS,
     (AppState.RESULTS, Action.TO_MENU): AppState.MENU,
     (AppState.PAUSED, Action.TO_MENU): AppState.MENU,
 }

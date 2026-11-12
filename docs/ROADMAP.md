@@ -85,7 +85,12 @@ Built on the `arcade-overhaul` branch. Each item is ticked when its feature is f
 - [x] Results as a proof sheet with the run's clean words printed as a broadside
 - [x] Motion and Print camera settings
 - [ ] Play test with a camera: is the hand easy enough to read in the print, and are the ink strengths right in a dim room
-- [ ] New demo clip and screenshots for the README
+- [x] Screenshots in the README (rendered over a still; a real clip is still to do)
+- [ ] New demo clip recorded with a camera
+
+## Phase 10: One game
+
+- [x] Rhythm and Rush removed; Music is the default mode, with Learn and Recall for study
 
 ## Open questions
 

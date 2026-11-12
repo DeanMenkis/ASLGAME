@@ -201,3 +201,7 @@ At rest the print has two inks. The yellow plate fades in with the multiplier, s
 ## Results print the run
 
 The run's clean words are kept in order and printed on the results sheet as a broadside. The score says how well the run went; the poster shows what was actually spelled, and a run with no clean word leaves the sheet blank.
+
+## Three modes: Music, Learn, Recall
+
+Rhythm and Rush were removed. Rhythm locked each sign to a beat, which play testing had already found slow, and Rush was Music without a song. Music is the game, so it is first in the menu and chosen by default; Learn and Recall stay as the untimed ways to study. The beat-locked engine, its approach rings, early locks, and adaptive speed went with them. Music's engine, once shared with Rush, is now just the music session.

@@ -1,17 +1,12 @@
-"""Rhythm, Music, and Rush: timed play on the press.
-
-Rhythm: a red ring closes in on the blue ring around your hand; sign before the two plates register.
-Music and Rush: a fuse of ink runs down around your hand; sign before it is gone.
-"""
+"""Music: timed play on the press. A fuse of ink runs down around your hand; sign before it is gone."""
 
 import math
 
 import pygame
 
 from aslgame import config, theme
-from aslgame.game import rhythm, rush
+from aslgame.game import music
 from aslgame.game.app_flow import Action
-from aslgame.game.rhythm import NoteState
 from aslgame.game.scoring import EventKind, Judgement
 from aslgame.hand import FINGER_BASES, WRIST
 from aslgame.capture.print_look import Look
@@ -29,19 +24,17 @@ SCALE_STEPS = 8  # pitches of the Perfect sound as a combo climbs
 FUSE_WARNING = 0.25
 
 
-class RhythmScreen:
-    """clock is anything with time, pause, and resume: a GameClock, or a MediaPlayer in music mode.
+class MusicScreen:
+    """clock is anything with time, pause, and resume; in play it is the MediaPlayer, so the song is the clock.
 
     The clock starts after the countdown, so game time is negative while it runs.
     """
 
-    def __init__(self, fonts, signs, queue, session, clock, size_px, settings, sfx, run_length_s):
+    def __init__(self, fonts, signs, queue, session, clock, size_px, settings, sfx):
         self._signs = signs
         self.queue = queue
         self.session = session
-        self.rush = isinstance(session, rush.RushSession)
         self.clock = clock
-        self._run_length_s = run_length_s
         self._scorer = TargetScorer(signs)
         self._fonts = fonts
         self._strip = Strip(fonts.slab_mode, self.queue, size_px)
@@ -85,21 +78,15 @@ class RhythmScreen:
     def handle_event(self, event):
         return Action.PAUSE if is_key(event, PAUSE_KEYS) or self._top_bar.pause_clicked(event) else None
 
-    def _target_sign(self):
-        if self.rush:
-            return self.session.target()
-        note = self.session.target()
-        return None if note is None else note.sign
-
     def update(self, now_s, result):
         game_s = self.clock.time(now_s)
         self._update_countdown(game_s)
         if game_s < 0:
             return None
-        sign = self._target_sign()
+        sign = self.session.target()
         hand = result.hand if result else None
         score = self._scorer.update(result, sign) if sign is not None and hand is not None else None
-        (rush.update if self.rush else rhythm.update)(self.session, game_s, score)
+        music.update(self.session, game_s, score)
         center, radius = self._hit_ring(hand)
         for event in self.tally.events:
             self._play_sound(event)
@@ -128,8 +115,6 @@ class RhythmScreen:
             self._sfx.play("break")
         elif event.kind == EventKind.WORD:
             self._sfx.play("word")
-        elif event.kind == EventKind.LOCK:
-            self._sfx.play("lock")
 
     def draw(self, screen, now_s, hand):
         game_s = self.clock.time(now_s)
@@ -143,7 +128,7 @@ class RhythmScreen:
         canvas.fill((0, 0, 0, 0))
         fx.draw_under(canvas, now_s)
         self._strip.draw(canvas, self._strip_judgements)
-        sign_name = self._target_sign()
+        sign_name = self.session.target()
         center_px, hit_radius_px = self._hit_ring(hand)
         if sign_name is not None:
             sign = self._signs[sign_name]
@@ -152,22 +137,14 @@ class RhythmScreen:
             self._ghost.draw(canvas, sign, hand, matched, fingers_off)
             draw_motion(canvas, self._scorer, sign, hand, self._idle_wrist, now_s, True)
             self._fix_hint.draw(canvas, fingers_off)
-            if self.rush:
-                # The fuse is lit only once the countdown is over, so its ring never crosses the countdown's.
-                if game_s >= 0:
-                    self._draw_fuse(canvas, game_s, now_s, center_px, hit_radius_px)
-                self._card.draw(canvas, sign.name, 1.0 - self.session.fuse_fraction(max(0.0, game_s)))
-            else:
-                note = self.session.target()
-                self._card.draw(canvas, sign.name, 1.0 - note.approach_fraction(game_s))
-                if note.state != NoteState.WAITING:
-                    self._draw_approach(canvas, note, game_s, center_px, hit_radius_px)
-        self._draw_locked(canvas, center_px, hit_radius_px)
+            # The fuse is lit only once the countdown is over, so its ring never crosses the countdown's.
+            if game_s >= 0:
+                self._draw_fuse(canvas, game_s, now_s, center_px, hit_radius_px)
+            self._card.draw(canvas, sign.name, 1.0 - self.session.fuse_fraction(max(0.0, game_s)))
         fx.draw_over(canvas, now_s)
         screen.blit(canvas, fx.shake_offset(now_s))
         self._top_bar.draw(screen)
-        if not self.rush or self.session.bpm:
-            self._draw_beat(screen, game_s)
+        self._draw_beat(screen, game_s)
         self._draw_clock(screen, game_s)
         fx.draw_hud(screen, self.tally.score, self.tally.multiplier, self._top_bar.pause_rect.left - theme.GRID_PX * 3, now_s)
         fx.draw_chads(screen, now_s)
@@ -181,7 +158,7 @@ class RhythmScreen:
         """The fuse: an arc of ink that runs down, leaving dots where it has been. Near the end it swells, so the warning is in its shape too."""
         fuse = self.session.fuse_fraction(max(0.0, game_s))
         ring_px = radius_px
-        if self.session.bpm and game_s >= 0:
+        if game_s >= 0:
             # It breathes with the beat, so the music shows on the hand.
             ring_px *= 1.0 + 0.06 * (1.0 - self.session.beat_phase(game_s)) ** 3
         width = self._ring_width(radius_px)
@@ -189,27 +166,6 @@ class RhythmScreen:
             width *= 1.0 + 0.35 * abs(math.sin(now_s * 10))
         press.draw_dot_ring(canvas, center_px, ring_px, fuse, theme.PAPER, 4)
         press.draw_arc(canvas, center_px, ring_px, fuse, width, press.heat_color(self._fx.heat))
-
-    def _draw_approach(self, canvas, note, game_s, center_px, hit_radius_px):
-        """Rhythm: a blue ring on the hand and a red ring closing in on it. When the two plates meet they print
-        as one dark ring: that is the beat."""
-        hittable = note.state == NoteState.HITTABLE
-        width = self._ring_width(hit_radius_px) * 0.6
-        press.draw_arc(canvas, center_px, hit_radius_px, 1.0, width, theme.PLUM if hittable else theme.BLUE)
-        scale = 1.0 + (theme.APPROACH_RING_START_SCALE - 1.0) * note.approach_fraction(game_s)
-        if scale > 1.02:
-            press.draw_arc(canvas, center_px, hit_radius_px * scale, 1.0, width, theme.RED)
-
-    def _draw_locked(self, canvas, center_px, hit_radius_px):
-        """Rhythm: signs made ahead of their beat wait as ink dots on the ring until it lands."""
-        if self.rush:
-            return
-        locked = [n for n in self.session.notes if n.locked_s is not None and n.judgement is None]
-        for index, _ in enumerate(locked):
-            angle = -math.pi / 2 + (index + 1) * 0.5
-            at = (center_px[0] + math.cos(angle) * hit_radius_px, center_px[1] + math.sin(angle) * hit_radius_px)
-            pygame.draw.circle(canvas, theme.PAPER, at, theme.GRID_PX * 1.5 + 3)
-            pygame.draw.circle(canvas, press.heat_color(self._fx.heat), at, theme.GRID_PX * 1.5)
 
     def _draw_countdown(self, screen, game_s):
         """3, 2, 1, Go: each number inside a registration mark whose ring prints itself in."""
@@ -233,10 +189,7 @@ class RhythmScreen:
 
     def _draw_clock(self, screen, game_s):
         """Time left in the run, at the left of the band."""
-        if self.rush:
-            left_s = self.session.time_left_s(max(0.0, game_s)) if game_s >= 0 else self.session.length_s
-        else:
-            left_s = max(0.0, self._run_length_s - max(0.0, game_s))
+        left_s = self.session.time_left_s(max(0.0, game_s))
         value = math.ceil(left_s)
         if value != self._clock_value:
             self._clock_value = value

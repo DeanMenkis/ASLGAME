@@ -76,56 +76,35 @@ MASTERY_UNTESTED_NEED = 0.4
 PRACTISE_SHARPNESS = 4
 PRACTISE_BASE_WEIGHT = 0.0005
 
-# Levels: Easy, Medium, Hard. Each sets how many beats a sign gets and which words are drawn.
+# Levels: Easy, Medium, Hard. Each sets which words are drawn and how long a sign's fuse is.
 LEVEL_NAMES = ("Easy", "Medium", "Hard")
-LEVEL_BEATS_PER_NOTE = (4, 2, 1)
 # Words up to this many letters belong to each level; longer ones are Hard.
 LEVEL_MAX_WORD_LETTERS = (4, 6)
 # Run lengths offered in the menu. A song shorter than the choice plays to its end.
 LENGTHS_S = (30, 60, 120, 240)
 DEFAULT_LENGTH_S = 60
 
-# Rhythm mode
-RHYTHM_BPM = 90
-APPROACH_BEATS = 3
-RHYTHM_LEAD_IN_S = 2.5
+# Charts leave at least this many beats before the first beat that counts.
+CHART_LEAD_BEATS = 4
 # Two tracker results in a row: enough to drop a one-frame flicker, short enough for fast fingerspelling.
-RHYTHM_HOLD_S = 0.06
-# A sign made before its beat is held and lands on the beat. After the beat, lateness is judged
-# as a share of the hit window: up to this share is Perfect, then Good, then OK.
-HIT_WINDOW_S = 0.5
-PERFECT_FRACTION = 0.3
-GOOD_FRACTION = 0.6
-# Fast charts shrink the window so one sign's window never runs deep into the next sign's time.
-HIT_WINDOW_INTERVAL_FRACTION = 0.6
-FEEDBACK_S = 0.5
-# J and Z are drawn, so they get at least two note slots and at least this long.
-MOTION_MIN_SLOT_S = 1.4
-MOTION_MIN_SLOTS = 2
+TIMED_HOLD_S = 0.06
 
 # Music mode stops this long before the song's end, so the last sign is never cut off.
 MUSIC_END_MARGIN_S = 3.0
 MUSIC_FADE_MS = 1200
 
-# Rush mode: no beat. Each sign must land before its fuse burns down, and faster is better.
-RUSH_FUSE_S = (6.0, 4.5, 3.0)
-RUSH_PERFECT_S = 0.8
-RUSH_GOOD_S = 1.6
-# Drawn letters take longer, so their speed limits are stretched by this.
-RUSH_MOTION_FACTOR = 2.0
-# A word signed without a miss adds time to the clock.
-RUSH_WORD_BONUS_S = 0.75
-RUSH_LEAD_IN_S = 0.3
-# The quickest anyone signs through the camera, used to draw enough words for a run.
-RUSH_FASTEST_SIGN_S = 0.1
-
-# Music: Rush on a song. Each sign's fuse is this many beats per level; Perfect and Good are shares of it.
-FLOW_FUSE_BEATS = (6, 4, 3)
-FLOW_PERFECT_FRACTION = 0.35
-FLOW_GOOD_FRACTION = 0.65
+# Music: the next sign appears the moment one lands. Each sign's fuse is this many beats per level,
+# and Perfect and Good are shares of it.
+FUSE_BEATS = (6, 4, 3)
+PERFECT_FRACTION = 0.35
+GOOD_FRACTION = 0.65
+# Drawn letters (J, Z) take longer, so their fuse is stretched by this.
+MOTION_FUSE_FACTOR = 2.0
 # A sign landing this close to a beat scores this much more.
 ON_BEAT_WINDOW_S = 0.09
 ON_BEAT_BONUS = 1.5
+# The quickest anyone signs through the camera, used to draw enough words for a run.
+FASTEST_SIGN_S = 0.1
 
 # The press. The multiplier is heat: the camera is printed in blue and red at first, a yellow plate joins as heat rises,
 # and halftone dots climb from the bottom edge. A miss slips the plates out of register and the heat is gone.
@@ -166,12 +145,11 @@ SLAM_S = 0.09
 COUNTDOWN_STEPS = 3
 COUNTDOWN_STEP_S = 0.6
 
-# Multiplier: x1.0 plus a little per hit in the combo, more per Perfect in a row, plus speed. Capped at x10.
+# Multiplier: x1.0 plus a little per hit in the combo, and more per Perfect in a row. Capped at x10.
 COMBO_CAP = 100
 COMBO_BONUS = 0.05
 PERFECT_STREAK_BONUS = 0.1
 PERFECT_STREAK_CAP = 4.0
-SPEED_BONUS = 1.0
 MULTIPLIER_MAX = 10.0
 WORD_BONUS_PER_SIGN = 50
 WORD_BONUS_MIN_SIGNS = 2
@@ -183,19 +161,12 @@ PARTICLE_GRAVITY = 600.0
 POP_LIFE_S = 0.9
 BANNER_LIFE_S = 1.1
 WORD_BANNER_LIFE_S = 1.3
-SHOCKWAVE_LIFE_S = 0.4
 SCORE_ROLL_RATE = 0.15
 PULSE_S = 0.3
 SHAKE_S = 0.22
 # The hit sound climbs one step of its scale every this many hits in a combo.
 PITCH_STEP_COMBO = 4
 GRADES = (("S", 0.95), ("A", 0.88), ("B", 0.75), ("C", 0.55), ("D", 0.0))
-SPEED_WINDOW_NOTES = 4
-SPEED_UP_ACCURACY = 0.8
-SPEED_DOWN_ACCURACY = 0.4
-SPEED_STEP = 1.1
-SPEED_MIN = 0.75
-SPEED_MAX = 2.0
 RESULTS_WEAKEST_COUNT = 3
 
 # Dataset import

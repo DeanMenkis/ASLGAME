@@ -1,4 +1,4 @@
-"""Scoring shared by the timed modes: judgements, combo, the multiplier and its tiers, word bonuses, and grades."""
+"""Scoring for Music: judgements, combo, the multiplier and its tiers, word bonuses, and grades."""
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
@@ -18,7 +18,6 @@ ACCURACY = {Judgement.PERFECT: 1.0, Judgement.GOOD: 0.8, Judgement.OK: 0.5, Judg
 
 
 class EventKind(Enum):
-    LOCK = auto()  # a sign was recognized ahead of its beat
     HIT = auto()
     MISS = auto()
     TIER_UP = auto()  # the multiplier crossed a whole number
@@ -61,15 +60,14 @@ def tier(multiplier_value):
     return int(multiplier_value)
 
 
-def multiplier(tally, speed=1.0):
-    """Grows with combo, with a run of Perfects, and with speed: bigger, faster, steadier play pays more."""
+def multiplier(tally):
+    """Grows with combo and with a run of Perfects: longer, cleaner play pays more."""
     combo_part = min(tally.combo, config.COMBO_CAP) * config.COMBO_BONUS
     streak_part = min(tally.perfect_streak * config.PERFECT_STREAK_BONUS, config.PERFECT_STREAK_CAP)
-    speed_part = max(0.0, speed - 1.0) * config.SPEED_BONUS
-    return min(config.MULTIPLIER_MAX, round(1.0 + combo_part + streak_part + speed_part, 1))
+    return min(config.MULTIPLIER_MAX, round(1.0 + combo_part + streak_part, 1))
 
 
-def record(tally, sign, judgement, ends_word=False, speed=1.0, bonus=1.0):
+def record(tally, sign, judgement, ends_word=False, bonus=1.0):
     """Score one resolved sign. The only place a tally changes."""
     tally.results.append((sign, judgement))
     before = tally.multiplier
@@ -80,7 +78,7 @@ def record(tally, sign, judgement, ends_word=False, speed=1.0, bonus=1.0):
         tally.combo += 1
         tally.max_combo = max(tally.max_combo, tally.combo)
         tally.perfect_streak = tally.perfect_streak + 1 if judgement == Judgement.PERFECT else 0
-    tally.multiplier = multiplier(tally, speed)
+    tally.multiplier = multiplier(tally)
     tally.max_multiplier = max(tally.max_multiplier, tally.multiplier)
     tally.last_points = int(POINTS[judgement] * tally.multiplier * bonus)
     tally.score += tally.last_points

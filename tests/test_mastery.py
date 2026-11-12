@@ -81,10 +81,6 @@ class PractiseDeckTest(unittest.TestCase):
 
 
 class PractiseRunTest(unittest.TestCase):
-    def test_deck_run_moves_to_the_practise_deck(self):
-        played = (DECKS_BY_NAME["wild"], 1, 60, "Rush/wild/Medium/60")
-        self.assertEqual(mastery.practise_run(played), (PRACTISE, 1, 60, "Rush/practise/Medium/60"))
-
     def test_song_keeps_its_music_and_changes_deck(self):
         chart = Chart("bouncer", "Bouncer", "bouncer.mp3", 128.0, 0.5, "party")
         item, level, length_s, key = mastery.practise_run((chart, 0, 60, "Music/bouncer/Easy/60"))
@@ -93,8 +89,8 @@ class PractiseRunTest(unittest.TestCase):
         self.assertEqual(mastery.practise_run((item, level, length_s, key)), (item, level, length_s, key))
 
     def test_practise_from_results_replays_the_mode(self):
-        self.assertEqual(next_state(AppState.RESULTS, Action.PRACTISE, AppState.RUSH), AppState.RUSH)
-        self.assertEqual(next_state(AppState.MENU, Action.PRACTISE, AppState.RUSH), AppState.MENU)
+        self.assertEqual(next_state(AppState.RESULTS, Action.PRACTISE, AppState.MUSIC), AppState.MUSIC)
+        self.assertEqual(next_state(AppState.MENU, Action.PRACTISE, AppState.MUSIC), AppState.MENU)
 
 
 if __name__ == "__main__":

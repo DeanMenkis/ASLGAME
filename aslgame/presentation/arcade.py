@@ -56,7 +56,6 @@ class ArcadeFx:
         self._stamps = {}
         self._bursts = []  # (center, radius, born_s, color): dots thrown out from the hand, under it
         self._over = []  # (surface, center, born_s, life_s, rise_px, slam): labels, pops, banners
-        self._ripples = []  # (center, radius, born_s)
         self._chads = np.zeros((0, 9))  # x, y, vx, vy, born, life, size, ink index, gravity
         self._chad_debt = 0.0
         self._rng = np.random.default_rng()
@@ -105,8 +104,6 @@ class ArcadeFx:
             surface = press.overprint_text(self._word_font, f"{event.word}  +{event.points:,}", theme.BLUE, theme.RED, (4, 4), halo_px=4)
             self._over.append((surface, (self._size_px[0] // 2, int(self._size_px[1] * 0.24)), now_s, config.WORD_BANNER_LIFE_S,
                                theme.GRID_PX * 2, True))
-        elif event.kind == EventKind.LOCK:
-            self._ripples.append((center, radius_px * 0.5, now_s))
 
     def _misprint(self, now_s):
         """A miss: the plates slip, the yellow drops out, and the dots fall away."""
@@ -180,7 +177,6 @@ class ArcadeFx:
             self._chads = c
         self._bursts = [item for item in self._bursts if now_s - item[2] < BURST_LIFE_S]
         self._over = [item for item in self._over if now_s - item[2] < item[3]]
-        self._ripples = [r for r in self._ripples if now_s - r[2] < config.SHOCKWAVE_LIFE_S]
 
     def _float_dots(self, now_s, frame_s):
         """Once hot, loose dots lift off the field at the bottom and drift up."""
@@ -221,9 +217,6 @@ class ArcadeFx:
                 pygame.draw.circle(canvas, color, at, dot_px)
 
     def draw_over(self, canvas, now_s):
-        for center, radius, born_s in self._ripples:
-            age = (now_s - born_s) / config.SHOCKWAVE_LIFE_S
-            pygame.draw.circle(canvas, press.heat_color(self.heat), center, radius * (1 + age), max(1, int(4 * (1 - age))))
         for surface, (x, y), born_s, life_s, rise_px, slam in self._over:
             age = (now_s - born_s) / life_s
             scale = 1.0 + 0.5 * max(0.0, 1 - (now_s - born_s) / config.SLAM_S) if slam else 1.0

@@ -88,7 +88,7 @@ def main():
     loud_frame = int(np.argmax(energy > energy.max() * LOUD_FRACTION))
     first_beat = int(np.ceil((loud_frame / frames_per_s - phase_s) / beat_s))
     # Start on a bar line, and leave room for the approach ring.
-    first_beat = max(first_beat + (-first_beat) % 4, config.APPROACH_BEATS + 1)
+    first_beat = max(first_beat + (-first_beat) % 4, config.CHART_LEAD_BEATS)
     first_note_s = phase_s + first_beat * beat_s
 
     chart = {

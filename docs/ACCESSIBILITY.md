@@ -9,7 +9,7 @@ Audit of every cue in the game against the rules in the architecture doc: nothin
 | Target sign | Silhouette over the hand and a large picture on the reference card | Shape | None |
 | Sign matched | Silhouette fills, "Hold it" label, card bar fills | Fill, text, and motion | Chime when confirmed |
 | Fingers to fix | Fingers traced on the player's hand, names listed under the card | Finger names in text | None |
-| Timing | A red ring closing on the blue ring around the palm, beat dot growing and shrinking | Size and motion | Music beat (optional) |
+| Timing | The fuse arc around the palm shortening, beat dot growing and shrinking | Size and motion | Music beat (optional) |
 | Judgement | A label reading "PERFECT", "GOOD", "OK", or "MISS" by the hand | Text | Distinct sound per judgement |
 | Score and multiplier | Rolling score and "x2.4" in the top bar, "+300" pops on each hit | Text and motion | None |
 | Combo milestone | "10 combo" banner | Text | Sparkle |

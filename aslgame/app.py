@@ -9,13 +9,11 @@ import pygame
 
 from aslgame import config, theme
 from aslgame.capture.print_look import Look
-from aslgame.game import mastery, rush, scoring
-from aslgame.game.app_flow import PLAY_STATES, TIMED_STATES, Action, AppState, next_state
+from aslgame.game import mastery, music, scoring
+from aslgame.game.app_flow import PLAY_STATES, Action, AppState, next_state
 from aslgame.game.chart import load_charts
-from aslgame.game.clock import GameClock
 from aslgame.game.motion import with_motion_letters
-from aslgame.game.rhythm import RhythmSession, signs_for
-from aslgame.game.sign_queue import make_queue, word_ends
+from aslgame.game.sign_queue import make_queue
 from aslgame.game.words import DECKS_BY_NAME, draw_words
 from aslgame.media.player import MediaPlayer, load_tracks
 from aslgame.media.sfx import Sfx
@@ -25,9 +23,9 @@ from aslgame.presentation.screens.boot import BootScreen
 from aslgame.presentation.screens.common import is_key
 from aslgame.presentation.screens.learn import LearnScreen
 from aslgame.presentation.screens.menu import MenuScreen
+from aslgame.presentation.screens.music import MusicScreen
 from aslgame.presentation.screens.paused import PausedScreen
 from aslgame.presentation.screens.results import ResultsScreen
-from aslgame.presentation.screens.rhythm import RhythmScreen
 from aslgame.records import load_records, save_records, update_record
 from aslgame.settings import load_settings, save_settings
 from aslgame.signs import load_signs
@@ -77,24 +75,12 @@ class App:
             words = draw(item, config.LEARN_RUN_SIGNS)
             self.screens[state] = LearnScreen(fonts, self.signs, " ".join(words), self.size_px, self.settings, self.sfx,
                                               recall=state == AppState.RECALL)
-        elif state == AppState.RHYTHM:
-            beats = config.LEVEL_BEATS_PER_NOTE[level]
-            words = draw(item, signs_for(length_s, config.RHYTHM_BPM * config.SPEED_MAX, beats))
-            session = RhythmSession([c for w in words for c in w], word_ends(words), beats_per_note=beats,
-                                    last_due_s=length_s - config.HIT_WINDOW_S - config.FEEDBACK_S)
-            self.screens[state] = RhythmScreen(fonts, self.signs, make_queue(" ".join(words)), session, GameClock(start_s),
-                                               self.size_px, self.settings, self.sfx, length_s)
-        elif state == AppState.MUSIC:
-            words = draw(DECKS_BY_NAME[item.deck], rush.signs_for(length_s))
-            session = rush.flow_session([c for w in words for c in w], word_ends(words), item, level, length_s)
+        else:
+            words = draw(DECKS_BY_NAME[item.deck], music.signs_for(length_s))
             self.player = MediaPlayer(self.tracks[item.name], start_s, length_s)
-            self.screens[state] = RhythmScreen(fonts, self.signs, make_queue(" ".join(words)), session, self.player, self.size_px,
-                                               self.settings, self.sfx, length_s)
-        elif state == AppState.RUSH:
-            words = draw(item, rush.signs_for(length_s))
-            session = rush.RushSession([c for w in words for c in w], word_ends(words), float(length_s), config.RUSH_FUSE_S[level])
-            self.screens[state] = RhythmScreen(fonts, self.signs, make_queue(" ".join(words)), session, GameClock(start_s),
-                                               self.size_px, self.settings, self.sfx, length_s)
+            self.screens[state] = MusicScreen(fonts, self.signs, make_queue(" ".join(words)),
+                                              music.make_session(words, item, level, length_s), self.player, self.size_px,
+                                              self.settings, self.sfx)
         self.play_state = state
         self.played = played
 
@@ -120,9 +106,9 @@ class App:
             self.start_play(new_state, played, now_s)
         elif self.state == AppState.RESULTS and new_state in PLAY_STATES:
             self.start_play(new_state, mastery.practise_run(self.played) if action == Action.PRACTISE else self.played, now_s)
-        elif new_state == AppState.PAUSED and self.state in TIMED_STATES:
+        elif new_state == AppState.PAUSED and self.state == AppState.MUSIC:
             self.screens[self.state].pause(now_s)
-        elif self.state == AppState.PAUSED and new_state in TIMED_STATES:
+        elif self.state == AppState.PAUSED and new_state == AppState.MUSIC:
             self.screens[new_state].resume(now_s)
         elif new_state == AppState.RESULTS:
             self.stop_music()

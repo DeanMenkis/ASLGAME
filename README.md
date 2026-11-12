@@ -2,11 +2,17 @@
 
 Learn the ASL alphabet by signing along to music.
 
-![Gameplay: signing letters to the beat while the score and multiplier climb](docs/demo.gif)
+![Play: the camera printed in blue, red, and yellow ink, a fuse ring around the hand, and the word set in type blocks along the bottom](docs/play.png)
+
+![Menu: a poster with the song list, a live print of the camera, and the alphabet as a case of type](docs/menu.png)
+
+![Results: the grade, the letters to practise, and the words signed without a miss printed as a poster](docs/results.png)
+
+The three pictures above are rendered from the game over a still photo. The photo below is from an earlier version.
 
 ![Three players dancing while one signs letters at the webcam, with the game projected behind them](docs/demo.jpg)
 
-Apps like Duolingo work well for spoken languages but leave out visual ones like American Sign Language. ASLGAME is a rhythm game in the spirit of osu!: your webcam watches your hand, a target handshape appears over it, and you match each letter on the beat. The goal is to bring movement, music, and play into learning ASL, in a classroom or at home.
+Apps like Duolingo work well for spoken languages but leave out visual ones like American Sign Language. ASLGAME is a music game in the spirit of osu!: your webcam watches your hand, a target handshape appears over it, and you spell words to a song, one letter at a time. The goal is to bring movement, music, and play into learning ASL, in a classroom or at home.
 
 Runs locally.
 
@@ -42,13 +48,11 @@ The first run takes a few minutes to set up, then the game opens. To play again 
 
 ## Modes
 
+- **Music**: sign along to a song. Each letter has a fuse a few beats long; sign it before the fuse runs out, and the next letter appears at once. Faster signs score better, and a sign that lands on a beat scores more.
 - **Learn**: untimed. Match each handshape at your own pace.
 - **Recall**: untimed and harder. Only the letter is shown; sign it from memory.
-- **Rhythm**: handshapes arrive on a beat. Speed adapts to how well you sign.
-- **Music**: sign along to a song. Rhythm mode with a soundtrack.
-- **Rush**: no beat. Sign each letter before its fuse burns out; clean words add time.
 
-The game remembers how well you sign each letter. The alphabet in the menu shows which letters you know and which need work, and the Practise deck deals words that use your weak letters, in any mode.
+The game remembers how well you sign each letter. The alphabet in the menu shows which letters you know and which need work, and the Practise deck deals words that use your weak letters: pick it in Learn or Recall, or press Practise after a song.
 
 Timing cues are always visual. Sound is never required to play.
 

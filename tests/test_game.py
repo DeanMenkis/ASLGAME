@@ -80,18 +80,18 @@ class AppFlowTest(unittest.TestCase):
             state = next_state(state, action, AppState.LEARN)
             self.assertEqual(state, expected)
 
-    def test_rhythm_to_results(self):
+    def test_music_to_results(self):
         state = AppState.MENU
         for action, expected in [
-            (Action.START_RHYTHM, AppState.RHYTHM),
+            (Action.START_MUSIC, AppState.MUSIC),
             (Action.PAUSE, AppState.PAUSED),
-            (Action.RESUME, AppState.RHYTHM),
+            (Action.RESUME, AppState.MUSIC),
             (Action.FINISH, AppState.RESULTS),
-            (Action.RETRY, AppState.RHYTHM),
+            (Action.RETRY, AppState.MUSIC),
             (Action.FINISH, AppState.RESULTS),
             (Action.TO_MENU, AppState.MENU),
         ]:
-            state = next_state(state, action, AppState.RHYTHM)
+            state = next_state(state, action, AppState.MUSIC)
             self.assertEqual(state, expected)
 
     def test_recall_pauses_and_resumes(self):

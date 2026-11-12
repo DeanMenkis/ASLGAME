@@ -19,8 +19,8 @@ The main loop owns the window and runs at a steady frame rate. Camera capture an
 - **Capture**: reads camera frames.
 - **Tracking**: turns frames into hand landmarks.
 - **Matching**: normalizes landmarks and scores them against a target handshape. Pure math, no GUI.
-- **Game**: charts, timing, judgement, scoring, speed changes. Pure logic, no GUI.
-- **Presentation**: draws the camera feed, ghost hand, approach circles, HUD, and menus.
+- **Game**: charts, timing, judgement, scoring, letter mastery. Pure logic, no GUI.
+- **Presentation**: draws the camera feed, ghost hand, fuse ring, HUD, and menus.
 - **Media**: plays music and reports the playback clock.
 
 Dependencies point downward only. Game logic can be tested without a camera or window.
@@ -30,14 +30,8 @@ Dependencies point downward only. Game logic can be tested without a camera or w
 **App**: the top-level screen.
 
 ```
-Boot -> Menu -> (Learn | Recall | Rhythm | Music) -> Results -> Menu
+Boot -> Menu -> (Music -> Results | Learn | Recall) -> Menu
                               \-> Paused -/
-```
-
-**Note**: one handshape in a chart.
-
-```
-Waiting -> Approaching -> Hittable -> (Hit | Missed) -> Done
 ```
 
 **Match detector**: turns noisy per-frame scores into a clean "matched" event.
@@ -60,6 +54,6 @@ The game clock is the single source of truth for when notes are due. In music mo
 
 ## Accessibility rules
 
-- Every cue that matters is visible: approach circles, beat pulse, text judgements.
+- Every cue that matters is visible: the fuse ring, beat pulse, text judgements.
 - Color is never the only signal. Pair it with shape, text, or motion.
 - Sound adds feel but is never required.

@@ -85,7 +85,6 @@ def _waves():
         "click": _click(),
         "tick": _tone(A5, 0.12, 25),
         "go": _sequence([E6, B6], 0.03, 0.4, 8),
-        "lock": _tone(B6, 0.06, 60, (1.0,)),
         "tier": _sequence([E5, B5, E6, GS6, B6, E6 * 2], 0.035, 0.3, 10),
         "word": _sequence([B5, E6, GS6], 0.05, 0.3, 12),
         "break": _buzz(0.45),

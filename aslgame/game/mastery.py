@@ -4,7 +4,6 @@ from dataclasses import replace
 from enum import Enum, auto
 
 from aslgame import config
-from aslgame.game.chart import Chart
 from aslgame.game.scoring import ACCURACY
 from aslgame.game.words import PRACTISE
 
@@ -56,11 +55,9 @@ def need(letters, letter):
 
 
 def practise_run(played):
-    """The same mode, level, and length as a finished run, on the Practise deck, with its own best score."""
-    item, level, length_s, key = played
+    """The same song, level, and length as a finished run, on the Practise deck, with its own best score."""
+    chart, level, length_s, key = played
+    if chart.deck == PRACTISE.name:
+        return played
     mode, name, rest = key.split("/", 2)
-    if isinstance(item, Chart):
-        if item.deck == PRACTISE.name:
-            return played
-        return replace(item, deck=PRACTISE.name), level, length_s, f"{mode}/{name}+{PRACTISE.name}/{rest}"
-    return PRACTISE, level, length_s, f"{mode}/{PRACTISE.name}/{rest}"
+    return replace(chart, deck=PRACTISE.name), level, length_s, f"{mode}/{name}+{PRACTISE.name}/{rest}"

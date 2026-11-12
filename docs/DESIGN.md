@@ -21,7 +21,7 @@ Fingerspelling is spelling, so the game is a press and the player is setting typ
 - **Color is the reward.** The multiplier is heat. As it climbs the yellow plate joins the print and the room turns full color, halftone dots rise from the bottom edge in one ink, then two, then three, and loose dots lift off. A miss is a misprint: the plates slip out of register, the yellow drops out, and the dots fall away.
 - **Type is wood type.** Letters, numbers, and titles are a bold slab; labels are condensed capitals. Big type is printed twice, red under blue, so both plates show.
 - **Panels are paper stickers** with a blue edge and a hard blue shadow, never soft. Buttons lift off their shadow when hovered or focused.
-- **Timing is registration.** In Rhythm a red ring closes on the blue ring around the hand; when the two plates meet, that is the beat. The fuse in Music and Rush is an arc of ink that leaves dots where it has been.
+- **Time is ink.** Each letter's fuse is an arc of ink around the hand that runs down and leaves dots where it has been; it breathes with the beat.
 - **The word strip is type blocks.** Each signed letter is printed in its judgement's ink, with dots and text as well as color.
 - **The menu is a poster.** Flat discs of ink drift behind it, the camera sits in a proof frame with trim marks, and the letter it reads is set on a yellow star. The alphabet is a case of type: a solid block is a letter you know.
 - **The results are a proof sheet.** The grade sits in a registration mark, and the words signed without a miss are printed as a broadside, each line stretched to the full measure, so every run ends with a poster of what was spelled.
